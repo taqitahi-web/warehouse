@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPFBD — Warehouse Management System</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="topbar">
+  <div class="topbar-brand">EPFBD — WMS<small>Warehouse Management System</small></div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-nav">
+    <a href="index.html" class="active">Dashboard</a>
+    <a href="manpower/all_manpower.html">Manpower</a>
+    <a href="warehouse/wh_list.html">Warehouse</a>
+    <a href="equipment/forklift.html">Equipment</a>
+    <a href="kpi/staff_kpi.html">KPI</a>
+    <a href="reports/pdf_library.html">Reports</a>
+    <a href="sop/policies.html">SOP</a>
+    <a href="incident/incident_log.html">Incidents</a>
+    <a href="pallet/wooden_pallet.html">Pallets</a>
+    <a href="vendor/vendor_list.html">Vendors</a>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Theme</span>
+    <div class="theme-dots">
+      <div class="tdot on" data-t="slate"  onclick="setTheme('slate')"  title="Slate Night"></div>
+      <div class="tdot"    data-t="arctic" onclick="setTheme('arctic')" title="Arctic Light"></div>
+      <div class="tdot"    data-t="ember"  onclick="setTheme('ember')"  title="Ember Gold"></div>
+    </div>
+    <span class="ctrl-label">Font</span>
+    <div class="font-sw">
+      <button class="fbtn on" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn"    data-f="exo"    onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="clock" class="clock">--:--:--</div>
+  </div>
+</nav>
+<aside class="sidebar">
+  <div class="sb-sec">
+    <div class="sb-head">Main</div>
+    <a class="sb-link on" href="index.html">🏠 Dashboard</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-head">Manpower</div>
+    <a class="sb-link" href="manpower/all_manpower.html">👥 All Manpower</a>
+    <a class="sb-link" href="manpower/EPF_manpower.html"><span class="sb-badge">EPF</span> EPF</a>
+    <a class="sb-link" href="manpower/TGL_manpower.html"><span class="sb-badge">TGL</span> TGL</a>
+    <a class="sb-link" href="manpower/BGL_manpower.html"><span class="sb-badge">BGL</span> BGL</a>
+    <a class="sb-link" href="manpower/GTM_manpower.html"><span class="sb-badge">GTM</span> GTM</a>
+    <a class="sb-link" href="manpower/RFL_manpower.html"><span class="sb-badge">RFL</span> RFL</a>
+    <a class="sb-link" href="manpower/EC_manpower.html"><span class="sb-badge">EC</span> EC</a>
+    <a class="sb-link" href="manpower/organogram.html">🌳 Organogram</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-head">Warehouse</div>
+    <a class="sb-link" href="warehouse/wh_list.html">🏭 WH List</a>
+    <a class="sb-link" href="warehouse/stock_report.html">📦 Stock</a>
+    <a class="sb-link" href="warehouse/delivery_history.html">🚚 Delivery</a>
+    <a class="sb-link" href="warehouse/floor_layout.html">🗺️ Floor Layout</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-head">Equipment</div>
+    <a class="sb-link" href="equipment/forklift.html">🏗️ Forklift</a>
+    <a class="sb-link" href="equipment/pda_devices.html">📱 PDA / Scanner</a>
+    <a class="sb-link" href="equipment/maintenance_log.html">🔧 Maintenance</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-head">Performance</div>
+    <a class="sb-link" href="kpi/staff_kpi.html">⭐ KPI</a>
+    <a class="sb-link" href="kpi/weekly_report.html">📅 Weekly</a>
+    <a class="sb-link" href="kpi/monthly_report.html">📆 Monthly</a>
+    <a class="sb-link" href="kpi/overtime.html">⏱️ Overtime</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-head">Reports</div>
+    <a class="sb-link" href="reports/pdf_library.html">📚 PDF Library</a>
+    <a class="sb-link" href="reports/materials.html">📋 Materials</a>
+  </div>
+  <div class="sb-sec">
+    <div class="sb-head">Others</div>
+    <a class="sb-link" href="sop/policies.html">📜 SOP</a>
+    <a class="sb-link" href="incident/incident_log.html">⚠️ Incidents</a>
+    <a class="sb-link" href="pallet/wooden_pallet.html">🪵 Pallets</a>
+    <a class="sb-link" href="vendor/vendor_list.html">🤝 Vendors</a>
+  </div>
+</aside>
+<main class="main">
+  <div class="pg-hdr fade-up" data-bg="EPF">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <h1>Evergreen Products Factory BD Ltd.</h1>
+        <p>Warehouse Management System — 6 active warehouse units</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:12px">
+          <span class="chip">EPF</span><span class="chip">TGL</span><span class="chip">RFL</span><span class="chip">EC</span><span class="chip">BGL</span><span class="chip">GTM</span>
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-family:var(--fh);font-size:10px;color:var(--text-m);letter-spacing:1px">TODAY</div>
+        <div id="today-date" style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--accent)"></div>
+      </div>
+    </div>
+  </div>
+  <div class="alert-strip fade-up">
+    <div class="alert alert-danger"><div class="adot"></div>Forklift #3 maintenance overdue — EPF</div>
+    <div class="alert alert-warn"><div class="adot"></div>3 KPI reports pending approval</div>
+    <div class="alert alert-ok"><div class="adot"></div>All 6 warehouses operational</div>
+  </div>
+  <div class="stat-row fade-up">
+    <div class="stat-box"><div class="stat-v">222</div><div class="stat-l">Total Manpower</div></div>
+    <div class="stat-box"><div class="stat-v">42</div><div class="stat-l">Officers</div></div>
+    <div class="stat-box"><div class="stat-v">170</div><div class="stat-l">Labour</div></div>
+    <div class="stat-box"><div class="stat-v">10</div><div class="stat-l">Drivers</div></div>
+    <div class="stat-box"><div class="stat-v">6</div><div class="stat-l">Warehouses</div></div>
+  </div>
+  <div class="sec-ttl fade-up">Warehouse Status</div>
+  <div class="wh-grid fade-up">
+    <div class="wh-card"><div class="wh-code">EPF</div><div class="wh-name">Evergreen Products Factory</div><div class="wh-row"><span>Officers</span><span>35</span></div><div class="wh-row"><span>Labour</span><span>103</span></div><div class="wh-row"><span>Drivers</span><span>7</span></div><div class="wh-row"><span>Total</span><span style="color:var(--accent)">145</span></div><div class="wh-row"><span>Status</span><span style="color:var(--success)">✓ Active</span></div></div>
+    <div class="wh-card"><div class="wh-code">TGL</div><div class="wh-name">TGL Warehouse</div><div class="wh-row"><span>Officers</span><span>22</span></div><div class="wh-row"><span>Labour</span><span>43</span></div><div class="wh-row"><span>Drivers</span><span>5</span></div><div class="wh-row"><span>Total</span><span style="color:var(--accent)">70</span></div><div class="wh-row"><span>Status</span><span style="color:var(--success)">✓ Active</span></div></div>
+    <div class="wh-card"><div class="wh-code">BGL</div><div class="wh-name">BGL Warehouse</div><div class="wh-row"><span>Officers</span><span>2</span></div><div class="wh-row"><span>Labour</span><span>2</span></div><div class="wh-row"><span>Total</span><span style="color:var(--accent)">4</span></div><div class="wh-row"><span>Status</span><span style="color:var(--success)">✓ Active</span></div></div>
+    <div class="wh-card"><div class="wh-code">GTM</div><div class="wh-name">GTM Warehouse</div><div class="wh-row"><span>Officers</span><span>1</span></div><div class="wh-row"><span>Labour</span><span>2</span></div><div class="wh-row"><span>Total</span><span style="color:var(--accent)">3</span></div><div class="wh-row"><span>Status</span><span style="color:var(--success)">✓ Active</span></div></div>
+    <div class="wh-card"><div class="wh-code">RFL</div><div class="wh-name">RFL Warehouse</div><div class="wh-row"><span>Total</span><span style="color:var(--text-m)">—</span></div><div class="wh-row"><span>Status</span><span style="color:var(--success)">✓ Active</span></div></div>
+    <div class="wh-card"><div class="wh-code">EC</div><div class="wh-name">EC Warehouse</div><div class="wh-row"><span>Total</span><span style="color:var(--text-m)">—</span></div><div class="wh-row"><span>Status</span><span style="color:var(--success)">✓ Active</span></div></div>
+  </div>
+  <div class="sec-ttl fade-up">All Modules</div>
+  <div class="mod-grid fade-up">
+    <a class="mod-card" href="manpower/all_manpower.html"><span class="mod-status s-active">Active</span><div class="mod-icon">👥</div><div class="mod-title">Manpower Management</div><div class="mod-desc">Officers, labour, drivers — all 6 WH. Filter, search, add/delete with PIN.</div><div class="mod-tags"><span class="mod-tag">EPF·145</span><span class="mod-tag">TGL·70</span><span class="mod-tag">BGL·4</span><span class="mod-tag">GTM·3</span></div></a>
+    <a class="mod-card" href="warehouse/wh_list.html"><span class="mod-status s-active">Active</span><div class="mod-icon">🏭</div><div class="mod-title">Warehouse Database</div><div class="mod-desc">WH list, addresses, floor layout, departments, stock, delivery history.</div><div class="mod-tags"><span class="mod-tag">List</span><span class="mod-tag">Stock</span><span class="mod-tag">Delivery</span></div></a>
+    <a class="mod-card" href="equipment/forklift.html"><span class="mod-status s-active">Active</span><div class="mod-icon">🏗️</div><div class="mod-title">Equipment & Devices</div><div class="mod-desc">Forklift, PDA/scanning, floor layouts, maintenance history.</div><div class="mod-tags"><span class="mod-tag">Forklift</span><span class="mod-tag">PDA</span><span class="mod-tag">Layout</span></div></a>
+    <a class="mod-card" href="kpi/staff_kpi.html"><span class="mod-status s-active">Active</span><div class="mod-icon">⭐</div><div class="mod-title">Staff KPI & Performance</div><div class="mod-desc">In/Out totals, overtime, critical issues, ratings — weekly & monthly.</div><div class="mod-tags"><span class="mod-tag">KPI</span><span class="mod-tag">Overtime</span><span class="mod-tag">Rating</span></div></a>
+    <a class="mod-card" href="reports/pdf_library.html"><span class="mod-status s-active">Active</span><div class="mod-icon">📚</div><div class="mod-title">Reports & PDF Library</div><div class="mod-desc">Centralized documents — materials, operations, importable PDFs.</div><div class="mod-tags"><span class="mod-tag">PDF</span><span class="mod-tag">Materials</span></div></a>
+    <a class="mod-card" href="sop/policies.html"><span class="mod-status s-active">Active</span><div class="mod-icon">📜</div><div class="mod-title">SOP & Policy Library</div><div class="mod-desc">SOPs, safety policies, fire drill, compliance, onboarding guides.</div><div class="mod-tags"><span class="mod-tag">SOP</span><span class="mod-tag">Fire</span><span class="mod-tag">Compliance</span></div></a>
+    <a class="mod-card" href="incident/incident_log.html"><span class="mod-status s-new">Soon</span><div class="mod-icon">⚠️</div><div class="mod-title">Incident & Maintenance</div><div class="mod-desc">Accident records, breakdown history, service schedule.</div><div class="mod-tags"><span class="mod-tag">Incidents</span><span class="mod-tag">Service</span></div></a>
+    <a class="mod-card" href="pallet/wooden_pallet.html"><span class="mod-status s-active">Active</span><div class="mod-icon">🪵</div><div class="mod-title">Wooden Pallet Tracker</div><div class="mod-desc">Per-WH pallet count, issue/return history, condition stats.</div><div class="mod-tags"><span class="mod-tag">Stock</span><span class="mod-tag">Issue/Return</span></div></a>
+    <a class="mod-card" href="vendor/vendor_list.html"><span class="mod-status s-new">New</span><div class="mod-icon">🤝</div><div class="mod-title">Vendor & Supplier Info</div><div class="mod-desc">Supplier list, contacts, delivery performance, contracts.</div><div class="mod-tags"><span class="mod-tag">Suppliers</span><span class="mod-tag">Contracts</span></div></a>
+  </div>
+  <div class="pg-foot">
+    <span>Evergreen Products Factory BD Ltd. | WMS v1.0</span>
+    <span id="footer-date">—</span>
+  </div>
+</main>
+<script src="assets/nav.js"></script>
+<script>
+  document.getElementById('today-date').textContent =
+    new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+</script>
+</body>
+</html>
