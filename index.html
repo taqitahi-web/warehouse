@@ -4,48 +4,60 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ইপিএফ ওয়্যারহাউজ ডাটাবেজ</title>
-<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0d1117">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EPF WMS">
+<link rel="manifest" id="pwa-manifest">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0a0e1a;
-  --surface: #111827;
-  --surface2: #1a2235;
-  --border: #1e2d45;
-  --accent: #00d4ff;
-  --accent2: #ff6b35;
-  --accent3: #7fff6b;
-  --text: #e2e8f0;
-  --text2: #8899aa;
-  --danger: #ff4757;
-  --warning: #ffa502;
-  --success: #2ed573;
-  --card-shadow: 0 4px 24px rgba(0,212,255,0.07);
+  --bg:       #0d1117;
+  --surface:  #161b22;
+  --surface2: #21262d;
+  --border:   #30363d;
+  --accent:   #2f81f7;
+  --accent2:  #f78166;
+  --accent3:  #3fb950;
+  --text:     #e6edf3;
+  --text2:    #7d8590;
+  --danger:   #f85149;
+  --warning:  #d29922;
+  --success:  #3fb950;
+  --card-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
-body[data-theme="ocean"] {
-  --bg:#030d1f;--surface:#071628;--surface2:#0d2040;--border:#0f2d50;
-  --accent:#29b6f6;--accent2:#26c6da;--accent3:#80cbc4;--text:#e1f5fe;--text2:#4a7fa0;
+/* ── Mobile bottom nav ── */
+#mobile-nav {
+  display:none;
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--surface);
+  border-top:1px solid var(--border);
+  z-index:200;
+  padding:6px 0 env(safe-area-inset-bottom,6px);
 }
-body[data-theme="forest"] {
-  --bg:#0a1a0f;--surface:#0f2418;--surface2:#152d1e;--border:#1a3d26;
-  --accent:#00e676;--accent2:#ff9800;--accent3:#69f0ae;--text:#e8f5e9;--text2:#5a7a5e;
+.mobile-nav-inner {
+  display:flex; justify-content:space-around; align-items:center;
 }
-body[data-theme="sunset"] {
-  --bg:#1a0a0a;--surface:#2a1010;--surface2:#3a1818;--border:#4a2020;
-  --accent:#ff6b35;--accent2:#ffa726;--accent3:#a5d6a7;--text:#fff3e0;--text2:#8d6e63;
+.mobile-nav-btn {
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  background:none; border:none; color:var(--text2);
+  font-size:10px; padding:6px 10px; cursor:pointer;
+  font-family:'Noto Sans Bengali',sans-serif; min-width:52px;
+  border-radius:10px; transition:all .18s;
 }
-.topbar-right-controls{display:flex;align-items:center;gap:10px;margin-left:auto;}
-.lang-switcher{display:flex;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px;}
-.lang-btn{background:transparent;border:none;color:var(--text2);font-size:11px;font-weight:600;padding:4px 7px;border-radius:5px;cursor:pointer;font-family:inherit;transition:all .18s;}
-.lang-btn.active{background:var(--accent);color:#000;}
-.lang-btn:hover:not(.active){color:var(--text);}
-.theme-switcher{display:flex;gap:5px;align-items:center;}
-.theme-dot{width:16px;height:16px;border-radius:50%;cursor:pointer;transition:transform .2s;flex-shrink:0;}
-.theme-dot:hover{transform:scale(1.3);}
-.theme-dot.active{box-shadow:0 0 0 2px white,0 0 0 4px var(--accent);}
+.mobile-nav-btn .mn-icon { font-size:20px; line-height:1; }
+.mobile-nav-btn.active { color:var(--accent); background:rgba(47,129,247,.1); }
+/* ── Hamburger ── */
+#sidebar-toggle {
+  display:none; background:none; border:none; color:var(--text);
+  font-size:22px; cursor:pointer; padding:4px 8px;
+}
+.topbar-right-controls{display:flex;align-items:center;gap:8px;margin-left:auto;}
 
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
-  font-family: 'Tiro Bangla', serif;
+  font-family: 'Noto Sans Bengali', 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -70,7 +82,7 @@ body {
   border-bottom: 1px solid var(--border);
 }
 .sidebar-logo h1 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
   font-size: 13px;
   font-weight: 800;
   color: var(--accent);
@@ -116,11 +128,11 @@ nav { flex: 1; padding: 16px 0; overflow-y: auto; }
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 50;
 }
-.topbar h2 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+.topbar h2 { font-family: 'Inter', 'Noto Sans Bengali', sans-serif; font-size: 18px; font-weight: 700; }
 .topbar-actions { display: flex; gap: 10px; }
 .btn {
   padding: 8px 16px; border: none; border-radius: 8px;
-  font-family: 'Tiro Bangla', serif; font-size: 13px;
+  font-family: 'Noto Sans Bengali', 'Inter', sans-serif; font-size: 13px;
   cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px;
 }
 .btn-primary { background: var(--accent); color: #000; font-weight: 600; }
@@ -185,7 +197,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 .form-group input, .form-group select, .form-group textarea {
   background: var(--surface2); border: 1px solid var(--border);
   color: var(--text); padding: 10px 14px; border-radius: 8px;
-  font-family: 'Tiro Bangla', serif; font-size: 13px; transition: border-color 0.2s;
+  font-family: 'Noto Sans Bengali', 'Inter', sans-serif; font-size: 13px; transition: border-color 0.2s;
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
   outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
@@ -343,73 +355,128 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
 .kpi-score-total{text-align:center;border-top:1px solid var(--border);padding-top:12px;}
 .kpi-score-num{font-size:48px;font-weight:700;color:var(--accent);line-height:1;}
 
-/* ═══ STICKY TABLE HEADER FIX ═══ */
-.table-wrap { overflow-x: auto; max-height: 70vh; overflow-y: auto; position: relative; }
-.table-wrap table { border-collapse: collapse; width: 100%; }
+/* ═══ STICKY TABLE + RESPONSIVE ═══ */
+.table-wrap {
+  overflow-x: auto;
+  max-height: 72vh;
+  overflow-y: auto;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+.table-wrap table { border-collapse: collapse; width: 100%; min-width: 0; }
 .table-wrap thead th {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  position: sticky; top: 0; z-index: 10;
   background: var(--surface2);
   border-bottom: 2px solid var(--border);
-  white-space: nowrap;
+  white-space: nowrap; padding: 10px 12px;
 }
-/* Keep table-wrap on pages without scroll limit */
+td { padding: 10px 12px; font-size: 13px; }
 #page-organogram .table-wrap,
 #page-backup .table-wrap { max-height: none; overflow-y: visible; }
+
+/* ── Table responsive: hide less-important columns on small screen ── */
+@media (max-width: 900px) {
+  th.hide-sm, td.hide-sm { display: none; }
+  td, th { padding: 8px 8px; font-size: 12px; }
+  .page { padding: 16px; }
+  #main { margin-left: 0 !important; }
+  #sidebar { transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.5); }
+  #sidebar-toggle { display: block !important; }
+  #mobile-nav { display: block !important; }
+  body { padding-bottom: 68px; }
+  .topbar { padding: 12px 16px; }
+  .topbar h2 { font-size: 15px; }
+  #fb-sync-status { display: none; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  th.hide-xs, td.hide-xs { display: none; }
+}
+
+/* ── Sidebar overlay on mobile ── */
+#sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.6); z-index: 99;
+}
+#sidebar-overlay.show { display: block; }
+
+/* ── Phone call link ── */
+a.call-link {
+  color: var(--accent3);
+  text-decoration: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 6px; border-radius: 6px;
+  border: 1px solid rgba(63,185,80,.3);
+  transition: all .18s;
+}
+a.call-link:hover { background: rgba(63,185,80,.1); border-color: var(--accent3); }
+a.call-link::before { content: '📞'; font-size: 11px; }
+
+/* ── PWA install banner ── */
+#pwa-banner {
+  display: none; position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%);
+  background: var(--surface); border: 1px solid var(--accent);
+  border-radius: 12px; padding: 12px 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); z-index: 300;
+  display: flex; align-items: center; gap: 12px; font-size: 13px;
+  max-width: 90vw; white-space: nowrap;
+}
 
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK — warehouse-e932a -->
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ⚠️ Replace with your Firebase config
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyBlT8VdFec00Kkh6vZKcLx2Nlsg6cTME2E",
+      authDomain: "warehouse-e932a.firebaseapp.com",
+      projectId: "warehouse-e932a",
+      storageBucket: "warehouse-e932a.firebasestorage.app",
+      messagingSenderId: "579331441661",
+      appId: "1:579331441661:web:dc92a9e9f45318a3388f94"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db  = getFirestore(app);
     const DOC_REF = doc(db, 'wms', 'mainDB');
 
-    // Save all DB to Firebase
+    // ── Save to Firebase ──────────────────────────────────────────────────────
     window.fbSaveAll = async function(data) {
       try {
         await setDoc(DOC_REF, {
-          officers: data.officers || [],
-          labors: data.labors || [],
-          delivery: data.delivery || [],
-          stock: data.stock || [],
-          floors: data.floors || [],
-          forklift: data.forklift || [],
-          pda: data.pda || [],
-          reports: data.reports || [],
-          warehouseList: data.warehouseList || [],
-          whInfo: data.whInfo || {},
-          updatedAt: Date.now()
+          officers:     data.officers     || [],
+          labors:       data.labors       || [],
+          delivery:     data.delivery     || [],
+          stock:        data.stock        || [],
+          floors:       data.floors       || [],
+          forklift:     data.forklift     || [],
+          pda:          data.pda          || [],
+          reports:      data.reports      || [],
+          warehouseList:data.warehouseList|| [],
+          whInfo:       data.whInfo       || {},
+          updatedAt:    Date.now()
         });
         const el = document.getElementById('fb-sync-status');
-        if(el) { el.textContent = '☁️ Synced'; el.style.color = 'var(--success)'; }
+        if(el){ el.textContent='☁️ Synced ✓'; el.style.color='var(--success)'; }
       } catch(e) {
-        console.error('Firebase save error:', e);
+        console.error('Firebase save:', e.message);
         const el = document.getElementById('fb-sync-status');
-        if(el) { el.textContent = '❌ Sync error'; el.style.color = 'var(--danger)'; }
+        if(el){ el.textContent='❌ Sync err'; el.style.color='var(--danger)'; }
       }
     };
 
-    // Real-time listener — sync from Firebase to local
+    // ── Real-time listener ────────────────────────────────────────────────────
     window.addEventListener('load', () => {
       const statusEl = document.getElementById('fb-sync-status');
       if(statusEl) statusEl.textContent = '🔄 Connecting...';
-      
+
       onSnapshot(DOC_REF, (snap) => {
         if(snap.exists()) {
           const data = snap.data();
@@ -417,46 +484,27 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
             if(data[k] && data[k].length > 0) DB[k] = data[k];
           });
           if(data.whInfo && Object.keys(data.whInfo).length > 0) DB.whInfo = data.whInfo;
-          // Update localStorage
-          try { localStorage.setItem('wms_db_v2', JSON.stringify(DB)); } catch(e) {}
-          // Re-render current page
-          updateDashboard();
-          const activePage = document.querySelector('.page.active');
-          if(activePage) {
-            const pageId = activePage.id.replace('page-','');
-            if(window.pageRenderMap && window.pageRenderMap[pageId]) window.pageRenderMap[pageId]();
+          try { localStorage.setItem('wms_db_v2', JSON.stringify(DB)); } catch(e){}
+          if(typeof updateDashboard === 'function') updateDashboard();
+          const active = document.querySelector('.page.active');
+          if(active && window.pageRenderMap) {
+            const pid = active.id.replace('page-','');
+            if(window.pageRenderMap[pid]) window.pageRenderMap[pid]();
           }
-          if(statusEl) { statusEl.textContent = '☁️ Firebase Live'; statusEl.style.color = 'var(--success)'; }
+          if(statusEl){ statusEl.textContent='☁️ Live ✓'; statusEl.style.color='var(--success)'; }
         } else {
-          if(statusEl) { statusEl.textContent = '📦 No cloud data'; statusEl.style.color = 'var(--text2)'; }
+          if(statusEl){ statusEl.textContent='📦 No data'; statusEl.style.color='var(--text2)'; }
         }
       }, (err) => {
         console.warn('Firebase offline:', err.message);
-        if(statusEl) { statusEl.textContent = '💾 Offline mode'; statusEl.style.color = 'var(--warning)'; }
+        if(statusEl){ statusEl.textContent='💾 Offline'; statusEl.style.color='var(--warning)'; }
       });
     });
     </script>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyBlT8VdFec00Kkh6vZKcLx2Nlsg6cTME2E",
-    authDomain: "warehouse-e932a.firebaseapp.com",
-    projectId: "warehouse-e932a",
-    storageBucket: "warehouse-e932a.firebasestorage.app",
-    messagingSenderId: "579331441661",
-    appId: "1:579331441661:web:dc92a9e9f45318a3388f94"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
 </head>
 <body>
+<!-- Sidebar overlay for mobile -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
 <!-- Sidebar -->
 <aside id="sidebar">
@@ -521,6 +569,7 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
 <!-- Main Content -->
 <main id="main">
   <div class="topbar">
+      <button id="sidebar-toggle" onclick="toggleSidebar()" style="display:none;" aria-label="Menu">☰</button>
     <h2 id="page-title">ড্যাশবোর্ড</h2>
     <div class="topbar-actions" id="topbar-actions"></div>
     <div class="topbar-right-controls">
@@ -667,6 +716,8 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
         <option value="TGL">TGL</option>
         <option value="BGL">BGL</option>
         <option value="GTM">GTM</option>
+        <option value="EC">EC</option>
+        <option value="RFL">RFL</option>
       </select>
       <select id="officer-filter-section" onchange="renderOfficers()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:8px; font-family:inherit; font-size:13px;">
         <option value="">সব ডিপার্টমেন্ট</option>
@@ -674,7 +725,7 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>নাম</th><th>ID</th><th>পদবী</th><th>Factory</th><th>ডিপার্টমেন্ট</th><th>বিল্ডিং</th><th>দায়িত্ব</th><th>WH Code</th><th>মোবাইল</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+        <thead><tr><th>#</th><th>নাম</th><th class='hide-sm'>ID</th><th>পদবী</th><th>Factory</th><th class='hide-sm'>ডিপার্টমেন্ট</th><th class='hide-xs'>বিল্ডিং</th><th class='hide-xs'>দায়িত্ব</th><th class='hide-sm'>WH Code</th><th>মোবাইল</th><th class='hide-sm'>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
         <tbody id="officer-tbody"></tbody>
       </table>
     </div>
@@ -693,6 +744,8 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
         <option value="TGL">TGL</option>
         <option value="BGL">BGL</option>
         <option value="GTM">GTM</option>
+        <option value="EC">EC</option>
+        <option value="RFL">RFL</option>
       </select>
       <select id="labor-filter-type" onchange="renderLabors()" style="background:var(--surface); border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:8px; font-family:inherit; font-size:13px;">
         <option value="">সব ধরন</option>
@@ -705,7 +758,7 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>নাম</th><th>ID</th><th>পদবী / ধরন</th><th>Factory</th><th>ডিপার্টমেন্ট</th><th>বিল্ডিং</th><th>দায়িত্ব</th><th>WH Code</th><th>মোবাইল</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+        <thead><tr><th>#</th><th>নাম</th><th class='hide-sm'>ID</th><th>পদবী / ধরন</th><th>Factory</th><th class='hide-sm'>ডিপার্টমেন্ট</th><th class='hide-xs'>বিল্ডিং</th><th class='hide-xs'>দায়িত্ব</th><th class='hide-sm'>WH Code</th><th>মোবাইল</th><th class='hide-sm'>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
         <tbody id="labor-tbody"></tbody>
       </table>
     </div>
@@ -1729,7 +1782,7 @@ function updateMpSummary() {
   
   // EPF factories: EPF only (EPF Carton also goes to EPF group by factory name)
   const epfFactories = ['EPF'];
-  const gtFactories  = ['TGL', 'BGL', 'GTM', 'GT-06', 'GT-08'];
+  const gtFactories  = ['TGL', 'BGL', 'GTM', 'GT-06', 'GT-08', 'EC', 'RFL'];
 
   function rowData(fty) {
     const people = all.filter(p => p.factory === fty);
@@ -1905,15 +1958,15 @@ function renderOfficers() {
   tbody.innerHTML = data.map((o,i)=>`<tr>
     <td>${i+1}</td>
     <td><strong>${o.name||'—'}</strong></td>
-    <td><span class="badge badge-blue" style="font-family:'IBM Plex Mono',monospace;">${o.empId||'—'}</span></td>
+    <td class="hide-sm"><span class="badge badge-blue" style="font-family:'IBM Plex Mono',monospace;">${o.empId||'—'}</span></td>
     <td style="font-size:12px;">${o.designation||'—'}</td>
     <td><span class="badge badge-${facColor[o.factory]||'blue'}">${o.factory||'—'}</span></td>
-    <td><span class="tag">${o.section||'—'}</span></td>
-    <td style="font-size:12px;">${o.building||'—'}</td>
-    <td style="font-size:12px;">${o.responsibility||'—'}</td>
-    <td><span class="tag">${o.whCode||'—'}</span></td>
-    <td style="font-family:'IBM Plex Mono',monospace;font-size:12px;">${o.contact||'—'}</td>
-    <td>${badgeStatus(o.status||'সক্রিয়')}</td>
+    <td class="hide-sm"><span class="tag">${o.section||'—'}</span></td>
+    <td class="hide-xs" style="font-size:12px;">${o.building||'—'}</td>
+    <td class="hide-xs" style="font-size:12px;">${o.responsibility||'—'}</td>
+    <td class="hide-sm"><span class="tag">${o.whCode||'—'}</span></td>
+    <td>${o.contact?`<a class="call-link" href="tel:${o.contact}">${o.contact}</a>`:'—'}</td>
+    <td class="hide-sm">${badgeStatus(o.status||'সক্রিয়')}</td>
     <td>
       <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="openModal('officer','${o.id}')">✏️</button>
       <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;margin-left:4px;" onclick="deleteRecord('officers','${o.id}')">🗑️</button>
@@ -1954,15 +2007,15 @@ function renderLabors() {
   tbody.innerHTML = data.map((l,i)=>`<tr>
     <td>${i+1}</td>
     <td><strong>${l.name||'—'}</strong></td>
-    <td><span class="badge badge-orange" style="font-family:'IBM Plex Mono',monospace;">${l.empId||'—'}</span></td>
+    <td class="hide-sm"><span class="badge badge-orange" style="font-family:'IBM Plex Mono',monospace;">${l.empId||'—'}</span></td>
     <td style="font-size:12px;">${typeIcon[l.type]||''} ${l.designation||l.laborType||'—'}</td>
     <td><span class="badge badge-${facColor[l.factory]||'blue'}">${l.factory||'—'}</span></td>
-    <td><span class="tag">${l.section||'—'}</span></td>
-    <td style="font-size:12px;">${l.building||'—'}</td>
-    <td style="font-size:12px;">${l.responsibility||'—'}</td>
-    <td><span class="tag">${l.whCode||'—'}</span></td>
-    <td style="font-family:'IBM Plex Mono',monospace;font-size:12px;">${l.contact||'—'}</td>
-    <td>${badgeStatus(l.status||'সক্রিয়')}</td>
+    <td class="hide-sm"><span class="tag">${l.section||'—'}</span></td>
+    <td class="hide-xs" style="font-size:12px;">${l.building||'—'}</td>
+    <td class="hide-xs" style="font-size:12px;">${l.responsibility||'—'}</td>
+    <td class="hide-sm"><span class="tag">${l.whCode||'—'}</span></td>
+    <td>${l.contact?`<a class="call-link" href="tel:${l.contact}">${l.contact}</a>`:'—'}</td>
+    <td class="hide-sm">${badgeStatus(l.status||'সক্রিয়')}</td>
     <td>
       <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="openModal('labor','${l.id}')">✏️</button>
       <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;margin-left:4px;" onclick="deleteRecord('labors','${l.id}')">🗑️</button>
@@ -2119,7 +2172,7 @@ const modalForms = {
       {key:'name',label:'নাম',type:'text',required:true},
       {key:'empId',label:'Employee ID',type:'text'},
       {key:'designation',label:'পদবী',type:'text'},
-      {key:'factory',label:'Factory',type:'select',options:['EPF','TGL','BGL','GTM','GT-06','GT-08']},
+      {key:'factory',label:'Factory',type:'select',options:['EPF','TGL','BGL','GTM','GT-06','GT-08','EC','RFL']},
       {key:'section',label:'ডিপার্টমেন্ট / সেকশন',type:'text'},
       {key:'building',label:'বিল্ডিং',type:'text'},
       {key:'responsibility',label:'দায়িত্ব / WH Area',type:'text'},
@@ -2139,7 +2192,7 @@ const modalForms = {
       {key:'empId',label:'Employee ID',type:'text'},
       {key:'designation',label:'পদবী / পদ',type:'text'},
       {key:'type',label:'ধরন',type:'select',options:['labor','driver']},
-      {key:'factory',label:'Factory',type:'select',options:['EPF','TGL','BGL','GTM','GT-06','GT-08']},
+      {key:'factory',label:'Factory',type:'select',options:['EPF','TGL','BGL','GTM','GT-06','GT-08','EC','RFL']},
       {key:'section',label:'ডিপার্টমেন্ট / সেকশন',type:'text'},
       {key:'building',label:'বিল্ডিং',type:'text'},
       {key:'responsibility',label:'দায়িত্ব / WH Area',type:'text'},
@@ -2215,7 +2268,7 @@ const modalForms = {
       {key:'deviceId',label:'ডিভাইস আইডি',type:'text',required:true},
       {key:'model',label:'মডেল (যেমন: YGF F20)',type:'text'},
       {key:'imei',label:'IMEI / S/N নম্বর',type:'text'},
-      {key:'fty',label:'Factory',type:'select',options:['EPF','TGL','DJ','RFL','GT-06','GT-08']},
+      {key:'fty',label:'Factory',type:'select',options:['EPF','TGL','DJ','RFL','GT-06','GT-08','EC']},
       {key:'deptUse',label:'Dept. Use (SM/MM/PM/EQ)',type:'text'},
       {key:'assignedTo',label:'দায়িত্বপ্রাপ্ত ব্যক্তি',type:'text'},
       {key:'assignedDate',label:'প্রাপ্তির তারিখ',type:'date'},
@@ -2227,7 +2280,7 @@ const modalForms = {
     title: 'ওয়্যারহাউস লোকেশন',
     fields: [
       {key:'sl',label:'S/L নং',type:'number'},
-      {key:'fty',label:'Factory (Fty)',type:'select',options:['EPF','TGL','DJ','RFL','GT-06','GT-08']},
+      {key:'fty',label:'Factory (Fty)',type:'select',options:['EPF','TGL','DJ','RFL','GT-06','GT-08','EC']},
       {key:'place',label:'Warehouse Place',type:'text',required:true},
       {key:'items',label:'Items (যেমন: MM/HH)',type:'text'},
       {key:'misCode',label:'MIS Warehouse Code',type:'text'},
@@ -3811,7 +3864,7 @@ function matRenderMonthlySummary() {
 function matRenderFtyTabs() {
   const el = document.getElementById('mat-fty-tabs');
   if(!el) return;
-  const ftys = ['ALL','EPF','TGL','RFL','GTM','BGL'];
+  const ftys = ['ALL','EPF','TGL','RFL','GTM','BGL','EC'];
   const colors = {ALL:'var(--accent)',EPF:'var(--accent)',TGL:'var(--accent3)',RFL:'var(--success)',GTM:'#a78bfa',BGL:'var(--accent2)'};
   el.innerHTML = ftys.map(f => `<button onclick="matSetFty('${f}')" id="mat-tab-${f}"
     style="padding:6px 16px;border:1px solid var(--border);border-radius:20px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;background:${f===_matFtyFilter?colors[f]:'var(--surface2)'};color:${f===_matFtyFilter?'#000':'var(--text2)'};">${f}</button>`).join('');
@@ -4136,5 +4189,93 @@ updateDashboard();
 renderOfficers && renderOfficers();
 
 </script>
+
+<!-- Mobile bottom navigation -->
+<nav id="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-btn active" onclick="showPage('dashboard');setMobileNav(this)">
+      <span class="mn-icon">🏠</span>হোম
+    </button>
+    <button class="mobile-nav-btn" onclick="showPage('officers');setMobileNav(this)">
+      <span class="mn-icon">👔</span>অফিসার
+    </button>
+    <button class="mobile-nav-btn" onclick="showPage('labors');setMobileNav(this)">
+      <span class="mn-icon">👷</span>লেবার
+    </button>
+    <button class="mobile-nav-btn" onclick="showPage('materials');setMobileNav(this)">
+      <span class="mn-icon">📦</span>মেটেরিয়াল
+    </button>
+    <button class="mobile-nav-btn" onclick="toggleSidebar()">
+      <span class="mn-icon">☰</span>আরো
+    </button>
+  </div>
+</nav>
+
+<script>
+// ── Sidebar mobile toggle ─────────────────────────────────────────────────────
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('show');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ── Mobile nav active state ───────────────────────────────────────────────────
+function setMobileNav(btn) {
+  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  closeSidebar();
+}
+
+// ── PWA Service Worker + Manifest ────────────────────────────────────────────
+(function initPWA() {
+  // Inline manifest
+  const manifest = {
+    name: "EPF Warehouse Management",
+    short_name: "EPF WMS",
+    description: "ইপিএফ ওয়্যারহাউজ ম্যানেজমেন্ট সিস্টেম",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#0d1117",
+    theme_color: "#0d1117",
+    orientation: "portrait-primary",
+    icons: [
+      { src: "https://img.icons8.com/fluency/192/warehouse.png", sizes: "192x192", type: "image/png" },
+      { src: "https://img.icons8.com/fluency/512/warehouse.png", sizes: "512x512", type: "image/png" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const link = document.getElementById('pwa-manifest');
+  if(link) link.href = URL.createObjectURL(blob);
+
+  // Service Worker
+  if('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'epf-wms-v1';
+      self.addEventListener('install', e => e.waitUntil(
+        caches.open(CACHE).then(c => c.addAll(['.']))
+      ));
+      self.addEventListener('fetch', e => e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('.')))
+      ));
+    `;
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob))
+      .then(() => console.log('PWA SW registered'))
+      .catch(e => console.log('SW skip:', e.message));
+  }
+})();
+
+// ── Close sidebar when nav item clicked ──────────────────────────────────────
+document.addEventListener('click', (e) => {
+  const navItem = e.target.closest('.nav-item');
+  if(navItem && window.innerWidth <= 900) closeSidebar();
+});
+</script>
+
 </body>
 </html>
