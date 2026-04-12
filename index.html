@@ -27,27 +27,23 @@
   --success:  #3fb950;
   --card-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
-/* ── Mobile bottom nav ── */
-#mobile-nav {
-  display:none;
-  position:fixed; bottom:0; left:0; right:0;
-  background:var(--surface);
-  border-top:1px solid var(--border);
-  z-index:200;
-  padding:6px 0 env(safe-area-inset-bottom,6px);
+/* Light mode */
+body.light-mode {
+  --bg:       #f6f8fa;
+  --surface:  #ffffff;
+  --surface2: #eaeef2;
+  --border:   #d0d7de;
+  --accent:   #0969da;
+  --accent2:  #cf222e;
+  --accent3:  #1a7f37;
+  --text:     #1f2328;
+  --text2:    #656d76;
+  --danger:   #cf222e;
+  --warning:  #9a6700;
+  --success:  #1a7f37;
+  --card-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
-.mobile-nav-inner {
-  display:flex; justify-content:space-around; align-items:center;
-}
-.mobile-nav-btn {
-  display:flex; flex-direction:column; align-items:center; gap:2px;
-  background:none; border:none; color:var(--text2);
-  font-size:10px; padding:6px 10px; cursor:pointer;
-  font-family:'Noto Sans Bengali',sans-serif; min-width:52px;
-  border-radius:10px; transition:all .18s;
-}
-.mobile-nav-btn .mn-icon { font-size:20px; line-height:1; }
-.mobile-nav-btn.active { color:var(--accent); background:rgba(47,129,247,.1); }
+/* ── Mobile bottom nav — REMOVED ── */
 /* ── Hamburger ── */
 #sidebar-toggle {
   display:none; background:none; border:none; color:var(--text);
@@ -115,7 +111,9 @@ nav { flex: 1; padding: 16px 0; overflow-y: auto; }
   transition: all 0.2s;
 }
 .nav-item:hover { color: var(--text); background: var(--surface2); }
-.nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,212,255,0.07); }
+.nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(47,129,247,0.08); }
+.nav-item.nav-locked { color: var(--text2); }
+.nav-item.nav-locked:hover { color: var(--text); }
 .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
 .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text2); font-family: 'IBM Plex Mono', monospace; }
 
@@ -362,6 +360,24 @@ textarea.kpi-input{resize:vertical;min-height:60px;}
   overflow-y: auto;
   position: relative;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--surface2);
+}
+.table-wrap::-webkit-scrollbar { height: 6px; width: 6px; }
+.table-wrap::-webkit-scrollbar-track { background: var(--surface2); border-radius: 3px; }
+.table-wrap::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+/* Mobile: always show horizontal scrollbar indicator */
+@media (max-width:900px) {
+  .table-wrap { overflow-x: scroll; }
+  .table-wrap::after {
+    content: '← swipe →';
+    display: block;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text2);
+    padding: 4px;
+    letter-spacing: 1px;
+  }
 }
 .table-wrap table { border-collapse: collapse; width: 100%; min-width: 0; }
 .table-wrap thead th {
@@ -383,8 +399,6 @@ td { padding: 10px 12px; font-size: 13px; }
   #sidebar { transform: translateX(-100%); }
   #sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.5); }
   #sidebar-toggle { display: block !important; }
-  #mobile-nav { display: block !important; }
-  body { padding-bottom: 68px; }
   .topbar { padding: 12px 16px; }
   .topbar h2 { font-size: 15px; }
   #fb-sync-status { display: none; }
@@ -393,6 +407,32 @@ td { padding: 10px 12px; font-size: 13px; }
 @media (max-width: 600px) {
   .stats-grid { grid-template-columns: repeat(2,1fr); }
   th.hide-xs, td.hide-xs { display: none; }
+}
+
+/* ── Horizontal scrollbar — always visible on mobile ── */
+.table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 72vh;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--surface2);
+}
+.table-wrap::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.table-wrap::-webkit-scrollbar-track {
+  background: var(--surface2);
+  border-radius: 3px;
+}
+.table-wrap::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+.table-wrap::-webkit-scrollbar-corner {
+  background: var(--surface2);
 }
 
 /* ── Sidebar overlay on mobile ── */
@@ -519,25 +559,25 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     <div class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span> ড্যাশবোর্ড</div>
     
     <div class="nav-section">ম্যানপাওয়ার</div>
-    <div class="nav-item" onclick="showPage('officers')"><span class="icon">👔</span> অফিসার</div>
-    <div class="nav-item" onclick="showPage('labors')"><span class="icon">👷</span> লেবার</div>
-    <div class="nav-item" onclick="showPage('organogram')"><span class="icon">🌐</span> অর্গানোগ্রাম</div>
+    <div class="nav-item nav-locked" onclick="showPage('officers')"><span class="icon">👔</span> অফিসার <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('labors')"><span class="icon">👷</span> লেবার <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('organogram')"><span class="icon">🌐</span> অর্গানোগ্রাম <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
     
     <div class="nav-section">অপারেশন</div>
-    <div class="nav-item" onclick="showPage('whlist')"><span class="icon">🏭</span> ওয়্যারহাউস লিস্ট</div>
-    <div class="nav-item" onclick="showPage('delivery')"><span class="icon">🚚</span> ডেলিভারি</div>
-    <div class="nav-item" onclick="showPage('stock')"><span class="icon">📦</span> স্টক রিপোর্ট</div>
-    <div class="nav-item" onclick="showPage('floors')"><span class="icon">🏢</span> ফ্লোর লিস্ট</div>
+    <div class="nav-item nav-locked" onclick="showPage('whlist')"><span class="icon">🏭</span> ওয়্যারহাউস লিস্ট <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('delivery')"><span class="icon">🚚</span> ডেলিভারি <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('stock')"><span class="icon">📦</span> স্টক রিপোর্ট <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('floors')"><span class="icon">🏢</span> ফ্লোর লিস্ট <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
     
     <div class="nav-section">সম্পদ</div>
-    <div class="nav-item" onclick="showPage('forklift')"><span class="icon">🏗️</span> ফর্কলিফট</div>
-    <div class="nav-item" onclick="showPage('pda')"><span class="icon">📱</span> PDA ডিভাইস</div>
-    <div class="nav-item" onclick="showPage('layout')"><span class="icon">🗺️</span> লে-আউট</div>
+    <div class="nav-item nav-locked" onclick="showPage('forklift')"><span class="icon">🏗️</span> ফর্কলিফট <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('pda')"><span class="icon">📱</span> PDA ডিভাইস <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('layout')"><span class="icon">🗺️</span> লে-আউট <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
     
     <div class="nav-section">রিপোর্ট</div>
-    <div class="nav-item" onclick="showPage('flowchart')"><span class="icon">🔄</span> ফ্লো চার্ট</div>
-    <div class="nav-item" onclick="showPage('reports')"><span class="icon">📋</span> রিপোর্ট ও ফাইল</div>
-    <div class="nav-item" onclick="showPage('pdflibrary')"><span class="icon">📚</span> PDF লাইব্রেরি</div>
+    <div class="nav-item nav-locked" onclick="showPage('flowchart')"><span class="icon">🔄</span> ফ্লো চার্ট <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('reports')"><span class="icon">📋</span> রিপোর্ট ও ফাইল <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('pdflibrary')"><span class="icon">📚</span> PDF লাইব্রেরি <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
     
     <div class="nav-section">সিস্টেম</div>
     <div class="nav-item" onclick="showPage('mis-email')"><span class="icon">📧</span> MIS &amp; Email</div>
@@ -560,6 +600,16 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     </div>
     <div class="nav-item" onclick="showPage('backup')"><span class="icon">💾</span> ব্যাকআপ</div>
   </nav>
+  <div style="padding:10px 20px;border-top:1px solid var(--border);">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span id="sidebar-lock-status" style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--danger);">🔒 Locked</span>
+      <button onclick="lockSession()" title="Lock System"
+        style="background:rgba(248,81,73,.12);border:1px solid var(--danger);color:var(--danger);
+               border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit;">
+        🔒 Lock
+      </button>
+    </div>
+  </div>
   <div class="sidebar-footer">
     <div id="clock">--:-- --</div>
     <div style="margin-top:4px; font-size:10px;">সিঙ্গেল ইউজার মোড</div>
@@ -580,13 +630,13 @@ a.call-link::before { content: '📞'; font-size: 11px; }
         <button class="lang-btn" id="lang-en" onclick="switchLang('en')">EN</button>
         <button class="lang-btn" id="lang-zh" onclick="switchLang('zh')">中文</button>
       </div>
-      <!-- Theme Switcher -->
-      <div class="theme-switcher" title="থিম পরিবর্তন">
-        <div class="theme-dot" data-theme="dark" onclick="applyTheme('dark')" title="Dark Navy" style="background:#0a0e1a;border:2px solid #00d4ff;"></div>
-        <div class="theme-dot" data-theme="ocean" onclick="applyTheme('ocean')" title="Ocean Blue" style="background:#051836;border:2px solid #29b6f6;"></div>
-        <div class="theme-dot" data-theme="forest" onclick="applyTheme('forest')" title="Forest Green" style="background:#0a1a10;border:2px solid #00e676;"></div>
-        <div class="theme-dot" data-theme="sunset" onclick="applyTheme('sunset')" title="Sunset Red" style="background:#1a0808;border:2px solid #ff6b35;"></div>
-      </div>
+      <!-- Dark/Light mode toggle -->
+      <button id="theme-toggle" onclick="toggleDarkMode()" title="Dark/Light Mode"
+        style="background:var(--surface2);border:1px solid var(--border);color:var(--text);
+               border-radius:20px;padding:5px 12px;cursor:pointer;font-size:15px;
+               display:flex;align-items:center;gap:5px;transition:all .2s;">
+        🌙
+      </button>
     </div>
   </div>
 
@@ -946,7 +996,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
             <div class="form-group"><label>মোট ফ্লোর সংখ্যা</label><input type="number" id="wh-floors" placeholder="যেমন: 3"></div>
             <div class="form-group"><label>মোট সেকশন সংখ্যা</label><input type="number" id="wh-sections" placeholder="যেমন: 12"></div>
             <div class="form-group"><label>ম্যানেজারের নাম</label><input type="text" id="wh-mgr" placeholder="আপনার নাম"></div>
-            <button class="btn btn-primary" onclick="saveWhInfo()">💾 সেভ করুন</button>
+            <button class="btn btn-primary" onclick="requirePin(()=>{const _f=saveWhInfo;if(typeof _origSaveWhInfo!=='undefined')_origSaveWhInfo();else _f()},'💾 তথ্য সেভ করতে PIN দিন')">💾 সেভ করুন</button>
           </div>
         </div>
         <div class="section-card">
@@ -3437,10 +3487,8 @@ function kpiAddContact(){kpiContacts.push({wh:'BDC'+kpiContacts.length,manager:'
 // ── Util ───────────────────────────────────────────────────
 function kpiDlFile(name,type,content){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();URL.revokeObjectURL(a.href);}
 
-// ── showPage hook for KPI sub-pages ───────────────────────
-const _origShowPage = window.showPage;
-window.showPage = function(id) {
-  _origShowPage(id);
+// ── KPI sub-page render hook (called from PIN-gated showPage) ───────────────
+window._kpiAfterShow = function(id) {
   // Reload KPI data from localStorage each time
   KPI_E = JSON.parse(localStorage.getItem('epf_wms4') || '[]');
   if(id==='kpi-dashboard') kpiRenderDashboard();
@@ -4107,7 +4155,7 @@ function pinCancel() {
     </div>
     <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
       <button class="btn btn-secondary" onclick="misCloseModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="misSaveEntry()">🔐 Verify PIN &amp; Save</button>
+      <button class="btn btn-primary" onclick="requirePin(()=>misSaveEntry(),'🔐 MIS/Mail সেভ করতে PIN দিন')">🔐 Verify PIN &amp; Save</button>
     </div>
   </div>`;
   document.body.appendChild(misModal);
@@ -4166,6 +4214,174 @@ function pinCancel() {
   if(mp && !mp.value) mp.value = matCurrentMonth();
 })();
 
+
+// ═══════════════════════════════════════════════════════════════
+// PIN GATE SYSTEM (PIN: 0796)
+// Pages that are FREE (no PIN needed):
+//   dashboard, kpi (all sub), materials
+// All other pages: LOCKED until PIN entered
+// ═══════════════════════════════════════════════════════════════
+const SYSTEM_PIN = '0796';
+_pinCallback = null;
+let _pinSessionActive = false;
+let _pinSessionTimer  = null;
+let _pendingPageId    = null;
+
+// Pages that never require PIN
+const FREE_PAGES = new Set(['dashboard','kpi','kpi-dashboard','kpi-entry','kpi-records',
+  'kpi-monthly','kpi-alerts','kpi-ranking','kpi-import','kpi-backup','kpi-contacts','materials']);
+
+// ── Core PIN request ──────────────────────────────────────────────────────────
+function requirePin(callback, label='') {
+  if(_pinSessionActive) { callback(); return; }
+  _pinCallback = callback;
+  document.getElementById('wms-pin-label').textContent = label || 'এই পেজ দেখতে PIN প্রয়োজন';
+  document.getElementById('wms-pin-input').value = '';
+  document.getElementById('wms-pin-error').style.display = 'none';
+  document.getElementById('wms-pin-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('wms-pin-input').focus(), 80);
+}
+
+function wmsConfirmPin() {
+  const val = document.getElementById('wms-pin-input').value.trim();
+  if(val === SYSTEM_PIN) {
+    document.getElementById('wms-pin-modal').style.display = 'none';
+    _pinSessionActive = true;
+    clearTimeout(_pinSessionTimer);
+    // Session: 30 minutes
+    _pinSessionTimer = setTimeout(() => {
+      _pinSessionActive = false;
+      // Lock back — return to dashboard silently
+    }, 30 * 60 * 1000);
+    // Update lock icon in sidebar
+    const lockEl = document.getElementById('sidebar-lock-status');
+    if(lockEl) { lockEl.textContent = '🔓 Unlocked'; lockEl.style.color = 'var(--success)'; }
+    if(_pinCallback) { _pinCallback(); _pinCallback = null; }
+  } else {
+    document.getElementById('wms-pin-error').style.display = 'block';
+    const inp = document.getElementById('wms-pin-input');
+    inp.value = '';
+    inp.style.borderColor = 'var(--danger)';
+    inp.focus();
+    setTimeout(() => inp.style.borderColor = '', 1200);
+  }
+}
+
+function wmsCancelPin() {
+  document.getElementById('wms-pin-modal').style.display = 'none';
+  _pinCallback = null;
+  _pendingPageId = null;
+}
+
+// ── Manual lock ───────────────────────────────────────────────────────────────
+function lockSession() {
+  _pinSessionActive = false;
+  clearTimeout(_pinSessionTimer);
+  const lockEl = document.getElementById('sidebar-lock-status');
+  if(lockEl) { lockEl.textContent = '🔒 Locked'; lockEl.style.color = 'var(--danger)'; }
+  showPage('dashboard');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('.nav-item[onclick*="dashboard"]')?.classList.add('active');
+}
+
+// ── Intercept showPage ────────────────────────────────────────────────────────
+// PIN-gated showPage (wraps original)
+function showPage(id) {
+  function _doShow(pageId) {
+    // Call original render logic
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pageEl = document.getElementById('page-' + pageId);
+    if(pageEl) pageEl.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+pageId+"'")) n.classList.add('active');
+    });
+    const titleEl = document.getElementById('page-title');
+    if(titleEl) titleEl.textContent = pageTitles[pageId] || pageId;
+    const actEl = document.getElementById('topbar-actions');
+    if(actEl) actEl.innerHTML = pageActions[pageId] || '';
+    // Render functions
+    if(pageId==='officers') renderOfficers();
+    else if(pageId==='labors') renderLabors();
+    else if(pageId==='delivery') renderDelivery();
+    else if(pageId==='stock') renderStock();
+    else if(pageId==='floors') renderFloors();
+    else if(pageId==='forklift') renderForklift();
+    else if(pageId==='pda') renderPDA();
+    else if(pageId==='reports') renderReports();
+    else if(pageId==='organogram') renderOrganogram();
+    else if(pageId==='layout') renderLayout();
+    else if(pageId==='whlist') renderWHList();
+    else if(pageId==='pdflibrary') pdfLib.render();
+    else if(pageId==='flowchart' && window.renderFlowchart) renderFlowchart();
+    else if(pageId==='backup') renderBackup();
+    else if(pageId==='mis-email') misRender();
+    else if(pageId==='materials') matInit();
+    // KPI after-show hook
+    if(window._kpiAfterShow) window._kpiAfterShow(pageId);
+    // Close mobile sidebar
+    closeSidebar && closeSidebar();
+  }
+
+  if(FREE_PAGES.has(id)) { _doShow(id); return; }
+  if(_pinSessionActive)  { _doShow(id); return; }
+  // Locked — ask PIN
+  _pendingPageId = id;
+  const pageLabel = pageTitles[id] || id;
+  requirePin(() => {
+    _doShow(_pendingPageId || id);
+    _pendingPageId = null;
+  }, `🔒 "${pageLabel}" দেখতে PIN দিন`);
+}
+
+// ── Intercept KPI showKpi ─────────────────────────────────────────────────────
+// KPI pages are free — no need to wrap
+
+// ── Action gates (edit/delete/save within unlocked pages) ────────────────────
+const _origOpenModal = openModal;
+function openModal(type, id=null) {
+  requirePin(() => _origOpenModal(type, id),
+    id ? '✏️ এডিট করতে PIN দিন' : '➕ যোগ করতে PIN দিন');
+}
+
+const _origDeleteRecord = deleteRecord;
+function deleteRecord(dbKey, id) {
+  requirePin(() => _origDeleteRecord(dbKey, id), '🗑️ মুছতে PIN দিন');
+}
+
+const _origSaveWhInfo = saveWhInfo;
+function saveWhInfo() {
+  requirePin(() => _origSaveWhInfo(), '💾 সেভ করতে PIN দিন');
+}
+
+const _origExportData = exportData;
+function exportData() {
+  requirePin(() => _origExportData(), '⬇️ ব্যাকআপ করতে PIN দিন');
+}
+
+const _origClearAllData = clearAllData;
+function clearAllData() {
+  requirePin(() => _origClearAllData(), '⚠️ সব ডাটা মুছতে PIN দিন');
+}
+
+// ── Dark/Light mode toggle ───────────────────────────────────────────────────
+function toggleDarkMode() {
+  const isLight = document.body.classList.toggle('light-mode');
+  const btn = document.getElementById('theme-toggle');
+  if(btn) btn.textContent = isLight ? '☀️' : '🌙';
+  try { localStorage.setItem('wms_theme', isLight ? 'light' : 'dark'); } catch(e){}
+}
+
+// Init theme from localStorage
+(function initTheme() {
+  const saved = localStorage.getItem('wms_theme');
+  if(saved === 'light') {
+    document.body.classList.add('light-mode');
+    const btn = document.getElementById('theme-toggle');
+    if(btn) btn.textContent = '☀️';
+  }
+})();
+
 // ============ INIT ============
 // Page render map for Firebase real-time sync re-render
 window.pageRenderMap = {
@@ -4190,26 +4406,6 @@ renderOfficers && renderOfficers();
 
 </script>
 
-<!-- Mobile bottom navigation -->
-<nav id="mobile-nav">
-  <div class="mobile-nav-inner">
-    <button class="mobile-nav-btn active" onclick="showPage('dashboard');setMobileNav(this)">
-      <span class="mn-icon">🏠</span>হোম
-    </button>
-    <button class="mobile-nav-btn" onclick="showPage('officers');setMobileNav(this)">
-      <span class="mn-icon">👔</span>অফিসার
-    </button>
-    <button class="mobile-nav-btn" onclick="showPage('labors');setMobileNav(this)">
-      <span class="mn-icon">👷</span>লেবার
-    </button>
-    <button class="mobile-nav-btn" onclick="showPage('materials');setMobileNav(this)">
-      <span class="mn-icon">📦</span>মেটেরিয়াল
-    </button>
-    <button class="mobile-nav-btn" onclick="toggleSidebar()">
-      <span class="mn-icon">☰</span>আরো
-    </button>
-  </div>
-</nav>
 
 <script>
 // ── Sidebar mobile toggle ─────────────────────────────────────────────────────
@@ -4224,16 +4420,8 @@ function closeSidebar() {
   document.getElementById('sidebar-overlay').classList.remove('show');
 }
 
-// ── Mobile nav active state ───────────────────────────────────────────────────
-function setMobileNav(btn) {
-  document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  closeSidebar();
-}
-
-// ── PWA Service Worker + Manifest ────────────────────────────────────────────
+// ── PWA Manifest only (SW blob not supported in file:// — skip silently) ─────
 (function initPWA() {
-  // Inline manifest
   const manifest = {
     name: "EPF Warehouse Management",
     short_name: "EPF WMS",
@@ -4248,25 +4436,16 @@ function setMobileNav(btn) {
       { src: "https://img.icons8.com/fluency/512/warehouse.png", sizes: "512x512", type: "image/png" }
     ]
   };
-  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-  const link = document.getElementById('pwa-manifest');
-  if(link) link.href = URL.createObjectURL(blob);
-
-  // Service Worker
-  if('serviceWorker' in navigator) {
-    const swCode = `
-      const CACHE = 'epf-wms-v1';
-      self.addEventListener('install', e => e.waitUntil(
-        caches.open(CACHE).then(c => c.addAll(['.']))
-      ));
-      self.addEventListener('fetch', e => e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('.')))
-      ));
-    `;
-    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob))
-      .then(() => console.log('PWA SW registered'))
-      .catch(e => console.log('SW skip:', e.message));
+  try {
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const link = document.getElementById('pwa-manifest');
+    if(link) link.href = URL.createObjectURL(blob);
+  } catch(e) {}
+  // Service Worker — only works on https:// (GitHub Pages), skip on file://
+  if('serviceWorker' in navigator && location.protocol === 'https:') {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      if(!reg) console.log('PWA: deploy to GitHub Pages for SW support');
+    });
   }
 })();
 
@@ -4276,6 +4455,49 @@ document.addEventListener('click', (e) => {
   if(navItem && window.innerWidth <= 900) closeSidebar();
 });
 </script>
+
+
+
+<!-- WMS PIN Modal -->
+<div id="wms-pin-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);
+  backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;
+    padding:36px 32px;width:90%;max-width:340px;text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:modalIn .2s ease;">
+    <div style="font-size:40px;margin-bottom:8px;">🔐</div>
+    <h3 style="font-size:16px;font-weight:700;color:var(--accent);margin-bottom:6px;">PIN যাচাই</h3>
+    <p id="wms-pin-label" style="font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.5;min-height:36px;">
+      এই পেজ দেখতে PIN প্রয়োজন
+    </p>
+    <input type="password" id="wms-pin-input" maxlength="6"
+      placeholder="••••"
+      onkeydown="if(event.key==='Enter')wmsConfirmPin()"
+      style="width:100%;text-align:center;font-size:28px;letter-spacing:10px;
+        background:var(--surface2);border:2px solid var(--border);color:var(--text);
+        padding:14px;border-radius:12px;font-family:'IBM Plex Mono',monospace;
+        margin-bottom:8px;transition:border-color .2s;outline:none;">
+    <div id="wms-pin-error" style="display:none;color:var(--danger);font-size:12px;margin-bottom:12px;">
+      ❌ ভুল PIN! আবার চেষ্টা করুন।
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:16px;">
+      <button onclick="wmsCancelPin()"
+        style="flex:1;padding:10px;border:1px solid var(--border);border-radius:10px;
+          background:var(--surface2);color:var(--text2);cursor:pointer;font-size:14px;
+          font-family:inherit;transition:all .18s;">
+        বাতিল
+      </button>
+      <button onclick="wmsConfirmPin()"
+        style="flex:1;padding:10px;border:none;border-radius:10px;
+          background:var(--accent);color:#fff;cursor:pointer;font-size:14px;font-weight:600;
+          font-family:inherit;transition:all .18s;">
+        ✔ নিশ্চিত
+      </button>
+    </div>
+    <p style="font-size:10px;color:var(--text2);margin-top:16px;opacity:.6;">
+      🔓 একবার unlock হলে ৫ মিনিট সক্রিয় থাকবে
+    </p>
+  </div>
+</div>
 
 </body>
 </html>
