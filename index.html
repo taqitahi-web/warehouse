@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="EPF WMS">
 <link rel="manifest" id="pwa-manifest">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -126,7 +127,7 @@ nav { flex: 1; padding: 16px 0; overflow-y: auto; }
   display: flex; align-items: center; justify-content: space-between;
   position: sticky; top: 0; z-index: 50;
 }
-.topbar h2 { font-family: 'Inter', 'Noto Sans Bengali', sans-serif; font-size: 18px; font-weight: 700; }
+.topbar h2 { font-family: 'Inter', 'Noto Sans Bengali', sans-serif; font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 480px; }
 .topbar-actions { display: flex; gap: 10px; }
 .btn {
   padding: 8px 16px; border: none; border-radius: 8px;
@@ -467,6 +468,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
 }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Firebase SDK — warehouse-e932a -->
@@ -500,6 +502,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
           pda:          data.pda          || [],
           reports:      data.reports      || [],
           warehouseList:data.warehouseList|| [],
+          fired:        data.fired        || [],
           whInfo:       data.whInfo       || {},
           updatedAt:    Date.now()
         });
@@ -520,7 +523,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
       onSnapshot(DOC_REF, (snap) => {
         if(snap.exists()) {
           const data = snap.data();
-          ['officers','labors','delivery','stock','floors','forklift','pda','reports','warehouseList'].forEach(k => {
+          ['officers','labors','delivery','stock','floors','forklift','pda','reports','warehouseList','fired'].forEach(k => {
             if(data[k] && data[k].length > 0) DB[k] = data[k];
           });
           if(data.whInfo && Object.keys(data.whInfo).length > 0) DB.whInfo = data.whInfo;
@@ -532,12 +535,14 @@ a.call-link::before { content: '📞'; font-size: 11px; }
             if(window.pageRenderMap[pid]) window.pageRenderMap[pid]();
           }
           if(statusEl){ statusEl.textContent='☁️ Live ✓'; statusEl.style.color='var(--success)'; }
+          updateFirebaseStatus && updateFirebaseStatus('☁️ Firebase সংযুক্ত ✅', 'var(--success)');
         } else {
           if(statusEl){ statusEl.textContent='📦 No data'; statusEl.style.color='var(--text2)'; }
         }
       }, (err) => {
         console.warn('Firebase offline:', err.message);
         if(statusEl){ statusEl.textContent='💾 Offline'; statusEl.style.color='var(--warning)'; }
+        updateFirebaseStatus && updateFirebaseStatus('💾 Offline মোডে চলছে', 'var(--warning)');
       });
     });
     </script>
@@ -551,7 +556,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
   <div class="sidebar-logo">
     <div class="wh-icon">🏭</div>
     <h1>EPF WMS</h1>
-    <p>ইপিএফ ওয়্যারহাউজ ডাটাবেজ</p>
+    <p>ইপিএফ ওয়্যারহাউজ ডাটাবেজ ড্যাশবোর্ড</p>
     <small style="font-size:9px;color:var(--text2);display:block;margin-top:2px;">Developed by Warehouse Manager</small>
   </div>
   <nav>
@@ -561,6 +566,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     <div class="nav-section">ম্যানপাওয়ার</div>
     <div class="nav-item nav-locked" onclick="showPage('officers')"><span class="icon">👔</span> অফিসার <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
     <div class="nav-item nav-locked" onclick="showPage('labors')"><span class="icon">👷</span> লেবার <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
+    <div class="nav-item nav-locked" onclick="showPage('fired')"><span class="icon">🚫</span> ফায়ার/বহিষ্কার <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
     <div class="nav-item nav-locked" onclick="showPage('organogram')"><span class="icon">🌐</span> অর্গানোগ্রাম <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span></div>
     
     <div class="nav-section">অপারেশন</div>
@@ -620,7 +626,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
 <main id="main">
   <div class="topbar">
       <button id="sidebar-toggle" onclick="toggleSidebar()" style="display:none;" aria-label="Menu">☰</button>
-    <h2 id="page-title">ড্যাশবোর্ড</h2>
+    <h2 id="page-title">ইপিএফ ওয়্যারহাউজ ডাটাবেজ ড্যাশবোর্ড</h2>
     <div class="topbar-actions" id="topbar-actions"></div>
     <div class="topbar-right-controls">
       <span id="fb-sync-status" style="font-size:11px;color:var(--text2);font-family:'IBM Plex Mono',monospace;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;">💾 Local</span>
@@ -685,6 +691,12 @@ a.call-link::before { content: '📞'; font-size: 11px; }
         <div class="sub">মোট লোকেশন</div>
         <div class="big-icon">🏭</div>
       </div>
+      <div class="stat-card red" onclick="showPage('fired')">
+        <div class="label">ফায়ার/বহিষ্কার</div>
+        <div class="value" id="stat-fired">0</div>
+        <div class="sub">মোট বহিষ্কৃত</div>
+        <div class="big-icon">🚫</div>
+      </div>
     </div>
 
     <!-- ══════════ WAREHOUSE STATUS CARDS ══════════ -->
@@ -729,6 +741,15 @@ a.call-link::before { content: '📞'; font-size: 11px; }
             <tbody id="mp-summary-gt"></tbody>
           </table>
         </div>
+      </div>
+      <!-- Fired summary strip -->
+      <div style="margin-top:14px;padding:10px 14px;background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.25);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:12px;color:var(--danger);font-weight:600;">🚫 ফায়ার / বহিষ্কার মোট:
+          <strong id="dash-fired-total" style="font-size:16px;font-family:'IBM Plex Mono',monospace;">0</strong> জন
+          &nbsp;|&nbsp; অফিসার: <strong id="dash-fired-off">0</strong>
+          &nbsp;|&nbsp; লেবার/ড্রাইভার: <strong id="dash-fired-lab">0</strong>
+        </span>
+        <button class="btn btn-danger" style="padding:5px 14px;font-size:12px;" onclick="showPage('fired')">বিস্তারিত দেখুন →</button>
       </div>
     </div>
 
@@ -811,6 +832,146 @@ a.call-link::before { content: '📞'; font-size: 11px; }
         <thead><tr><th>#</th><th>নাম</th><th class='hide-sm'>ID</th><th>পদবী / ধরন</th><th>Factory</th><th class='hide-sm'>ডিপার্টমেন্ট</th><th class='hide-xs'>বিল্ডিং</th><th class='hide-xs'>দায়িত্ব</th><th class='hide-sm'>WH Code</th><th>মোবাইল</th><th class='hide-sm'>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
         <tbody id="labor-tbody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- FIRED / TERMINATED -->
+  <div class="page" id="page-fired">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+      <div class="alert alert-warning" style="margin:0;flex:1;min-width:220px;">
+        🚫 মোট <strong id="fired-count">0</strong> জন বহিষ্কৃত/চাকরিচ্যুত
+        &nbsp;|&nbsp; <span id="fired-officer-count" style="color:var(--accent);">অফিসার: 0</span>
+        &nbsp;|&nbsp; <span id="fired-labor-count" style="color:var(--accent3);">লেবার/ড্রাইভার: 0</span>
+      </div>
+      <button class="btn btn-danger" onclick="openFiredModal()" style="white-space:nowrap;">
+        ➕ নতুন এন্ট্রি যোগ করুন
+      </button>
+    </div>
+
+    <!-- Filter bar -->
+    <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+      <div class="search-bar" style="flex:1;min-width:200px;">
+        <input type="text" id="fired-search" placeholder="নাম, ID, ফ্যাক্টরি বা কারণ দিয়ে খুঁজুন..."
+          oninput="renderFired()"
+          style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 14px 10px 36px;border-radius:8px;font-family:inherit;font-size:13px;">
+      </div>
+      <select id="fired-filter-factory" onchange="renderFired()"
+        style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-family:inherit;font-size:13px;">
+        <option value="">সব Factory</option>
+        <option value="EPF">EPF</option>
+        <option value="TGL">TGL</option>
+        <option value="BGL">BGL</option>
+        <option value="GTM">GTM</option>
+        <option value="EC">EC</option>
+        <option value="RFL">RFL</option>
+      </select>
+      <select id="fired-filter-type" onchange="renderFired()"
+        style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-family:inherit;font-size:13px;">
+        <option value="">সব ধরন</option>
+        <option value="officer">অফিসার</option>
+        <option value="labor">লেবার</option>
+        <option value="driver">ড্রাইভার</option>
+      </select>
+      <select id="fired-filter-reason" onchange="renderFired()"
+        style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-family:inherit;font-size:13px;">
+        <option value="">সব কারণ</option>
+        <option value="বহিষ্কার">বহিষ্কার</option>
+        <option value="চাকরিচ্যুত">চাকরিচ্যুত (ফায়ার)</option>
+        <option value="স্বেচ্ছায় পদত্যাগ">স্বেচ্ছায় পদত্যাগ</option>
+        <option value="চুক্তি শেষ">চুক্তি শেষ</option>
+        <option value="অন্যান্য">অন্যান্য</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>নাম</th>
+            <th class="hide-sm">EMP ID</th>
+            <th>ধরন</th>
+            <th>Factory</th>
+            <th class="hide-sm">পদবী</th>
+            <th class="hide-sm">WH Code</th>
+            <th>কারণ</th>
+            <th class="hide-xs">তারিখ</th>
+            <th class="hide-xs">মন্তব্য</th>
+            <th>অ্যাকশন</th>
+          </tr>
+        </thead>
+        <tbody id="fired-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FIRED MODAL -->
+  <div class="modal-overlay" id="fired-modal">
+    <div class="modal" style="max-width:560px;">
+      <h3 id="fired-modal-title">🚫 ফায়ার / বহিষ্কার এন্ট্রি</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>নাম *</label>
+          <input type="text" id="fm-name" placeholder="সম্পূর্ণ নাম">
+        </div>
+        <div class="form-group">
+          <label>Employee ID *</label>
+          <input type="text" id="fm-empid" placeholder="যেমন: 33359">
+        </div>
+        <div class="form-group">
+          <label>ধরন *</label>
+          <select id="fm-type">
+            <option value="officer">অফিসার</option>
+            <option value="labor">লেবার</option>
+            <option value="driver">ড্রাইভার</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Factory</label>
+          <select id="fm-factory">
+            <option value="EPF">EPF</option>
+            <option value="TGL">TGL</option>
+            <option value="BGL">BGL</option>
+            <option value="GTM">GTM</option>
+            <option value="EC">EC</option>
+            <option value="RFL">RFL</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>পদবী / Designation</label>
+          <input type="text" id="fm-designation" placeholder="যেমন: Executive, Labour">
+        </div>
+        <div class="form-group">
+          <label>Section</label>
+          <input type="text" id="fm-section" placeholder="যেমন: Main Material">
+        </div>
+        <div class="form-group">
+          <label>WH Code</label>
+          <input type="text" id="fm-whcode" placeholder="যেমন: BDC110">
+        </div>
+        <div class="form-group">
+          <label>বহিষ্কারের কারণ *</label>
+          <select id="fm-reason">
+            <option value="বহিষ্কার">বহিষ্কার</option>
+            <option value="চাকরিচ্যুত">চাকরিচ্যুত (ফায়ার)</option>
+            <option value="স্বেচ্ছায় পদত্যাগ">স্বেচ্ছায় পদত্যাগ</option>
+            <option value="চুক্তি শেষ">চুক্তি শেষ</option>
+            <option value="অন্যান্য">অন্যান্য</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>তারিখ *</label>
+          <input type="date" id="fm-date">
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label>মন্তব্য / বিস্তারিত</label>
+          <textarea id="fm-note" placeholder="বহিষ্কারের কারণ বা অন্য কোনো তথ্য..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeFiredModal()">বাতিল</button>
+        <button class="btn btn-danger" onclick="saveFiredEntry()">💾 সংরক্ষণ করুন</button>
+      </div>
     </div>
   </div>
 
@@ -986,43 +1147,90 @@ a.call-link::before { content: '📞'; font-size: 11px; }
   </div>
 
   <div class="page" id="page-backup">
-    <div style="padding:24px 32px;">
-      <div class="grid-2">
-        <div class="section-card">
-          <h3>⚙️ ওয়্যারহাউস তথ্য সেটআপ</h3>
-          <div class="form-grid" style="grid-template-columns:1fr;">
-            <div class="form-group"><label>ওয়্যারহাউসের নাম</label><input type="text" id="wh-name" placeholder="যেমন: কেন্দ্রীয় ওয়্যারহাউস"></div>
-            <div class="form-group"><label>লোকেশন / ঠিকানা</label><input type="text" id="wh-loc" placeholder="যেমন: ঢাকা, মিরপুর"></div>
-            <div class="form-group"><label>মোট ফ্লোর সংখ্যা</label><input type="number" id="wh-floors" placeholder="যেমন: 3"></div>
-            <div class="form-group"><label>মোট সেকশন সংখ্যা</label><input type="number" id="wh-sections" placeholder="যেমন: 12"></div>
-            <div class="form-group"><label>ম্যানেজারের নাম</label><input type="text" id="wh-mgr" placeholder="আপনার নাম"></div>
-            <button class="btn btn-primary" onclick="requirePin(()=>{const _f=saveWhInfo;if(typeof _origSaveWhInfo!=='undefined')_origSaveWhInfo();else _f()},'💾 তথ্য সেভ করতে PIN দিন')">💾 সেভ করুন</button>
+    <div style="padding:24px 32px; max-width:700px; margin:0 auto;">
+
+      <!-- Firebase Sync Status Card -->
+      <div class="section-card" style="margin-bottom:20px; border:1px solid rgba(47,129,247,.3);">
+        <h3 style="color:var(--accent); margin-bottom:16px;">☁️ Firebase Real-time Sync</h3>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <div id="bk-firebase-dot" style="width:12px;height:12px;border-radius:50%;background:var(--text2);flex-shrink:0;"></div>
+          <div>
+            <div id="bk-firebase-status" style="font-size:14px;font-weight:600;color:var(--text);">সংযোগ যাচাই হচ্ছে...</div>
+            <div id="bk-firebase-info" style="font-size:11px;color:var(--text2);margin-top:2px;font-family:'IBM Plex Mono',monospace;">warehouse-e932a.firebaseapp.com</div>
           </div>
         </div>
-        <div class="section-card">
-          <h3>💾 ডেটা ব্যাকআপ ও রিস্টোর</h3>
-          <p style="font-size:13px; color:var(--text2); margin-bottom:20px;">সমস্ত ডেটা JSON ফাইলে সেভ করুন এবং পরে আবার লোড করুন।</p>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <button class="btn btn-success" onclick="exportData()" style="justify-content:center;">⬇️ JSON ব্যাকআপ ডাউনলোড করুন</button>
-            <div style="border:2px dashed var(--border); border-radius:10px; padding:20px; text-align:center;">
-              <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display:none">
-              <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" style="margin:0 auto;">⬆️ JSON ফাইল ইমপোর্ট করুন</button>
-              <p style="font-size:11px; color:var(--text2); margin-top:8px;">আগে ডাউনলোড করা JSON ফাইল সিলেক্ট করুন</p>
-            </div>
-            <button class="btn btn-danger" onclick="clearAllData()" style="justify-content:center;">🗑️ সব ডেটা মুছে ফেলুন</button>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;">
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">অফিসার</div>
+            <div style="font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--accent);" id="bk-officers">0</div>
           </div>
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">লেবার</div>
+            <div style="font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--accent2);" id="bk-labors">0</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">PDA</div>
+            <div style="font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--accent3);" id="bk-pda">0</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">ডেলিভারি</div>
+            <div style="font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--warning);" id="bk-delivery">0</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">স্টক</div>
+            <div style="font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--success);" id="bk-stock">0</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">ফর্কলিফট</div>
+            <div style="font-size:24px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--danger);" id="bk-forklift">0</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="manualFirebaseSync()" style="width:100%;justify-content:center;">
+          ☁️ Firebase-এ এখনই সিংক করুন
+        </button>
+        <div id="bk-last-sync" style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'IBM Plex Mono',monospace;"></div>
+      </div>
+
+      <!-- Excel Export -->
+      <div class="section-card" style="margin-bottom:16px;">
+        <h3 style="margin-bottom:12px;">📊 Excel এক্সপোর্ট</h3>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:14px;">৭টি Sheet: Officers, Labour, WH List, Forklift, PDA, Delivery, Stock + Summary</p>
+        <button class="btn btn-success" onclick="exportExcel()" style="width:100%;justify-content:center;font-size:14px;padding:12px;">
+          📊 Excel (.xlsx) ডাউনলোড করুন
+        </button>
+      </div>
+
+      <!-- Email Send -->
+      <div class="section-card" style="margin-bottom:16px;">
+        <h3 style="margin-bottom:12px;">📧 ইমেইল পাঠান</h3>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">ডিফল্ট mail app (Gmail/Outlook) খুলবে summary সহ</p>
+        <div style="display:flex;gap:8px;">
+          <input type="email" id="email-recipient" placeholder="প্রাপকের email দিন..."
+            style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);
+                   padding:10px 14px;border-radius:8px;font-family:inherit;font-size:13px;">
+          <button class="btn btn-primary" onclick="sendEmail()" style="white-space:nowrap;padding:10px 16px;">
+            📧 পাঠান
+          </button>
         </div>
       </div>
-      <div class="section-card" style="margin-top:16px;">
-        <h3>📊 ডেটা সারসংক্ষেপ</h3>
-        <div class="stats-grid" style="margin-bottom:0;">
-          <div class="stat-card blue"><div class="label">অফিসার</div><div class="value" id="bk-officers">0</div></div>
-          <div class="stat-card orange"><div class="label">লেবার</div><div class="value" id="bk-labors">0</div></div>
-          <div class="stat-card green"><div class="label">ডেলিভারি</div><div class="value" id="bk-delivery">0</div></div>
-          <div class="stat-card yellow"><div class="label">স্টক আইটেম</div><div class="value" id="bk-stock">0</div></div>
-          <div class="stat-card blue"><div class="label">ফর্কলিফট</div><div class="value" id="bk-forklift">0</div></div>
-          <div class="stat-card orange"><div class="label">PDA</div><div class="value" id="bk-pda">0</div></div>
+
+      <!-- Local Backup -->
+      <div class="section-card">
+        <h3 style="margin-bottom:16px;">💾 লোকাল ব্যাকআপ ও রিস্টোর</h3>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <button class="btn btn-secondary" onclick="exportData()" style="justify-content:center;">⬇️ JSON ব্যাকআপ ডাউনলোড করুন</button>
+          <div style="border:2px dashed var(--border); border-radius:10px; padding:20px; text-align:center;">
+            <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display:none">
+            <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" style="margin:0 auto;">⬆️ JSON ফাইল ইমপোর্ট করুন</button>
+            <p style="font-size:11px; color:var(--text2); margin-top:8px;">আগে ডাউনলোড করা JSON ফাইল সিলেক্ট করুন</p>
+          </div>
+          <button class="btn btn-danger" onclick="clearAllData()" style="justify-content:center;">🗑️ সব ডেটা মুছে ফেলুন</button>
         </div>
+      </div>
+
+      <!-- Hidden legacy fields needed by renderBackup() -->
+      <div style="display:none;">
+        <input id="wh-name"><input id="wh-loc"><input id="wh-floors"><input id="wh-sections"><input id="wh-mgr">
       </div>
     </div>
   </div>
@@ -1738,7 +1946,8 @@ let DB = {
     {id:'wl026', sl:26, fty:'GT-06', place:'1st floor',             items:'MM/PM/SM/EQ',    misCode:'BDC110/BDC210/BDC310/BDC515'},
     {id:'wl027', sl:27, fty:'GT-08', place:'C-building 1st Floor',  items:'MM/PM/SM/EQ',    misCode:'BDC110/BDC210/BDC310/BDC515'},
   ],
-  reports: []
+  reports: [],
+  fired: []
 };
 let currentModal = null;
 let editId = null;
@@ -1760,7 +1969,7 @@ function loadLocalDB() {
     if(saved) {
       const parsed = JSON.parse(saved);
       // Merge with existing DB — preserve hardcoded data if saved is empty
-      ['officers','labors','delivery','stock','floors','forklift','pda','reports','warehouseList'].forEach(k => {
+      ['officers','labors','delivery','stock','floors','forklift','pda','reports','warehouseList','fired'].forEach(k => {
         if(parsed[k] && parsed[k].length > 0) DB[k] = parsed[k];
       });
       if(parsed.whInfo && Object.keys(parsed.whInfo).length > 0) DB.whInfo = parsed.whInfo;
@@ -1770,7 +1979,8 @@ function loadLocalDB() {
 
 // ============ NAVIGATION ============
 const pageTitles = {
-  dashboard:'ড্যাশবোর্ড', officers:'অফিসার তালিকা', labors:'লেবার তালিকা',
+  dashboard:'ইপিএফ ওয়্যারহাউজ ডাটাবেজ ড্যাশবোর্ড', officers:'অফিসার তালিকা', labors:'লেবার তালিকা',
+  fired:'ফায়ার / বহিষ্কার তালিকা',
   organogram:'অর্গানোগ্রাম', whlist:'ওয়্যারহাউস লিস্ট', delivery:'ডেলিভারি', stock:'স্টক রিপোর্ট',
   floors:'ফ্লোর লিস্ট', forklift:'ফর্কলিফট', pda:'PDA / স্মার্ট ডিভাইস',
   layout:'লে-আউট', flowchart:'ওয়ার্ক ফ্লো চার্ট', reports:'রিপোর্ট ও ফাইল', backup:'ব্যাকআপ ও সেটআপ',
@@ -1797,33 +2007,204 @@ const pageActions = {
 };
 
 function showPage(id) {
+  // PIN gate — dashboard, kpi-*, materials are free
+  const FREE = new Set(['dashboard','materials','kpi','kpi-dashboard','kpi-entry','kpi-records','kpi-monthly','kpi-alerts','kpi-ranking','kpi-import','kpi-backup','kpi-contacts']);
+  if(!FREE.has(id) && !_pinSessionActive) {
+    const pageLabel = pageTitles[id] || id;
+    requirePin(() => showPage(id), '🔒 "' + pageLabel + '" দেখতে PIN দিন');
+    return;
+  }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
+  const pageEl = document.getElementById('page-' + id);
+  if(pageEl) pageEl.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => {
     if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
   });
   document.getElementById('page-title').textContent = pageTitles[id] || id;
   document.getElementById('topbar-actions').innerHTML = pageActions[id] || '';
+  closeSidebar && closeSidebar();
 
   // Render specific pages
   if(id==='officers') renderOfficers();
-  if(id==='labors') renderLabors();
-  if(id==='delivery') renderDelivery();
-  if(id==='stock') renderStock();
-  if(id==='floors') renderFloors();
-  if(id==='forklift') renderForklift();
-  if(id==='pda') renderPDA();
-  if(id==='reports') renderReports();
-  if(id==='organogram') renderOrganogram();
-  if(id==='layout') renderLayout();
-  if(id==='whlist') renderWHList();
-  if(id==='pdflibrary') pdfLib.render();
-  if(id==='flowchart' && window.renderFlowchart) renderFlowchart();
-  // KPI loaded inline
-  if(id==='backup') renderBackup();
-  if(id==='mis-email') misRender();
-  if(id==='materials') matInit();
+  else if(id==='labors') renderLabors();
+  else if(id==='fired') renderFired();
+  else if(id==='delivery') renderDelivery();
+  else if(id==='stock') renderStock();
+  else if(id==='floors') renderFloors();
+  else if(id==='forklift') renderForklift();
+  else if(id==='pda') renderPDA();
+  else if(id==='reports') renderReports();
+  else if(id==='organogram') renderOrganogram();
+  else if(id==='layout') renderLayout();
+  else if(id==='whlist') renderWHList();
+  else if(id==='pdflibrary') pdfLib.render();
+  else if(id==='flowchart' && window.renderFlowchart) renderFlowchart();
+  else if(id==='backup') renderBackup();
+  else if(id==='mis-email') misRender();
+  else if(id==='materials') matInit();
+  // KPI after-show
+  if(window._kpiAfterShow) window._kpiAfterShow(id);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FIRED / TERMINATED MODULE
+// ═══════════════════════════════════════════════════════════════
+let _firedEditId = null;
+
+function renderFired() {
+  if(!DB.fired) DB.fired = [];
+  const q      = (document.getElementById('fired-search')?.value||'').toLowerCase();
+  const fac    = document.getElementById('fired-filter-factory')?.value||'';
+  const type   = document.getElementById('fired-filter-type')?.value||'';
+  const reason = document.getElementById('fired-filter-reason')?.value||'';
+
+  let data = DB.fired.filter(f =>
+    (!q      || f.name?.toLowerCase().includes(q) || f.empId?.toLowerCase().includes(q) ||
+                f.factory?.toLowerCase().includes(q) || f.reason?.toLowerCase().includes(q) ||
+                f.note?.toLowerCase().includes(q)) &&
+    (!fac    || f.factory === fac) &&
+    (!type   || f.type === type) &&
+    (!reason || f.reason === reason)
+  );
+
+  // Sort: newest date first
+  data.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+
+  const tbody = document.getElementById('fired-tbody');
+  if(!tbody) return;
+
+  if(data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" class="empty-state"><div class="icon">🚫</div>কোনো রেকর্ড নেই</td></tr>`;
+  } else {
+    const reasonColor = { 'বহিষ্কার':'badge-red', 'চাকরিচ্যুত':'badge-orange', 'স্বেচ্ছায় পদত্যাগ':'badge-yellow', 'চুক্তি শেষ':'badge-blue', 'অন্যান্য':'badge-blue' };
+    const typeLabel   = { officer:'👔 অফিসার', labor:'👷 লেবার', driver:'🚗 ড্রাইভার' };
+    tbody.innerHTML = data.map((f, i) => `
+      <tr>
+        <td style="color:var(--text2);font-size:12px;">${i+1}</td>
+        <td><strong>${f.name||'—'}</strong></td>
+        <td class="hide-sm" style="font-family:'IBM Plex Mono',monospace;font-size:12px;">${f.empId||'—'}</td>
+        <td><span class="badge badge-blue" style="font-size:11px;">${typeLabel[f.type]||f.type||'—'}</span></td>
+        <td><span class="tag">${f.factory||'—'}</span></td>
+        <td class="hide-sm" style="font-size:12px;">${f.designation||'—'}</td>
+        <td class="hide-sm" style="font-size:12px;font-family:'IBM Plex Mono',monospace;">${f.whCode||'—'}</td>
+        <td><span class="badge ${reasonColor[f.reason]||'badge-red'}">${f.reason||'—'}</span></td>
+        <td class="hide-xs" style="font-size:12px;font-family:'IBM Plex Mono',monospace;">${f.date||'—'}</td>
+        <td class="hide-xs" style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${f.note||''}">${f.note||'—'}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-secondary" style="padding:4px 10px;font-size:11px;" onclick="editFiredEntry('${f.id}')">✏️</button>
+            <button class="btn btn-danger"    style="padding:4px 10px;font-size:11px;" onclick="deleteFiredEntry('${f.id}')">🗑️</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // Update counters
+  const total   = DB.fired.length;
+  const officers= DB.fired.filter(f=>f.type==='officer').length;
+  const labors  = DB.fired.filter(f=>f.type!=='officer').length;
+  const countEl  = document.getElementById('fired-count');
+  const offEl    = document.getElementById('fired-officer-count');
+  const labEl    = document.getElementById('fired-labor-count');
+  if(countEl) countEl.textContent = total;
+  if(offEl)   offEl.textContent   = 'অফিসার: '+officers;
+  if(labEl)   labEl.textContent   = 'লেবার/ড্রাইভার: '+labors;
+}
+
+function openFiredModal(prefillId) {
+  _firedEditId = null;
+  document.getElementById('fired-modal-title').textContent = '🚫 নতুন ফায়ার / বহিষ্কার এন্ট্রি';
+  document.getElementById('fm-name').value        = '';
+  document.getElementById('fm-empid').value       = '';
+  document.getElementById('fm-type').value        = 'labor';
+  document.getElementById('fm-factory').value     = 'EPF';
+  document.getElementById('fm-designation').value = '';
+  document.getElementById('fm-section').value     = '';
+  document.getElementById('fm-whcode').value      = '';
+  document.getElementById('fm-reason').value      = 'চাকরিচ্যুত';
+  document.getElementById('fm-date').value        = new Date().toISOString().slice(0,10);
+  document.getElementById('fm-note').value        = '';
+  document.getElementById('fired-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('fm-name').focus(),100);
+}
+
+function editFiredEntry(id) {
+  if(!DB.fired) return;
+  const f = DB.fired.find(x=>x.id===id);
+  if(!f) return;
+  _firedEditId = id;
+  document.getElementById('fired-modal-title').textContent = '✏️ এন্ট্রি সম্পাদনা করুন';
+  document.getElementById('fm-name').value        = f.name||'';
+  document.getElementById('fm-empid').value       = f.empId||'';
+  document.getElementById('fm-type').value        = f.type||'labor';
+  document.getElementById('fm-factory').value     = f.factory||'EPF';
+  document.getElementById('fm-designation').value = f.designation||'';
+  document.getElementById('fm-section').value     = f.section||'';
+  document.getElementById('fm-whcode').value      = f.whCode||'';
+  document.getElementById('fm-reason').value      = f.reason||'চাকরিচ্যুত';
+  document.getElementById('fm-date').value        = f.date||'';
+  document.getElementById('fm-note').value        = f.note||'';
+  document.getElementById('fired-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('fm-name').focus(),100);
+}
+
+function closeFiredModal() {
+  document.getElementById('fired-modal').classList.remove('open');
+  _firedEditId = null;
+}
+
+function saveFiredEntry() {
+  const name   = document.getElementById('fm-name').value.trim();
+  const empId  = document.getElementById('fm-empid').value.trim();
+  const reason = document.getElementById('fm-reason').value;
+  const date   = document.getElementById('fm-date').value;
+
+  if(!name)   { alert('নাম আবশ্যিক!'); document.getElementById('fm-name').focus(); return; }
+  if(!reason) { alert('কারণ আবশ্যিক!'); return; }
+  if(!date)   { alert('তারিখ আবশ্যিক!'); document.getElementById('fm-date').focus(); return; }
+
+  if(!DB.fired) DB.fired = [];
+
+  const entry = {
+    id:          _firedEditId || uid(),
+    name,
+    empId:       document.getElementById('fm-empid').value.trim(),
+    type:        document.getElementById('fm-type').value,
+    factory:     document.getElementById('fm-factory').value,
+    designation: document.getElementById('fm-designation').value.trim(),
+    section:     document.getElementById('fm-section').value.trim(),
+    whCode:      document.getElementById('fm-whcode').value.trim(),
+    reason,
+    date,
+    note:        document.getElementById('fm-note').value.trim(),
+    addedAt:     _firedEditId ? (DB.fired.find(x=>x.id===_firedEditId)?.addedAt || new Date().toISOString()) : new Date().toISOString(),
+  };
+
+  if(_firedEditId) {
+    const idx = DB.fired.findIndex(x=>x.id===_firedEditId);
+    if(idx>-1) DB.fired[idx] = entry;
+    addActivity(`এন্ট্রি আপডেট: ${name}`, 'var(--warning)');
+  } else {
+    DB.fired.push(entry);
+    addActivity(`ফায়ার/বহিষ্কার নথিভুক্ত: ${name} (${reason})`, 'var(--danger)');
+  }
+
+  saveDB();
+  renderFired();
+  closeFiredModal();
+}
+
+function deleteFiredEntry(id) {
+  if(!DB.fired) return;
+  const f = DB.fired.find(x=>x.id===id);
+  if(!f) return;
+  if(!confirm(`"${f.name}" এর রেকর্ড মুছে ফেলবেন?`)) return;
+  DB.fired = DB.fired.filter(x=>x.id!==id);
+  addActivity(`রেকর্ড মুছে ফেলা হয়েছে: ${f.name}`, 'var(--warning)');
+  saveDB();
+  renderFired();
 }
 
 // ============ DASHBOARD ============
@@ -1929,6 +2310,7 @@ function updateDashboard() {
   document.getElementById('stat-pda').textContent = DB.pda.length;
   const wlEl = document.getElementById('stat-whlist');
   if(wlEl) wlEl.textContent = DB.warehouseList.length;
+  const firedEl = document.getElementById("stat-fired"); if(firedEl) firedEl.textContent = (DB.fired||[]).length;
   // WH info
   const w = DB.whInfo;
   document.getElementById('wh-name-display').textContent = w.name || '—';
@@ -1944,6 +2326,8 @@ function updateDashboard() {
   document.getElementById('bk-forklift').textContent = DB.forklift.length;
   document.getElementById('bk-pda').textContent = DB.pda.length;
   updateMpSummary();
+  // Fired summary strip on dashboard
+  const _f = DB.fired||[]; const _ft=document.getElementById("dash-fired-total"); const _fo=document.getElementById("dash-fired-off"); const _fl=document.getElementById("dash-fired-lab"); if(_ft)_ft.textContent=_f.length; if(_fo)_fo.textContent=_f.filter(x=>x.type==="officer").length; if(_fl)_fl.textContent=_f.filter(x=>x.type!=="officer").length;
   renderWarehouseStatusCards();
 }
 
@@ -2347,7 +2731,7 @@ const modalForms = {
   }
 };
 
-function openModal(type, id=null) {
+function _rawOpenModal(type, id=null) {
   currentModal = type;
   editId = id;
   const cfg = modalForms[type];
@@ -2412,7 +2796,7 @@ function saveModal() {
   if(renderMap[dbKey]) renderMap[dbKey]();
 }
 
-function deleteRecord(dbKey, id) {
+function _rawDeleteRecord(dbKey, id) {
   if(!confirm('এই রেকর্ডটি মুছে ফেলবেন?')) return;
   DB[dbKey] = DB[dbKey].filter(r=>r.id!==id);
   addActivity(`রেকর্ড মুছে ফেলা হয়েছে`, 'var(--danger)');
@@ -2422,7 +2806,7 @@ function deleteRecord(dbKey, id) {
 }
 
 // ============ WAREHOUSE INFO ============
-function saveWhInfo() {
+function _rawSaveWhInfo() {
   DB.whInfo = {
     name: document.getElementById('wh-name').value,
     location: document.getElementById('wh-loc').value,
@@ -2436,7 +2820,7 @@ function saveWhInfo() {
 }
 
 // ============ BACKUP ============
-function exportData() {
+function _rawExportData() {
   const json = JSON.stringify(DB, null, 2);
   const blob = new Blob([json], {type:'application/json'});
   const a = document.createElement('a');
@@ -2471,9 +2855,9 @@ function importData(e) {
   e.target.value = '';
 }
 
-function clearAllData() {
+function _rawClearAllData() {
   if(!confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এই কাজ পূর্বাবস্থায় ফেরানো যাবে না!')) return;
-  DB = { whInfo:{}, officers:[], labors:[], delivery:[], stock:[], floors:[], forklift:[], pda:[], reports:[] };
+  DB = { whInfo:{}, officers:[], labors:[], delivery:[], stock:[], floors:[], forklift:[], pda:[], reports:[], fired:[] };
   saveDB();
   addActivity('সকল ডেটা মুছে ফেলা হয়েছে', 'var(--danger)');
   alert('✅ সব ডেটা মুছে ফেলা হয়েছে।');
@@ -4227,9 +4611,7 @@ let _pinSessionActive = false;
 let _pinSessionTimer  = null;
 let _pendingPageId    = null;
 
-// Pages that never require PIN
-const FREE_PAGES = new Set(['dashboard','kpi','kpi-dashboard','kpi-entry','kpi-records',
-  'kpi-monthly','kpi-alerts','kpi-ranking','kpi-import','kpi-backup','kpi-contacts','materials']);
+// FREE_PAGES handled inside showPage directly
 
 // ── Core PIN request ──────────────────────────────────────────────────────────
 function requirePin(callback, label='') {
@@ -4279,90 +4661,20 @@ function lockSession() {
   clearTimeout(_pinSessionTimer);
   const lockEl = document.getElementById('sidebar-lock-status');
   if(lockEl) { lockEl.textContent = '🔒 Locked'; lockEl.style.color = 'var(--danger)'; }
-  showPage('dashboard');
+  // Return to dashboard
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const d=document.getElementById('page-dashboard');if(d)d.classList.add('active');
+  document.getElementById('page-title').textContent='ইপিএফ ওয়্যারহাউজ ডাটাবেজ ড্যাশবোর্ড';
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelector('.nav-item[onclick*="dashboard"]')?.classList.add('active');
 }
 
 // ── Intercept showPage ────────────────────────────────────────────────────────
-// PIN-gated showPage (wraps original)
-function showPage(id) {
-  function _doShow(pageId) {
-    // Call original render logic
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const pageEl = document.getElementById('page-' + pageId);
-    if(pageEl) pageEl.classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => {
-      if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+pageId+"'")) n.classList.add('active');
-    });
-    const titleEl = document.getElementById('page-title');
-    if(titleEl) titleEl.textContent = pageTitles[pageId] || pageId;
-    const actEl = document.getElementById('topbar-actions');
-    if(actEl) actEl.innerHTML = pageActions[pageId] || '';
-    // Render functions
-    if(pageId==='officers') renderOfficers();
-    else if(pageId==='labors') renderLabors();
-    else if(pageId==='delivery') renderDelivery();
-    else if(pageId==='stock') renderStock();
-    else if(pageId==='floors') renderFloors();
-    else if(pageId==='forklift') renderForklift();
-    else if(pageId==='pda') renderPDA();
-    else if(pageId==='reports') renderReports();
-    else if(pageId==='organogram') renderOrganogram();
-    else if(pageId==='layout') renderLayout();
-    else if(pageId==='whlist') renderWHList();
-    else if(pageId==='pdflibrary') pdfLib.render();
-    else if(pageId==='flowchart' && window.renderFlowchart) renderFlowchart();
-    else if(pageId==='backup') renderBackup();
-    else if(pageId==='mis-email') misRender();
-    else if(pageId==='materials') matInit();
-    // KPI after-show hook
-    if(window._kpiAfterShow) window._kpiAfterShow(pageId);
-    // Close mobile sidebar
-    closeSidebar && closeSidebar();
-  }
-
-  if(FREE_PAGES.has(id)) { _doShow(id); return; }
-  if(_pinSessionActive)  { _doShow(id); return; }
-  // Locked — ask PIN
-  _pendingPageId = id;
-  const pageLabel = pageTitles[id] || id;
-  requirePin(() => {
-    _doShow(_pendingPageId || id);
-    _pendingPageId = null;
-  }, `🔒 "${pageLabel}" দেখতে PIN দিন`);
-}
 
 // ── Intercept KPI showKpi ─────────────────────────────────────────────────────
 // KPI pages are free — no need to wrap
 
-// ── Action gates (edit/delete/save within unlocked pages) ────────────────────
-const _origOpenModal = openModal;
-function openModal(type, id=null) {
-  requirePin(() => _origOpenModal(type, id),
-    id ? '✏️ এডিট করতে PIN দিন' : '➕ যোগ করতে PIN দিন');
-}
-
-const _origDeleteRecord = deleteRecord;
-function deleteRecord(dbKey, id) {
-  requirePin(() => _origDeleteRecord(dbKey, id), '🗑️ মুছতে PIN দিন');
-}
-
-const _origSaveWhInfo = saveWhInfo;
-function saveWhInfo() {
-  requirePin(() => _origSaveWhInfo(), '💾 সেভ করতে PIN দিন');
-}
-
-const _origExportData = exportData;
-function exportData() {
-  requirePin(() => _origExportData(), '⬇️ ব্যাকআপ করতে PIN দিন');
-}
-
-const _origClearAllData = clearAllData;
-function clearAllData() {
-  requirePin(() => _origClearAllData(), '⚠️ সব ডাটা মুছতে PIN দিন');
-}
+// PIN gates handled directly in original functions
 
 // ── Dark/Light mode toggle ───────────────────────────────────────────────────
 function toggleDarkMode() {
@@ -4382,6 +4694,371 @@ function toggleDarkMode() {
   }
 })();
 
+
+// ── Firebase backup page status ───────────────────────────────────────────────
+function updateFirebaseStatus(status, color) {
+  const dot  = document.getElementById('bk-firebase-dot');
+  const txt  = document.getElementById('bk-firebase-status');
+  if(dot) dot.style.background = color;
+  if(txt) txt.textContent = status;
+  if(txt) txt.style.color = color;
+}
+
+function manualFirebaseSync() {
+  if(typeof window.fbSaveAll === 'function') {
+    updateFirebaseStatus('🔄 সিংক হচ্ছে...', 'var(--warning)');
+    window.fbSaveAll(DB).then(() => {
+      const now = new Date().toLocaleTimeString('bn-BD');
+      const el = document.getElementById('bk-last-sync');
+      if(el) el.textContent = 'সর্বশেষ সিংক: ' + now;
+      updateFirebaseStatus('☁️ Firebase সিংক সম্পন্ন ✅', 'var(--success)');
+    }).catch(e => {
+      updateFirebaseStatus('❌ সিংক ব্যর্থ: ' + e.message, 'var(--danger)');
+    });
+  } else {
+    updateFirebaseStatus('⚠️ Firebase সংযোগ নেই', 'var(--warning)');
+  }
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// EXCEL EXPORT — 7 Sheets + Summary
+// ═══════════════════════════════════════════════════════════════
+function exportExcel() {
+  if(typeof XLSX === 'undefined') {
+    alert('SheetJS লোড হয়নি। Internet connection চেক করুন।');
+    return;
+  }
+  const statusEl = document.getElementById('excel-export-status');
+  if(statusEl) statusEl.textContent = '⏳ Excel তৈরি হচ্ছে...';
+
+  try {
+    const wb = XLSX.utils.book_new();
+    const today = new Date().toLocaleDateString('bn-BD');
+
+    // ── Sheet 1: Summary ─────────────────────────────────────
+    const summaryData = [
+      ['EPF Warehouse Management System — Data Summary'],
+      ['Export Date', today],
+      [''],
+      ['Category', 'Count'],
+      ['Officers', DB.officers.length],
+      ['Labour', DB.labors.length],
+      ['Forklift', DB.forklift.length],
+      ['PDA Devices', DB.pda.length],
+      ['WH Locations', DB.warehouseList.length],
+      ['Delivery Records', DB.delivery.length],
+      ['Stock Items', DB.stock.length],
+    ];
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
+    wsSummary['!cols'] = [{wch:30},{wch:20}];
+    XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
+
+    // ── Sheet 2: Officers ────────────────────────────────────
+    const offHeaders = ['#','Name','Employee ID','Designation','Factory','Section','Building','Responsibility','WH Code','Contact','Email','Shift','Join Date','NID','Status'];
+    const offRows = DB.officers.map((o,i) => [
+      i+1, o.name||'', o.empId||'', o.designation||'', o.factory||'',
+      o.section||'', o.building||'', o.responsibility||'', o.whCode||'',
+      o.contact||'', o.email||'', o.shift||'', o.joinDate||'', o.nid||'', o.status||'সক্রিয়'
+    ]);
+    const wsOff = XLSX.utils.aoa_to_sheet([offHeaders, ...offRows]);
+    wsOff['!cols'] = offHeaders.map((h,i) => ({wch: i===1?25:i===7?30:15}));
+    XLSX.utils.book_append_sheet(wb, wsOff, 'Officers');
+
+    // ── Sheet 3: Labour ──────────────────────────────────────
+    const labHeaders = ['#','Name','Employee ID','Designation','Type','Factory','Section','Building','Responsibility','WH Code','Contact','Shift','Join Date','NID','Status'];
+    const labRows = DB.labors.map((l,i) => [
+      i+1, l.name||'', l.empId||'', l.designation||'', l.type||'', l.factory||'',
+      l.section||'', l.building||'', l.responsibility||'', l.whCode||'',
+      l.contact||'', l.shift||'', l.joinDate||'', l.nid||'', l.status||'সক্রিয়'
+    ]);
+    const wsLab = XLSX.utils.aoa_to_sheet([labHeaders, ...labRows]);
+    wsLab['!cols'] = labHeaders.map(() => ({wch:15}));
+    wsLab['!cols'][1] = {wch:25};
+    XLSX.utils.book_append_sheet(wb, wsLab, 'Labour');
+
+    // ── Sheet 4: WH List ─────────────────────────────────────
+    const whHeaders = ['SL','Factory','Warehouse Place','Items','MIS Code'];
+    const whRows = DB.warehouseList.map((w,i) => [
+      w.sl||i+1, w.fty||'', w.place||'', w.items||'', w.misCode||''
+    ]);
+    const wsWH = XLSX.utils.aoa_to_sheet([whHeaders, ...whRows]);
+    wsWH['!cols'] = [{wch:5},{wch:8},{wch:30},{wch:20},{wch:25}];
+    XLSX.utils.book_append_sheet(wb, wsWH, 'WH List');
+
+    // ── Sheet 5: Forklift ────────────────────────────────────
+    const fkHeaders = ['#','Machine ID','Model','Brand','Capacity','Location','Operator','Operator ID','Contact','Last Service','Next Service','Status'];
+    const fkRows = DB.forklift.map((f,i) => [
+      i+1, f.machineId||'', f.model||'', f.brand||'', f.capacity||'',
+      f.location||'', f.operator||'', f.operatorId||'', f.operatorContact||'',
+      f.lastService||'', f.nextService||'', f.status||''
+    ]);
+    const wsFk = XLSX.utils.aoa_to_sheet([fkHeaders, ...fkRows]);
+    wsFk['!cols'] = fkHeaders.map(() => ({wch:15}));
+    XLSX.utils.book_append_sheet(wb, wsFk, 'Forklift');
+
+    // ── Sheet 6: PDA ─────────────────────────────────────────
+    const pdaHeaders = ['#','Device ID','Model','IMEI/SN','Factory','Dept Use','Assigned To','Assigned Date','Charge %','Status'];
+    const pdaRows = DB.pda.map((p,i) => [
+      i+1, p.deviceId||'', p.model||'', p.imei||'', p.fty||'',
+      p.deptUse||'', p.assignedTo||'', p.assignedDate||'', p.charge||'', p.status||''
+    ]);
+    const wsPDA = XLSX.utils.aoa_to_sheet([pdaHeaders, ...pdaRows]);
+    wsPDA['!cols'] = pdaHeaders.map(() => ({wch:16}));
+    XLSX.utils.book_append_sheet(wb, wsPDA, 'PDA');
+
+    // ── Sheet 7: Delivery ────────────────────────────────────
+    const dlvHeaders = ['#','Date','DO No','Vehicle','Driver','Product','Quantity','Unit','Destination','Received By','Status','Note'];
+    const dlvRows = DB.delivery.map((d,i) => [
+      i+1, d.date||'', d.doNo||'', d.vehicle||'', d.driver||'',
+      d.product||'', d.quantity||'', d.unit||'', d.destination||'',
+      d.receivedBy||'', d.status||'', d.note||''
+    ]);
+    const wsDlv = XLSX.utils.aoa_to_sheet([dlvHeaders, ...dlvRows]);
+    wsDlv['!cols'] = dlvHeaders.map(() => ({wch:15}));
+    XLSX.utils.book_append_sheet(wb, wsDlv, 'Delivery');
+
+    // ── Sheet 8: Stock ───────────────────────────────────────
+    const stkHeaders = ['#','Item Name','Code','Category','Location','Quantity','Unit','Min Level','Supplier','Last Update'];
+    const stkRows = DB.stock.map((s,i) => [
+      i+1, s.name||'', s.code||'', s.category||'', s.location||'',
+      s.quantity||'', s.unit||'', s.minLevel||'', s.supplier||'', s.lastUpdate||''
+    ]);
+    const wsStk = XLSX.utils.aoa_to_sheet([stkHeaders, ...stkRows]);
+    wsStk['!cols'] = stkHeaders.map(() => ({wch:16}));
+    XLSX.utils.book_append_sheet(wb, wsStk, 'Stock');
+
+    // ── Download ─────────────────────────────────────────────
+    const filename = 'EPF_WMS_Backup_' + new Date().toISOString().slice(0,10) + '.xlsx';
+    XLSX.writeFile(wb, filename);
+
+    if(statusEl) { statusEl.textContent = '✅ Excel ফাইল ডাউনলোড হয়েছে: ' + filename; statusEl.style.color = 'var(--success)'; }
+    addActivity('Excel ব্যাকআপ ডাউনলোড হয়েছে', 'var(--success)');
+  } catch(e) {
+    console.error('Excel export error:', e);
+    if(statusEl) { statusEl.textContent = '❌ Error: ' + e.message; statusEl.style.color = 'var(--danger)'; }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EMAIL SEND — opens default mail app with summary
+// ═══════════════════════════════════════════════════════════════
+function sendEmailSummary() {
+  const toEl = document.getElementById('backup-email-to');
+  const to = toEl ? toEl.value.trim() : '';
+  if(!to) { alert('প্রাপকের email দিন'); toEl && toEl.focus(); return; }
+
+  const d = new Date().toLocaleDateString('bn-BD');
+  const subject = encodeURIComponent('EPF WMS — ডেটা সারসংক্ষেপ (' + d + ')');
+
+  const epfOff   = DB.officers.filter(o=>o.factory==='EPF').length;
+  const gtOff    = DB.officers.filter(o=>o.factory!=='EPF').length;
+  const epfLab   = DB.labors.filter(l=>l.factory==='EPF').length;
+  const gtLab    = DB.labors.filter(l=>l.factory!=='EPF').length;
+
+  const body = encodeURIComponent(
+`EPF Warehouse Management System
+তারিখ: ${d}
+${'='.repeat(40)}
+
+📊 ম্যানপাওয়ার সারসংক্ষেপ
+• মোট অফিসার : ${DB.officers.length} (EPF: ${epfOff} | GT: ${gtOff})
+• মোট লেবার  : ${DB.labors.length} (EPF: ${epfLab} | GT: ${gtLab})
+• সর্বমোট    : ${DB.officers.length + DB.labors.length} জন
+
+🏭 সম্পদ সারসংক্ষেপ
+• WH লোকেশন  : ${DB.warehouseList.length}টি
+• ফর্কলিফট   : ${DB.forklift.length}টি
+• PDA ডিভাইস : ${DB.pda.length}টি
+
+📦 অপারেশন
+• ডেলিভারি রেকর্ড : ${DB.delivery.length}টি
+• স্টক আইটেম      : ${DB.stock.length}টি
+
+${'='.repeat(40)}
+Generated by EPF WMS — warehouse-e932a.firebaseapp.com`
+  );
+
+  window.location.href = 'mailto:' + to + '?subject=' + subject + '&body=' + body;
+  addActivity('ইমেইল পাঠানো হয়েছে: ' + to, 'var(--success)');
+}
+
+// ── PIN-gated functions (safe — _raw versions have no naming conflict) ────────
+function openModal(type, id=null) {
+  requirePin(() => _rawOpenModal(type, id),
+    id ? '✏️ এডিট করতে PIN দিন' : '➕ যোগ করতে PIN দিন');
+}
+function deleteRecord(dbKey, id) {
+  requirePin(() => _rawDeleteRecord(dbKey, id), '🗑️ মুছতে PIN দিন');
+}
+function saveWhInfo() {
+  requirePin(() => _rawSaveWhInfo(), '💾 সেভ করতে PIN দিন');
+}
+function exportData() {
+  requirePin(() => _rawExportData(), '⬇️ ব্যাকআপ করতে PIN দিন');
+}
+function clearAllData() {
+  requirePin(() => _rawClearAllData(), '⚠️ সব ডাটা মুছতে PIN দিন');
+}
+
+// ── Backup page Firebase status ───────────────────────────────────────────────
+function _updateBackupFirebaseStatus() {
+  const syncStatus = document.getElementById('fb-sync-status');
+  if(!syncStatus) return;
+  const txt = syncStatus.textContent;
+  if(txt.includes('Live') || txt.includes('Synced')) {
+    updateFirebaseStatus && updateFirebaseStatus('☁️ Firebase সংযুক্ত ✅', 'var(--success)');
+  } else if(txt.includes('Offline') || txt.includes('err')) {
+    updateFirebaseStatus && updateFirebaseStatus('💾 Offline মোডে চলছে', 'var(--warning)');
+  } else {
+    updateFirebaseStatus && updateFirebaseStatus('🔄 সংযোগ হচ্ছে...', 'var(--text2)');
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// EXCEL EXPORT (xlsx via SheetJS CDN)
+// ═══════════════════════════════════════════════════════════════
+function exportExcel() {
+  if(!_pinSessionActive) {
+    requirePin(() => exportExcel(), '⬇️ Excel এক্সপোর্ট করতে PIN দিন');
+    return;
+  }
+
+  // Load SheetJS dynamically
+  if(typeof XLSX === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => _doExcelExport();
+    s.onerror = () => alert('SheetJS লোড হয়নি। ইন্টারনেট সংযোগ চেক করুন।');
+    document.head.appendChild(s);
+  } else {
+    _doExcelExport();
+  }
+}
+
+function _doExcelExport() {
+  const wb = XLSX.utils.book_new();
+
+  // Helper: array of objects → sheet
+  function makeSheet(data, cols) {
+    if(!data || !data.length) return XLSX.utils.aoa_to_sheet([cols]);
+    const rows = [cols, ...data.map(r => cols.map(c => {
+      const key = Object.keys(r).find(k => k.toLowerCase()===c.toLowerCase().replace(/ /g,'').replace('#','').trim()) || c;
+      return r[key] || r[c] || '';
+    }))];
+    return XLSX.utils.aoa_to_sheet(rows);
+  }
+
+  // Officers
+  const offCols = ['#','Name','Emp ID','Designation','Factory','Section','Building','Responsibility','WH Code','Contact','Status'];
+  const offData = DB.officers.map((o,i) => [i+1, o.name||'', o.empId||'', o.designation||'', o.factory||'', o.section||'', o.building||'', o.responsibility||'', o.whCode||'', o.contact||'', o.status||'']);
+  const offSheet = XLSX.utils.aoa_to_sheet([offCols, ...offData]);
+  XLSX.utils.book_append_sheet(wb, offSheet, 'Officers');
+
+  // Labour
+  const labCols = ['#','Name','Emp ID','Designation','Type','Factory','Section','Building','Responsibility','WH Code','Contact','Status'];
+  const labData = DB.labors.map((l,i) => [i+1, l.name||'', l.empId||'', l.designation||'', l.type||'', l.factory||'', l.section||'', l.building||'', l.responsibility||'', l.whCode||'', l.contact||'', l.status||'']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([labCols,...labData]), 'Labour');
+
+  // WH List
+  const whCols = ['SL','Factory','WH Place','Items','MIS Code'];
+  const whData = DB.warehouseList.map((w,i) => [w.sl||i+1, w.fty||'', w.place||'', w.items||'', w.misCode||'']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([whCols,...whData]), 'WH List');
+
+  // Forklift
+  const fkCols = ['Machine ID','Model','Brand','Capacity','Location','Operator','Op.ID','Op.Contact','Last Service','Status'];
+  const fkData = DB.forklift.map(f => [f.machineId||'',f.model||'',f.brand||'',f.capacity||'',f.location||'',f.operator||'',f.operatorId||'',f.operatorContact||'',f.lastService||'',f.status||'']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([fkCols,...fkData]), 'Forklift');
+
+  // PDA
+  const pdaCols = ['Device ID','Model','IMEI','Factory','Dept','Assigned To','Date','Status'];
+  const pdaData = DB.pda.map(p => [p.deviceId||'',p.model||'',p.imei||'',p.fty||'',p.deptUse||'',p.assignedTo||'',p.assignedDate||'',p.status||'']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([pdaCols,...pdaData]), 'PDA');
+
+  // Delivery
+  const delCols = ['Date','DO No','Vehicle','Driver','Product','Qty','Unit','Destination','Status'];
+  const delData = DB.delivery.map(d => [d.date||'',d.doNo||'',d.vehicle||'',d.driver||'',d.product||'',d.quantity||0,d.unit||'',d.destination||'',d.status||'']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([delCols,...delData]), 'Delivery');
+
+  // Stock
+  const stCols = ['Name','Code','Category','Location','Qty','Unit','Min Level','Supplier','Last Update'];
+  const stData = DB.stock.map(s => [s.name||'',s.code||'',s.category||'',s.location||'',s.quantity||0,s.unit||'',s.minLevel||0,s.supplier||'',s.lastUpdate||'']);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([stCols,...stData]), 'Stock');
+
+  // Summary
+  const now = new Date().toLocaleString('en-BD');
+  const sumData = [
+    ['EPF Warehouse Management System — Export Summary'],
+    ['Exported At:', now],
+    [''],
+    ['Category','Count'],
+    ['Officers',   DB.officers.length],
+    ['Labour',     DB.labors.length],
+    ['WH Locations', DB.warehouseList.length],
+    ['Forklift',   DB.forklift.length],
+    ['PDA Devices',DB.pda.length],
+    ['Delivery',   DB.delivery.length],
+    ['Stock Items',DB.stock.length],
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(sumData), 'Summary');
+
+  // Download
+  XLSX.writeFile(wb, 'EPF_WMS_Backup_' + new Date().toISOString().slice(0,10) + '.xlsx');
+  addActivity('Excel ব্যাকআপ ডাউনলোড হয়েছে', 'var(--success)');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EMAIL SEND (opens default mail app with summary)
+// ═══════════════════════════════════════════════════════════════
+function sendEmail() {
+  const recipient = document.getElementById('email-recipient')?.value?.trim() || '';
+  const now = new Date().toLocaleString('bn-BD');
+  const subject = encodeURIComponent('EPF WMS ডেটা সারসংক্ষেপ — ' + new Date().toLocaleDateString('bn-BD'));
+  const body = encodeURIComponent(
+    'EPF Warehouse Management System\n' +
+    'তারিখ: ' + now + '\n\n' +
+    '📊 ডেটা সারসংক্ষেপ:\n' +
+    '━━━━━━━━━━━━━━━━━━━━━━━━\n' +
+    '👔 অফিসার:       ' + DB.officers.length + ' জন\n' +
+    '👷 লেবার:        ' + DB.labors.length + ' জন\n' +
+    '🏭 WH Location:  ' + DB.warehouseList.length + '\n' +
+    '🏗️ ফর্কলিফট:    ' + DB.forklift.length + '\n' +
+    '📱 PDA ডিভাইস:  ' + DB.pda.length + '\n' +
+    '🚚 ডেলিভারি:    ' + DB.delivery.length + '\n' +
+    '📦 স্টক আইটেম: ' + DB.stock.length + '\n' +
+    '━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
+    'EPF WMS System — Auto Generated Report'
+  );
+  const mailto = 'mailto:' + recipient + '?subject=' + subject + '&body=' + body;
+  window.location.href = mailto;
+  addActivity('ইমেইল ক্লায়েন্ট খোলা হয়েছে', 'var(--accent)');
+}
+
+// Firebase backup page status update (standalone, no wrapper)
+function updateFirebaseStatus(status, color) {
+  const dot = document.getElementById('bk-firebase-dot');
+  const txt = document.getElementById('bk-firebase-status');
+  if(dot) dot.style.background = color;
+  if(txt){ txt.textContent = status; txt.style.color = color; }
+}
+
+function manualFirebaseSync() {
+  if(typeof window.fbSaveAll === 'function') {
+    updateFirebaseStatus('🔄 সিংক হচ্ছে...', 'var(--warning)');
+    window.fbSaveAll(DB).then && window.fbSaveAll(DB);
+    setTimeout(() => {
+      const now = new Date().toLocaleTimeString('bn-BD');
+      const el = document.getElementById('bk-last-sync');
+      if(el) el.textContent = 'সর্বশেষ সিংক: ' + now;
+      updateFirebaseStatus('☁️ সিংক সম্পন্ন ✅', 'var(--success)');
+    }, 2000);
+  } else {
+    updateFirebaseStatus('⚠️ Firebase সংযোগ নেই', 'var(--warning)');
+  }
+}
+
 // ============ INIT ============
 // Page render map for Firebase real-time sync re-render
 window.pageRenderMap = {
@@ -4396,6 +5073,7 @@ window.pageRenderMap = {
   whlist: renderWHList,
   organogram: renderOrganogram,
   layout: renderLayout,
+  fired: renderFired,
 };
 
 // Load from localStorage first (fast startup)
