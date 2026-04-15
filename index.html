@@ -796,7 +796,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>নাম</th><th class='hide-sm'>ID</th><th>পদবী</th><th>Factory</th><th class='hide-sm'>ডিপার্টমেন্ট</th><th class='hide-xs'>বিল্ডিং</th><th class='hide-xs'>দায়িত্ব</th><th class='hide-sm'>WH Code</th><th>মোবাইল</th><th class='hide-sm'>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+        <thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_name">নাম</th><th class="hide-sm" data-i18n="th_id">ID</th><th data-i18n="th_designation">পদবী</th><th data-i18n="th_factory">Factory</th><th class="hide-sm" data-i18n="th_dept">ডিপার্টমেন্ট</th><th class="hide-xs" data-i18n="th_building">বিল্ডিং</th><th class="hide-xs" data-i18n="th_resp">দায়িত্ব</th><th class="hide-sm" data-i18n="th_whcode">WH Code</th><th data-i18n="th_mobile">মোবাইল</th><th class="hide-sm" data-i18n="th_status">স্ট্যাটাস</th><th data-i18n="th_action">অ্যাকশন</th></tr></thead>
         <tbody id="officer-tbody"></tbody>
       </table>
     </div>
@@ -829,7 +829,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>#</th><th>নাম</th><th class='hide-sm'>ID</th><th>পদবী / ধরন</th><th>Factory</th><th class='hide-sm'>ডিপার্টমেন্ট</th><th class='hide-xs'>বিল্ডিং</th><th class='hide-xs'>দায়িত্ব</th><th class='hide-sm'>WH Code</th><th>মোবাইল</th><th class='hide-sm'>স্ট্যাটাস</th><th>অ্যাকশন</th></tr></thead>
+        <thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_name">নাম</th><th class="hide-sm" data-i18n="th_id">ID</th><th data-i18n="th_designation">পদবী / ধরন</th><th data-i18n="th_factory">Factory</th><th class="hide-sm" data-i18n="th_dept">ডিপার্টমেন্ট</th><th class="hide-xs" data-i18n="th_building">বিল্ডিং</th><th class="hide-xs" data-i18n="th_resp">দায়িত্ব</th><th class="hide-sm" data-i18n="th_whcode">WH Code</th><th data-i18n="th_mobile">মোবাইল</th><th class="hide-sm" data-i18n="th_status">স্ট্যাটাস</th><th data-i18n="th_action">অ্যাকশন</th></tr></thead>
         <tbody id="labor-tbody"></tbody>
       </table>
     </div>
@@ -887,17 +887,17 @@ a.call-link::before { content: '📞'; font-size: 11px; }
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>নাম</th>
-            <th class="hide-sm">EMP ID</th>
-            <th>ধরন</th>
-            <th>Factory</th>
-            <th class="hide-sm">পদবী</th>
-            <th class="hide-sm">WH Code</th>
-            <th>কারণ</th>
-            <th class="hide-xs">তারিখ</th>
-            <th class="hide-xs">মন্তব্য</th>
-            <th>অ্যাকশন</th>
+            <th data-i18n="th_no">#</th>
+            <th data-i18n="th_name">নাম</th>
+            <th class="hide-sm" data-i18n="th_id">EMP ID</th>
+            <th data-i18n="th_type">ধরন</th>
+            <th data-i18n="th_factory">Factory</th>
+            <th class="hide-sm" data-i18n="th_designation">পদবী</th>
+            <th class="hide-sm" data-i18n="th_whcode">WH Code</th>
+            <th data-i18n="th_reason">কারণ</th>
+            <th class="hide-xs" data-i18n="th_date">তারিখ</th>
+            <th class="hide-xs" data-i18n="th_note">মন্তব্য</th>
+            <th data-i18n="th_action">অ্যাকশন</th>
           </tr>
         </thead>
         <tbody id="fired-tbody"></tbody>
@@ -1223,6 +1223,15 @@ a.call-link::before { content: '📞'; font-size: 11px; }
             <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display:none">
             <button class="btn btn-secondary" onclick="document.getElementById('import-file').click()" style="margin:0 auto;">⬆️ JSON ফাইল ইমপোর্ট করুন</button>
             <p style="font-size:11px; color:var(--text2); margin-top:8px;">আগে ডাউনলোড করা JSON ফাইল সিলেক্ট করুন</p>
+          </div>
+          <!-- Excel Import -->
+          <div style="border:2px dashed rgba(63,185,80,.4); border-radius:10px; padding:20px; text-align:center;">
+            <input type="file" id="import-excel-file" accept=".xlsx,.xls" onchange="importExcel(event)" style="display:none">
+            <button class="btn btn-success" onclick="document.getElementById('import-excel-file').click()" style="margin:0 auto; justify-content:center;">
+              📥 Excel (.xlsx) ইমপোর্ট করুন
+            </button>
+            <p style="font-size:11px; color:var(--text2); margin-top:8px;">EPF WMS Excel ফাইল সিলেক্ট করুন (Officers, Labour, WH List, Forklift, PDA, Delivery, Stock)</p>
+            <div id="excel-import-status" style="font-size:12px; margin-top:8px; min-height:16px;"></div>
           </div>
           <button class="btn btn-danger" onclick="clearAllData()" style="justify-content:center;">🗑️ সব ডেটা মুছে ফেলুন</button>
         </div>
@@ -2341,9 +2350,26 @@ function addActivity(msg, color='var(--accent)') {
   if(list.children.length > 10) list.removeChild(list.lastChild);
 }
 function badgeStatus(s) {
-  const map = {'সক্রিয়':'green','নিষ্ক্রিয়':'red','ছুটিতে':'yellow','সম্পন্ন':'green','প্রক্রিয়াধীন':'blue','বাতিল':'red','কম স্তর':'yellow','স্বাভাবিক':'green','রক্ষণাবেক্ষণ':'yellow','নষ্ট':'red','চার্জিং':'blue'};
+  const map = {
+    'সক্রিয়':'green','Active':'green','在职':'green',
+    'নিষ্ক্রিয়':'red','Inactive':'red','离职':'red',
+    'ছুটিতে':'yellow','On Leave':'yellow','休假中':'yellow',
+    'বহিষ্কার':'red','Dismissed':'red','开除':'red',
+    'চাকরিচ্যুত (ফায়ার)':'red','Fired':'red','解雇':'red',
+    'সম্পন্ন':'green','প্রক্রিয়াধীন':'blue','বাতিল':'red',
+    'কম স্তর':'yellow','স্বাভাবিক':'green','রক্ষণাবেক্ষণ':'yellow',
+    'নষ্ট':'red','চার্জিং':'blue'
+  };
   const cls = map[s] || 'blue';
-  return `<span class="badge badge-${cls}">${s}</span>`;
+  // Translate status label
+  const L = WMS_LANG_LABELS[_currentLang] || WMS_LANG_LABELS.bn;
+  const stMap = {
+    'সক্রিয়':L.st_active||s, 'নিষ্ক্রিয়':L.st_inactive||s,
+    'ছুটিতে':L.st_leave||s, 'বহিষ্কার':L.st_dismissed||s,
+    'চাকরিচ্যুত (ফায়ার)':L.st_fired||s,
+  };
+  const displayText = stMap[s] || s;
+  return `<span class="badge badge-${cls}">${displayText}</span>`;
 }
 function emptyRow(cols, msg) { return `<tr><td colspan="${cols}" class="empty-state"><div class="icon">📭</div>${msg}</td></tr>`; }
 
@@ -2367,7 +2393,9 @@ function renderOfficers() {
   const q = (document.getElementById('officer-search')?.value||'').toLowerCase();
   const sec = document.getElementById('officer-filter-section')?.value||'';
   const fac = document.getElementById('officer-filter-factory')?.value||'';
+  const FIRED_ST = ['বহিষ্কার','চাকরিচ্যুত (ফায়ার)'];
   let data = DB.officers.filter(o =>
+    !FIRED_ST.includes(o.status) &&
     (!q || o.name?.toLowerCase().includes(q) || o.empId?.toLowerCase().includes(q) || o.designation?.toLowerCase().includes(q)) &&
     (!sec || o.section === sec) &&
     (!fac || o.factory === fac)
@@ -2414,7 +2442,9 @@ function renderLabors() {
   const sec = document.getElementById('labor-filter')?.value||'';
   const fac = document.getElementById('labor-filter-factory')?.value||'';
   const typ = document.getElementById('labor-filter-type')?.value||'';
+  const FIRED_ST2 = ['বহিষ্কার','চাকরিচ্যুত (ফায়ার)'];
   let data = DB.labors.filter(l =>
+    !FIRED_ST2.includes(l.status) &&
     (!q || l.name?.toLowerCase().includes(q) || l.empId?.toLowerCase().includes(q) || l.designation?.toLowerCase().includes(q)) &&
     (!sec || l.section===sec) &&
     (!fac || l.factory===fac) &&
@@ -2616,7 +2646,7 @@ const modalForms = {
       {key:'shift',label:'শিফট',type:'select',options:['সকাল','দুপুর','রাত','জেনারেল']},
       {key:'joinDate',label:'যোগদানের তারিখ',type:'date'},
       {key:'nid',label:'NID নম্বর',type:'text'},
-      {key:'status',label:'স্ট্যাটাস',type:'select',options:['সক্রিয়','নিষ্ক্রিয়','ছুটিতে']},
+      {key:'status',label:'স্ট্যাটাস',type:'select',options:['সক্রিয়','নিষ্ক্রিয়','ছুটিতে','বহিষ্কার','চাকরিচ্যুত (ফায়ার)']},
     ]
   },
   labor: {
@@ -2635,7 +2665,7 @@ const modalForms = {
       {key:'shift',label:'শিফট',type:'select',options:['সকাল','দুপুর','রাত','জেনারেল']},
       {key:'joinDate',label:'যোগদানের তারিখ',type:'date'},
       {key:'nid',label:'NID নম্বর',type:'text'},
-      {key:'status',label:'স্ট্যাটাস',type:'select',options:['সক্রিয়','নিষ্ক্রিয়','ছুটিতে']},
+      {key:'status',label:'স্ট্যাটাস',type:'select',options:['সক্রিয়','নিষ্ক্রিয়','ছুটিতে','বহিষ্কার','চাকরিচ্যুত (ফায়ার)']},
     ]
   },
   delivery: {
@@ -2780,9 +2810,47 @@ function saveModal() {
   const dbMap = {officer:'officers',labor:'labors',floor:'floors',report:'reports',whlistitem:'warehouseList'};
   const dbKey = dbMap[type] || type;
   
+  const FIRED_STATUSES = ['বহিষ্কার', 'চাকরিচ্যুত (ফায়ার)'];
+  const isFiredStatus = FIRED_STATUSES.includes(record.status);
+  const isPersonRecord = (dbKey === 'officers' || dbKey === 'labors');
+
   if(editId) {
     const idx = DB[dbKey].findIndex(r=>r.id===editId);
     if(idx>=0) DB[dbKey][idx] = {...DB[dbKey][idx], ...record};
+
+    // Auto-move to fired list if status changed to fired
+    if(isPersonRecord && isFiredStatus) {
+      const person = DB[dbKey][idx];
+      if(!DB.fired) DB.fired = [];
+      // Avoid duplicate
+      const alreadyFired = DB.fired.some(f => f.sourceId === editId);
+      if(!alreadyFired) {
+        DB.fired.push({
+          id:          uid(),
+          sourceId:    editId,
+          name:        person.name || '',
+          empId:       person.empId || '',
+          type:        dbKey === 'officers' ? 'officer' : (person.type || 'labor'),
+          factory:     person.factory || '',
+          designation: person.designation || '',
+          section:     person.section || '',
+          whCode:      person.whCode || '',
+          reason:      record.status === 'বহিষ্কার' ? 'বহিষ্কার' : 'চাকরিচ্যুত',
+          date:        today(),
+          note:        'স্ট্যাটাস পরিবর্তনের মাধ্যমে স্বয়ংক্রিয়ভাবে যোগ হয়েছে',
+          addedAt:     new Date().toISOString(),
+        });
+        // Remove from original list
+        DB[dbKey].splice(idx, 1);
+        addActivity(`🚫 ${person.name} → ফায়ার/বহিষ্কার তালিকায় সরানো হয়েছে`, 'var(--danger)');
+        closeModal();
+        saveDB();
+        if(dbKey==='officers') renderOfficers(); else renderLabors();
+        renderFired();
+        updateDashboard();
+        return;
+      }
+    }
     addActivity(`${cfg.title} আপডেট করা হয়েছে: ${record.name||record.title||record.doNo||record.machineId||record.deviceId||'রেকর্ড'}`, 'var(--warning)');
   } else {
     record.id = uid();
@@ -2828,6 +2896,212 @@ function _rawExportData() {
   a.download = `warehouse-backup-${today()}.json`;
   a.click();
   addActivity('ব্যাকআপ ডাউনলোড করা হয়েছে', 'var(--success)');
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// EXCEL IMPORT
+// ═══════════════════════════════════════════════════════════════
+function importExcel(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  if(typeof XLSX === 'undefined') { alert('SheetJS লোড হয়নি। Internet চেক করুন।'); return; }
+
+  const statusEl = document.getElementById('excel-import-status');
+  if(statusEl) { statusEl.textContent = '⏳ Excel পড়া হচ্ছে...'; statusEl.style.color = 'var(--warning)'; }
+
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const wb = XLSX.read(ev.target.result, { type: 'binary', cellDates: true });
+      let imported = 0;
+      const errors = [];
+
+      // Helper: sheet rows to objects
+      function sheetToRows(sheetName) {
+        const ws = wb.Sheets[sheetName];
+        if(!ws) return null;
+        return XLSX.utils.sheet_to_json(ws, { defval: '' });
+      }
+
+      // ── Officers ──────────────────────────────────────────────────────────
+      const offRows = sheetToRows('Officers');
+      if(offRows && offRows.length > 0) {
+        const mapped = offRows.map(r => ({
+          id:           r['ID'] || r['id'] || uid(),
+          name:         String(r['Name'] || r['নাম'] || '').trim(),
+          empId:        String(r['Employee ID'] || r['empId'] || '').trim(),
+          designation:  String(r['Designation'] || r['পদবী'] || '').trim(),
+          factory:      String(r['Factory'] || '').trim(),
+          section:      String(r['Section'] || r['সেকশন'] || '').trim(),
+          building:     String(r['Building'] || '').trim(),
+          responsibility: String(r['Responsibility'] || '').trim(),
+          whCode:       String(r['WH Code'] || '').trim(),
+          contact:      String(r['Contact'] || '').trim(),
+          email:        String(r['Email'] || '').trim(),
+          shift:        String(r['Shift'] || '').trim(),
+          joinDate:     String(r['Join Date'] || '').trim(),
+          nid:          String(r['NID'] || '').trim(),
+          status:       String(r['Status'] || 'সক্রিয়').trim(),
+        })).filter(r => r.name);
+        // Merge: skip existing IDs, add new
+        const existingIds = new Set(DB.officers.map(o => o.id));
+        const newOff = mapped.filter(o => !existingIds.has(o.id));
+        DB.officers.push(...newOff);
+        imported += newOff.length;
+      }
+
+      // ── Labour ────────────────────────────────────────────────────────────
+      const labRows = sheetToRows('Labour');
+      if(labRows && labRows.length > 0) {
+        const mapped = labRows.map(r => ({
+          id:           r['ID'] || r['id'] || uid(),
+          name:         String(r['Name'] || r['নাম'] || '').trim(),
+          empId:        String(r['Employee ID'] || r['empId'] || '').trim(),
+          designation:  String(r['Designation'] || '').trim(),
+          type:         String(r['Type'] || r['ধরন'] || 'labor').trim(),
+          factory:      String(r['Factory'] || '').trim(),
+          section:      String(r['Section'] || '').trim(),
+          building:     String(r['Building'] || '').trim(),
+          responsibility: String(r['Responsibility'] || '').trim(),
+          whCode:       String(r['WH Code'] || '').trim(),
+          contact:      String(r['Contact'] || '').trim(),
+          shift:        String(r['Shift'] || '').trim(),
+          joinDate:     String(r['Join Date'] || '').trim(),
+          nid:          String(r['NID'] || '').trim(),
+          status:       String(r['Status'] || 'সক্রিয়').trim(),
+        })).filter(r => r.name);
+        const existingIds = new Set(DB.labors.map(l => l.id));
+        const newLab = mapped.filter(l => !existingIds.has(l.id));
+        DB.labors.push(...newLab);
+        imported += newLab.length;
+      }
+
+      // ── WH List ───────────────────────────────────────────────────────────
+      const whRows = sheetToRows('WH List');
+      if(whRows && whRows.length > 0) {
+        const mapped = whRows.map(r => ({
+          id:      r['ID'] || r['id'] || uid(),
+          sl:      r['SL'] || '',
+          fty:     String(r['Factory'] || '').trim(),
+          place:   String(r['Warehouse Place'] || '').trim(),
+          items:   String(r['Items'] || '').trim(),
+          misCode: String(r['MIS Code'] || '').trim(),
+        })).filter(r => r.place);
+        const existingIds = new Set(DB.warehouseList.map(w => w.id));
+        const newWH = mapped.filter(w => !existingIds.has(w.id));
+        DB.warehouseList.push(...newWH);
+        imported += newWH.length;
+      }
+
+      // ── Forklift ──────────────────────────────────────────────────────────
+      const fkRows = sheetToRows('Forklift');
+      if(fkRows && fkRows.length > 0) {
+        const mapped = fkRows.map(r => ({
+          id:              r['ID'] || r['id'] || uid(),
+          machineId:       String(r['Machine ID'] || '').trim(),
+          model:           String(r['Model'] || '').trim(),
+          brand:           String(r['Brand'] || '').trim(),
+          capacity:        String(r['Capacity'] || '').trim(),
+          location:        String(r['Location'] || '').trim(),
+          operator:        String(r['Operator'] || '').trim(),
+          operatorId:      String(r['Operator ID'] || '').trim(),
+          operatorContact: String(r['Contact'] || '').trim(),
+          lastService:     String(r['Last Service'] || '').trim(),
+          nextService:     String(r['Next Service'] || '').trim(),
+          status:          String(r['Status'] || 'সক্রিয়').trim(),
+        })).filter(r => r.machineId);
+        const existingIds = new Set(DB.forklift.map(f => f.id));
+        const newFK = mapped.filter(f => !existingIds.has(f.id));
+        DB.forklift.push(...newFK);
+        imported += newFK.length;
+      }
+
+      // ── PDA ───────────────────────────────────────────────────────────────
+      const pdaRows = sheetToRows('PDA');
+      if(pdaRows && pdaRows.length > 0) {
+        const mapped = pdaRows.map(r => ({
+          id:           r['ID'] || r['id'] || uid(),
+          deviceId:     String(r['Device ID'] || '').trim(),
+          model:        String(r['Model'] || '').trim(),
+          imei:         String(r['IMEI/SN'] || '').trim(),
+          fty:          String(r['Factory'] || '').trim(),
+          deptUse:      String(r['Dept Use'] || '').trim(),
+          assignedTo:   String(r['Assigned To'] || '').trim(),
+          assignedDate: String(r['Assigned Date'] || '').trim(),
+          charge:       String(r['Charge %'] || '').trim(),
+          status:       String(r['Status'] || 'সক্রিয়').trim(),
+        })).filter(r => r.deviceId);
+        const existingIds = new Set(DB.pda.map(p => p.id));
+        const newPDA = mapped.filter(p => !existingIds.has(p.id));
+        DB.pda.push(...newPDA);
+        imported += newPDA.length;
+      }
+
+      // ── Delivery ──────────────────────────────────────────────────────────
+      const dlvRows = sheetToRows('Delivery');
+      if(dlvRows && dlvRows.length > 0) {
+        const mapped = dlvRows.map(r => ({
+          id:          r['ID'] || r['id'] || uid(),
+          date:        String(r['Date'] || '').trim(),
+          doNo:        String(r['DO No'] || '').trim(),
+          vehicle:     String(r['Vehicle'] || '').trim(),
+          driver:      String(r['Driver'] || '').trim(),
+          product:     String(r['Product'] || '').trim(),
+          quantity:    String(r['Quantity'] || '').trim(),
+          unit:        String(r['Unit'] || '').trim(),
+          destination: String(r['Destination'] || '').trim(),
+          receivedBy:  String(r['Received By'] || '').trim(),
+          status:      String(r['Status'] || '').trim(),
+          note:        String(r['Note'] || '').trim(),
+        })).filter(r => r.doNo);
+        const existingIds = new Set(DB.delivery.map(d => d.id));
+        const newDlv = mapped.filter(d => !existingIds.has(d.id));
+        DB.delivery.push(...newDlv);
+        imported += newDlv.length;
+      }
+
+      // ── Stock ─────────────────────────────────────────────────────────────
+      const stkRows = sheetToRows('Stock');
+      if(stkRows && stkRows.length > 0) {
+        const mapped = stkRows.map(r => ({
+          id:         r['ID'] || r['id'] || uid(),
+          name:       String(r['Item Name'] || '').trim(),
+          code:       String(r['Code'] || '').trim(),
+          category:   String(r['Category'] || '').trim(),
+          location:   String(r['Location'] || '').trim(),
+          quantity:   String(r['Quantity'] || '').trim(),
+          unit:       String(r['Unit'] || '').trim(),
+          minLevel:   String(r['Min Level'] || '').trim(),
+          supplier:   String(r['Supplier'] || '').trim(),
+          lastUpdate: String(r['Last Update'] || '').trim(),
+        })).filter(r => r.name);
+        const existingIds = new Set(DB.stock.map(s => s.id));
+        const newStk = mapped.filter(s => !existingIds.has(s.id));
+        DB.stock.push(...newStk);
+        imported += newStk.length;
+      }
+
+      // ── Save and update ───────────────────────────────────────────────────
+      saveDB();
+      updateDashboard();
+      if(typeof window.fbSaveAll === 'function') window.fbSaveAll(DB);
+      addActivity(`Excel ইমপোর্ট সম্পন্ন — ${imported}টি নতুন রেকর্ড যোগ হয়েছে`, 'var(--success)');
+
+      if(statusEl) {
+        statusEl.textContent = `✅ সফল! ${imported}টি নতুন রেকর্ড ইমপোর্ট হয়েছে`;
+        statusEl.style.color = 'var(--success)';
+      }
+    } catch(err) {
+      console.error('Excel import error:', err);
+      if(statusEl) {
+        statusEl.textContent = '❌ Error: ' + err.message;
+        statusEl.style.color = 'var(--danger)';
+      }
+    }
+    e.target.value = '';
+  };
+  reader.readAsBinaryString(file);
 }
 
 function importData(e) {
@@ -3362,48 +3636,191 @@ function applyTheme(theme) {
 // ============ LANGUAGE ============
 const WMS_LANG_LABELS = {
   bn: {
+    // Nav
     dashboard:'ড্যাশবোর্ড', officers:'অফিসার', labors:'লেবার', organogram:'অর্গানোগ্রাম',
     whlist:'ওয়্যারহাউস লিস্ট', delivery:'ডেলিভারি', stock:'স্টক রিপোর্ট', floors:'ফ্লোর লিস্ট',
     forklift:'ফর্কলিফট', pda:'PDA ডিভাইস', layout:'লে-আউট', flowchart:'ফ্লো চার্ট',
-    reports:'রিপোর্ট ও ফাইল', pdflibrary:'PDF লাইব্রেরি', kpi:'KPI ড্যাশবোর্ড', backup:'ব্যাকআপ',
-    sec_main:'মেইন', sec_mp:'ম্যানপাওয়ার', sec_op:'অপারেশন', sec_res:'সম্পদ', sec_rep:'রিপোর্ট', sec_sys:'সিস্টেম'
+    reports:'রিপোর্ট ও ফাইল', pdflibrary:'PDF লাইব্রেরি', kpi:'KPI ড্যাশবোর্ড', backup:'ব্যাকআপ', fired:'ফায়ার/বহিষ্কার',
+    sec_main:'মেইন', sec_mp:'ম্যানপাওয়ার', sec_op:'অপারেশন', sec_res:'সম্পদ', sec_rep:'রিপোর্ট', sec_sys:'সিস্টেম',
+    // Table headers
+    th_no:'#', th_name:'নাম', th_id:'ID', th_designation:'পদবী', th_factory:'Factory',
+    th_dept:'ডিপার্টমেন্ট', th_building:'বিল্ডিং', th_resp:'দায়িত্ব', th_whcode:'WH Code',
+    th_mobile:'মোবাইল', th_status:'স্ট্যাটাস', th_action:'অ্যাকশন', th_type:'ধরন',
+    th_reason:'কারণ', th_date:'তারিখ', th_note:'নোট',
+    // Buttons
+    btn_add_officer:'+ অফিসার যোগ করুন', btn_add_labor:'+ লেবার যোগ করুন',
+    btn_add_fired:'+ ফায়ার/বহিষ্কার এন্ট্রি', btn_edit:'✏️', btn_delete:'🗑️',
+    btn_save:'সেভ করুন', btn_cancel:'বাতিল', btn_sync:'☁️ Firebase সিংক',
+    // Status labels
+    st_active:'সক্রিয়', st_inactive:'নিষ্ক্রিয়', st_leave:'ছুটিতে',
+    st_fired:'চাকরিচ্যুত (ফায়ার)', st_dismissed:'বহিষ্কার',
+    // Section titles
+    t_officers:'অফিসার তালিকা', t_labors:'লেবার তালিকা', t_fired:'ফায়ার / বহিষ্কার তালিকা',
+    t_dashboard:'ড্যাশবোর্ড', t_backup:'ব্যাকআপ ও সেটআপ',
+    // Search placeholders
+    ph_search_officer:'নাম, ID বা পদবী দিয়ে খুঁজুন...', ph_search_labor:'নাম, ID বা ধরন দিয়ে খুঁজুন...',
+    ph_search_fired:'নাম, ID, ফ্যাক্টরি বা কারণ দিয়ে খুঁজুন...',
+    // Filter labels
+    f_all_dept:'সব ডিপার্টমেন্ট', f_all_factory:'সব Factory', f_all_type:'সব ধরন', f_all_reason:'সব কারণ',
+    // Dashboard labels
+    d_total_officer:'মোট অফিসার', d_total_labor:'মোট লেবার', d_fired:'ফায়ার/বহিষ্কার',
+    d_forklift:'ফর্কলিফট', d_pda:'PDA ডিভাইস',
+    // Common
+    no_data:'কোনো ডেটা নেই', loading:'লোড হচ্ছে...',
+    confirm_delete:'এই রেকর্ডটি মুছে ফেলবেন?',
   },
   en: {
     dashboard:'Dashboard', officers:'Officers', labors:'Labors', organogram:'Organogram',
     whlist:'WH List', delivery:'Delivery', stock:'Stock Report', floors:'Floor List',
     forklift:'Forklift', pda:'PDA Devices', layout:'Layout', flowchart:'Flow Chart',
-    reports:'Reports', pdflibrary:'PDF Library', kpi:'KPI Dashboard', backup:'Backup',
-    sec_main:'MAIN', sec_mp:'MANPOWER', sec_op:'OPERATIONS', sec_res:'RESOURCES', sec_rep:'REPORTS', sec_sys:'SYSTEM'
+    reports:'Reports', pdflibrary:'PDF Library', kpi:'KPI Dashboard', backup:'Backup', fired:'Fired/Dismissed',
+    sec_main:'MAIN', sec_mp:'MANPOWER', sec_op:'OPERATIONS', sec_res:'RESOURCES', sec_rep:'REPORTS', sec_sys:'SYSTEM',
+    th_no:'#', th_name:'Name', th_id:'ID', th_designation:'Designation', th_factory:'Factory',
+    th_dept:'Department', th_building:'Building', th_resp:'Responsibility', th_whcode:'WH Code',
+    th_mobile:'Mobile', th_status:'Status', th_action:'Action', th_type:'Type',
+    th_reason:'Reason', th_date:'Date', th_note:'Note',
+    btn_add_officer:'+ Add Officer', btn_add_labor:'+ Add Labor',
+    btn_add_fired:'+ Add Fired Entry', btn_edit:'✏️', btn_delete:'🗑️',
+    btn_save:'Save', btn_cancel:'Cancel', btn_sync:'☁️ Firebase Sync',
+    st_active:'Active', st_inactive:'Inactive', st_leave:'On Leave',
+    st_fired:'Fired', st_dismissed:'Dismissed',
+    t_officers:'Officer List', t_labors:'Labor List', t_fired:'Fired / Dismissed List',
+    t_dashboard:'Dashboard', t_backup:'Backup & Setup',
+    ph_search_officer:'Search by name, ID or designation...',
+    ph_search_labor:'Search by name, ID or type...',
+    ph_search_fired:'Search by name, ID, factory or reason...',
+    f_all_dept:'All Departments', f_all_factory:'All Factory', f_all_type:'All Types', f_all_reason:'All Reasons',
+    d_total_officer:'Total Officers', d_total_labor:'Total Labors', d_fired:'Fired/Dismissed',
+    d_forklift:'Forklift', d_pda:'PDA Devices',
+    no_data:'No data found', loading:'Loading...',
+    confirm_delete:'Delete this record?',
   },
   zh: {
     dashboard:'仪表板', officers:'管理人员', labors:'工人', organogram:'组织结构',
     whlist:'仓库列表', delivery:'交付', stock:'库存报告', floors:'楼层列表',
     forklift:'叉车', pda:'PDA设备', layout:'布局', flowchart:'流程图',
-    reports:'报告', pdflibrary:'PDF库', kpi:'KPI仪表板', backup:'备份',
-    sec_main:'主菜单', sec_mp:'人员', sec_op:'操作', sec_res:'资源', sec_rep:'报告', sec_sys:'系统'
+    reports:'报告', pdflibrary:'PDF库', kpi:'KPI仪表板', backup:'备份', fired:'解雇/开除',
+    sec_main:'主菜单', sec_mp:'人员', sec_op:'操作', sec_res:'资源', sec_rep:'报告', sec_sys:'系统',
+    th_no:'#', th_name:'姓名', th_id:'ID', th_designation:'职位', th_factory:'工厂',
+    th_dept:'部门', th_building:'楼栋', th_resp:'职责', th_whcode:'仓库代码',
+    th_mobile:'手机', th_status:'状态', th_action:'操作', th_type:'类型',
+    th_reason:'原因', th_date:'日期', th_note:'备注',
+    btn_add_officer:'+ 添加管理员', btn_add_labor:'+ 添加工人',
+    btn_add_fired:'+ 添加解雇记录', btn_edit:'✏️', btn_delete:'🗑️',
+    btn_save:'保存', btn_cancel:'取消', btn_sync:'☁️ Firebase同步',
+    st_active:'在职', st_inactive:'离职', st_leave:'休假中',
+    st_fired:'解雇', st_dismissed:'开除',
+    t_officers:'管理人员列表', t_labors:'工人列表', t_fired:'解雇/开除列表',
+    t_dashboard:'仪表板', t_backup:'备份与设置',
+    ph_search_officer:'按姓名、ID或职位搜索...',
+    ph_search_labor:'按姓名、ID或类型搜索...',
+    ph_search_fired:'按姓名、ID、工厂或原因搜索...',
+    f_all_dept:'所有部门', f_all_factory:'所有工厂', f_all_type:'所有类型', f_all_reason:'所有原因',
+    d_total_officer:'管理人员总数', d_total_labor:'工人总数', d_fired:'解雇/开除',
+    d_forklift:'叉车', d_pda:'PDA设备',
+    no_data:'没有数据', loading:'加载中...',
+    confirm_delete:'删除此记录？',
   }
 };
 
+let _currentLang = 'bn';
+
 function switchLang(lang) {
+  _currentLang = lang;
   localStorage.setItem('wms_lang', lang);
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('lang-' + lang);
   if(btn) btn.classList.add('active');
   const L = WMS_LANG_LABELS[lang] || WMS_LANG_LABELS.bn;
-  // Update nav items
+  document.documentElement.lang = lang === 'bn' ? 'bn' : lang === 'zh' ? 'zh' : 'en';
+
+  // ── 1. Nav items ─────────────────────────────────────────────────────────────
   document.querySelectorAll('.nav-item[onclick]').forEach(el => {
-    const m = el.getAttribute('onclick').match(/showPage\('(\w+)'\)/);
+    const m = el.getAttribute('onclick').match(/showPage\('([\w-]+)'\)/);
     if(m && L[m[1]]) {
       const icon = el.querySelector('.icon');
-      const iconText = icon ? icon.outerHTML : '';
-      el.innerHTML = iconText + ' ' + L[m[1]];
-      if(icon) { /* icon already replaced */ }
+      const lockSpan = el.querySelector('span:last-child');
+      const hasLock = lockSpan && lockSpan.textContent.includes('🔒');
+      const iconHTML = icon ? icon.outerHTML : '';
+      el.innerHTML = iconHTML + ' ' + L[m[1]] + (hasLock ? ' <span style="margin-left:auto;font-size:10px;opacity:.5;">🔒</span>' : '');
     }
   });
-  // Update nav section labels
+
+  // ── 2. Nav section labels ────────────────────────────────────────────────────
   const secs = document.querySelectorAll('.nav-section');
   const secKeys = ['sec_main','sec_mp','sec_op','sec_res','sec_rep','sec_sys'];
   secs.forEach((el, i) => { if(secKeys[i] && L[secKeys[i]]) el.textContent = L[secKeys[i]]; });
+
+  // ── 3. Page add buttons (topbar actions) ─────────────────────────────────────
+  const actEl = document.getElementById('topbar-actions');
+  if(actEl) {
+    const activePage = document.querySelector('.page.active');
+    if(activePage) {
+      const pid = activePage.id.replace('page-','');
+      const btnMap = {
+        officers: `<button class="btn btn-primary" onclick="openModal('officer')">${L.btn_add_officer||'+ Add Officer'}</button>`,
+        labors:   `<button class="btn btn-primary" onclick="openModal('labor')">${L.btn_add_labor||'+ Add Labor'}</button>`,
+        fired:    `<button class="btn btn-danger" onclick="openFiredModal()">${L.btn_add_fired||'+ Add Fired Entry'}</button>`,
+      };
+      if(btnMap[pid]) actEl.innerHTML = btnMap[pid];
+    }
+  }
+
+  // ── 4. Table headers with data-i18n ──────────────────────────────────────────
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if(L[key]) el.textContent = L[key];
+  });
+
+  // ── 5. Search placeholders ───────────────────────────────────────────────────
+  const phMap = {
+    'officer-search': L.ph_search_officer,
+    'labor-search':   L.ph_search_labor,
+    'fired-search':   L.ph_search_fired,
+  };
+  Object.entries(phMap).forEach(([id, ph]) => {
+    const el = document.getElementById(id);
+    if(el && ph) el.placeholder = ph;
+  });
+
+  // ── 6. Filter dropdowns first option ─────────────────────────────────────────
+  const filterMap = {
+    'officer-filter-section': L.f_all_dept,
+    'officer-filter-factory': L.f_all_factory,
+    'labor-filter':           L.f_all_dept,
+    'labor-filter-factory':   L.f_all_factory,
+    'labor-filter-type':      L.f_all_type,
+    'fired-filter-factory':   L.f_all_factory,
+    'fired-filter-type':      L.f_all_type,
+    'fired-filter-reason':    L.f_all_reason,
+  };
+  Object.entries(filterMap).forEach(([id, label]) => {
+    const el = document.getElementById(id);
+    if(el && el.options[0] && label) el.options[0].textContent = label;
+  });
+
+  // ── 7. Dashboard stat card labels ────────────────────────────────────────────
+  const dashMap = {
+    'stat-officers': L.d_total_officer,
+    'stat-labors':   L.d_total_labor,
+    'stat-fired':    L.d_fired,
+    'stat-forklift': L.d_forklift,
+    'stat-pda':      L.d_pda,
+  };
+  Object.entries(dashMap).forEach(([id, label]) => {
+    const el = document.getElementById(id);
+    if(el && label) {
+      const labelEl = el.closest('.stat-card')?.querySelector('.label');
+      if(labelEl) labelEl.textContent = label;
+    }
+  });
+
+  // ── 8. Re-render current page so dynamic content translates ──────────────────
+  const activePage = document.querySelector('.page.active');
+  if(activePage && window.pageRenderMap) {
+    const pid = activePage.id.replace('page-','');
+    if(window.pageRenderMap[pid]) window.pageRenderMap[pid]();
+  }
 }
 (function(){
   const saved = localStorage.getItem('wms_lang') || 'bn';
