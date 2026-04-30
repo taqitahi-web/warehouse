@@ -488,6 +488,11 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
     const DOC_REF = doc(db, 'wms', 'mainDB');
+    const WMS_DB_CACHE_KEY = 'wms_db_v2';
+
+    window.clearMainLocalCache = function() {
+      try { localStorage.removeItem(WMS_DB_CACHE_KEY); } catch(e) {}
+    };
 
     // ── Save to Firebase ──────────────────────────────────────────────────────
     window.fbSaveAll = async function(data) {
@@ -524,10 +529,10 @@ a.call-link::before { content: '📞'; font-size: 11px; }
         if(snap.exists()) {
           const data = snap.data();
           ['officers','labors','delivery','stock','floors','forklift','pda','reports','warehouseList','fired'].forEach(k => {
-            if(data[k] && data[k].length > 0) DB[k] = data[k];
+            DB[k] = Array.isArray(data[k]) ? data[k] : [];
           });
-          if(data.whInfo && Object.keys(data.whInfo).length > 0) DB.whInfo = data.whInfo;
-          try { localStorage.setItem('wms_db_v2', JSON.stringify(DB)); } catch(e){}
+          DB.whInfo = (data.whInfo && typeof data.whInfo === 'object') ? data.whInfo : {};
+          window.clearMainLocalCache && window.clearMainLocalCache();
           if(typeof updateDashboard === 'function') updateDashboard();
           const active = document.querySelector('.page.active');
           if(active && window.pageRenderMap) {
@@ -537,6 +542,10 @@ a.call-link::before { content: '📞'; font-size: 11px; }
           if(statusEl){ statusEl.textContent='☁️ Live ✓'; statusEl.style.color='var(--success)'; }
           updateFirebaseStatus && updateFirebaseStatus('☁️ Firebase সংযুক্ত ✅', 'var(--success)');
         } else {
+          ['officers','labors','delivery','stock','floors','forklift','pda','reports','warehouseList','fired'].forEach(k => { DB[k] = []; });
+          DB.whInfo = {};
+          window.clearMainLocalCache && window.clearMainLocalCache();
+          if(typeof updateDashboard === 'function') updateDashboard();
           if(statusEl){ statusEl.textContent='📦 No data'; statusEl.style.color='var(--text2)'; }
         }
       }, (err) => {
@@ -796,7 +805,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_name">নাম</th><th class="hide-sm" data-i18n="th_id">ID</th><th data-i18n="th_designation">পদবী</th><th data-i18n="th_factory">Factory</th><th class="hide-sm" data-i18n="th_dept">ডিপার্টমেন্ট</th><th class="hide-xs" data-i18n="th_building">বিল্ডিং</th><th class="hide-xs" data-i18n="th_resp">দায়িত্ব</th><th class="hide-sm" data-i18n="th_whcode">WH Code</th><th data-i18n="th_mobile">মোবাইল</th><th class="hide-sm" data-i18n="th_status">স্ট্যাটাস</th><th data-i18n="th_action">অ্যাকশন</th></tr></thead>
+        <thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_name">নাম</th><th class="hide-sm" data-i18n="th_id">ID</th><th data-i18n="th_designation">পদবী</th><th data-i18n="th_factory">Factory</th><th class="hide-sm">WH ID</th><th class="hide-sm" data-i18n="th_dept">ডিপার্টমেন্ট</th><th class="hide-xs" data-i18n="th_building">বিল্ডিং</th><th class="hide-xs" data-i18n="th_resp">দায়িত্ব</th><th class="hide-sm" data-i18n="th_whcode">WH Code</th><th data-i18n="th_mobile">মোবাইল</th><th class="hide-sm" data-i18n="th_status">স্ট্যাটাস</th><th data-i18n="th_action">অ্যাকশন</th></tr></thead>
         <tbody id="officer-tbody"></tbody>
       </table>
     </div>
@@ -829,7 +838,7 @@ a.call-link::before { content: '📞'; font-size: 11px; }
     </div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_name">নাম</th><th class="hide-sm" data-i18n="th_id">ID</th><th data-i18n="th_designation">পদবী / ধরন</th><th data-i18n="th_factory">Factory</th><th class="hide-sm" data-i18n="th_dept">ডিপার্টমেন্ট</th><th class="hide-xs" data-i18n="th_building">বিল্ডিং</th><th class="hide-xs" data-i18n="th_resp">দায়িত্ব</th><th class="hide-sm" data-i18n="th_whcode">WH Code</th><th data-i18n="th_mobile">মোবাইল</th><th class="hide-sm" data-i18n="th_status">স্ট্যাটাস</th><th data-i18n="th_action">অ্যাকশন</th></tr></thead>
+        <thead><tr><th data-i18n="th_no">#</th><th data-i18n="th_name">নাম</th><th class="hide-sm" data-i18n="th_id">ID</th><th data-i18n="th_designation">পদবী / ধরন</th><th data-i18n="th_factory">Factory</th><th class="hide-sm">WH ID</th><th class="hide-sm" data-i18n="th_dept">ডিপার্টমেন্ট</th><th class="hide-xs" data-i18n="th_building">বিল্ডিং</th><th class="hide-xs" data-i18n="th_resp">দায়িত্ব</th><th class="hide-sm" data-i18n="th_whcode">WH Code</th><th data-i18n="th_mobile">মোবাইল</th><th class="hide-sm" data-i18n="th_status">স্ট্যাটাস</th><th data-i18n="th_action">অ্যাকশন</th></tr></thead>
         <tbody id="labor-tbody"></tbody>
       </table>
     </div>
@@ -1965,14 +1974,15 @@ function saveDB() {
   const sections = [...new Set([...DB.officers.map(o=>o.section), ...DB.labors.map(l=>l.section)].filter(Boolean))];
   updateSectionDropdowns(sections);
   updateDashboard();
-  // Save to localStorage as backup
-  try { localStorage.setItem('wms_db_v2', JSON.stringify(DB)); } catch(e) {}
+  window.clearMainLocalCache && window.clearMainLocalCache();
   // Firebase sync if available
   if(window.fbSaveAll) window.fbSaveAll(DB);
 }
 
 // Load from localStorage on startup
 function loadLocalDB() {
+  window.clearMainLocalCache && window.clearMainLocalCache();
+  return;
   try {
     const saved = localStorage.getItem('wms_db_v2');
     if(saved) {
@@ -2343,6 +2353,7 @@ function updateDashboard() {
 // ============ HELPERS ============
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function today() { return new Date().toISOString().slice(0,10); }
+const FACTORY_OPTIONS = ['EPF','TGL','BGL','GTM','GT-06','GT-08','EC','RFL'];
 function addActivity(msg, color='var(--accent)') {
   const list = document.getElementById('activity-list');
   const time = new Date().toLocaleTimeString('bn-BD');
@@ -2388,6 +2399,96 @@ function updateSectionDropdowns(sections) {
   }
 }
 
+function normalizeText(v) {
+  return String(v || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+function uniqueSorted(values) {
+  return [...new Set(values.map(v => String(v || '').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function getWarehouseIdOptions() {
+  const seeded = DB.warehouseList.map(w => ({
+    value: String(w.id || '').trim(),
+    label: `${String(w.id || '').trim()}${w.place ? ' - ' + w.place : ''}${w.fty ? ' (' + w.fty + ')' : ''}`
+  })).filter(o => o.value);
+  const fromPeople = [...DB.officers, ...DB.labors]
+    .map(r => String(r.warehouseId || '').trim())
+    .filter(Boolean)
+    .map(v => ({ value: v, label: v }));
+  const map = new Map();
+  [...seeded, ...fromPeople].forEach(opt => { if(opt.value && !map.has(opt.value)) map.set(opt.value, opt); });
+  return [...map.values()];
+}
+function getDropdownOptions(fieldKey) {
+  if(fieldKey === 'designation') {
+    return uniqueSorted([...DB.officers.map(o=>o.designation), ...DB.labors.map(l=>l.designation)]);
+  }
+  if(fieldKey === 'section') {
+    return uniqueSorted([...DB.officers.map(o=>o.section), ...DB.labors.map(l=>l.section)]);
+  }
+  if(fieldKey === 'whCode') {
+    return uniqueSorted([
+      ...DB.officers.map(o=>o.whCode),
+      ...DB.labors.map(l=>l.whCode),
+      ...DB.warehouseList.flatMap(w => String(w.misCode || '').split('/'))
+    ]);
+  }
+  if(fieldKey === 'warehouseId') return getWarehouseIdOptions();
+  return [];
+}
+function ensureCurrentOption(options, currentValue) {
+  const value = String(currentValue || '').trim();
+  if(!value) return options;
+  const exists = options.some(opt => (typeof opt === 'string' ? opt === value : String(opt.value ?? '') === value));
+  return exists ? options : [...options, value];
+}
+function renderSelectOptions(options, currentValue) {
+  return options.map(opt => {
+    const value = typeof opt === 'string' ? opt : String(opt.value ?? '');
+    const label = typeof opt === 'string' ? opt : String(opt.label ?? opt.value ?? '');
+    return `<option value="${value}"${value===currentValue?' selected':''}>${label}</option>`;
+  }).join('');
+}
+function createImportKey(record, type) {
+  const strategies = {
+    officers: [record.empId, record.name, record.factory, record.section],
+    labors: [record.empId, record.name, record.factory, record.type || 'labor'],
+    warehouseList: [record.fty, record.place, record.misCode],
+    forklift: [record.machineId],
+    pda: [record.deviceId, record.imei],
+    delivery: [record.date, record.doNo],
+    stock: [record.name, record.code, record.location]
+  };
+  return (strategies[type] || []).map(normalizeText).filter(Boolean).join('|');
+}
+function mergeImportedRecords(dbKey, records) {
+  if(!Array.isArray(records) || !records.length) return 0;
+  const existing = Array.isArray(DB[dbKey]) ? DB[dbKey] : [];
+  const keyMap = new Map();
+  existing.forEach((item, index) => {
+    const key = createImportKey(item, dbKey);
+    if(key) keyMap.set(key, index);
+  });
+  let changed = 0;
+  records.forEach(record => {
+    const cleaned = Object.fromEntries(Object.entries(record).map(([k,v]) => [k, typeof v === 'string' ? v.trim() : v]));
+    const key = createImportKey(cleaned, dbKey);
+    if(key && keyMap.has(key)) {
+      const idx = keyMap.get(key);
+      DB[dbKey][idx] = { ...DB[dbKey][idx], ...cleaned, id: DB[dbKey][idx].id || cleaned.id || uid() };
+      changed++;
+      return;
+    }
+    cleaned.id = cleaned.id || uid();
+    DB[dbKey].push(cleaned);
+    if(key) keyMap.set(key, DB[dbKey].length - 1);
+    changed++;
+  });
+  return changed;
+}
+function askConfirmation(message) {
+  return window.confirm(message);
+}
+
 // ============ OFFICERS ============
 function renderOfficers() {
   const q = (document.getElementById('officer-search')?.value||'').toLowerCase();
@@ -2415,7 +2516,7 @@ function renderOfficers() {
     dEl.innerHTML = '<option value="">সব ডিপার্টমেন্ট</option>' + depts.map(d=>`<option value="${d}"${cur===d?' selected':''}>${d}</option>`).join('');
   }
   const tbody = document.getElementById('officer-tbody');
-  if(!data.length) { tbody.innerHTML = emptyRow(12,'কোনো অফিসার পাওয়া যায়নি'); return; }
+  if(!data.length) { tbody.innerHTML = emptyRow(13,'কোনো অফিসার পাওয়া যায়নি'); return; }
   const facColor = {EPF:'blue',TGL:'green',BGL:'orange',GTM:'yellow'};
   tbody.innerHTML = data.map((o,i)=>`<tr>
     <td>${i+1}</td>
@@ -2423,6 +2524,7 @@ function renderOfficers() {
     <td class="hide-sm"><span class="badge badge-blue" style="font-family:'IBM Plex Mono',monospace;">${o.empId||'—'}</span></td>
     <td style="font-size:12px;">${o.designation||'—'}</td>
     <td><span class="badge badge-${facColor[o.factory]||'blue'}">${o.factory||'—'}</span></td>
+    <td class="hide-sm"><span class="tag">${o.warehouseId||'—'}</span></td>
     <td class="hide-sm"><span class="tag">${o.section||'—'}</span></td>
     <td class="hide-xs" style="font-size:12px;">${o.building||'—'}</td>
     <td class="hide-xs" style="font-size:12px;">${o.responsibility||'—'}</td>
@@ -2465,7 +2567,7 @@ function renderLabors() {
     dEl.innerHTML = '<option value="">সব ডিপার্টমেন্ট</option>' + depts.map(d=>`<option value="${d}"${cur===d?' selected':''}>${d}</option>`).join('');
   }
   const tbody = document.getElementById('labor-tbody');
-  if(!data.length) { tbody.innerHTML = emptyRow(12,'কোনো লেবার পাওয়া যায়নি'); return; }
+  if(!data.length) { tbody.innerHTML = emptyRow(13,'কোনো লেবার পাওয়া যায়নি'); return; }
   const facColor = {EPF:'blue',TGL:'green',BGL:'orange',GTM:'yellow'};
   const typeIcon = {labor:'👷', driver:'🚛'};
   tbody.innerHTML = data.map((l,i)=>`<tr>
@@ -2474,6 +2576,7 @@ function renderLabors() {
     <td class="hide-sm"><span class="badge badge-orange" style="font-family:'IBM Plex Mono',monospace;">${l.empId||'—'}</span></td>
     <td style="font-size:12px;">${typeIcon[l.type]||''} ${l.designation||l.laborType||'—'}</td>
     <td><span class="badge badge-${facColor[l.factory]||'blue'}">${l.factory||'—'}</span></td>
+    <td class="hide-sm"><span class="tag">${l.warehouseId||'—'}</span></td>
     <td class="hide-sm"><span class="tag">${l.section||'—'}</span></td>
     <td class="hide-xs" style="font-size:12px;">${l.building||'—'}</td>
     <td class="hide-xs" style="font-size:12px;">${l.responsibility||'—'}</td>
@@ -2635,12 +2738,13 @@ const modalForms = {
     fields: [
       {key:'name',label:'নাম',type:'text',required:true},
       {key:'empId',label:'Employee ID',type:'text'},
-      {key:'designation',label:'পদবী',type:'text'},
-      {key:'factory',label:'Factory',type:'select',options:['EPF','TGL','BGL','GTM','GT-06','GT-08','EC','RFL']},
-      {key:'section',label:'ডিপার্টমেন্ট / সেকশন',type:'text'},
+      {key:'designation',label:'পদবী',type:'select',optionsFn:()=>getDropdownOptions('designation')},
+      {key:'factory',label:'Factory',type:'select',options:FACTORY_OPTIONS},
+      {key:'warehouseId',label:'Warehouse ID',type:'select',optionsFn:()=>getDropdownOptions('warehouseId')},
+      {key:'section',label:'ডিপার্টমেন্ট / সেকশন',type:'select',optionsFn:()=>getDropdownOptions('section')},
       {key:'building',label:'বিল্ডিং',type:'text'},
       {key:'responsibility',label:'দায়িত্ব / WH Area',type:'text'},
-      {key:'whCode',label:'WH Dept. Code',type:'text'},
+      {key:'whCode',label:'WH Dept. Code',type:'select',optionsFn:()=>getDropdownOptions('whCode')},
       {key:'contact',label:'মোবাইল নম্বর',type:'text'},
       {key:'email',label:'ইমেইল',type:'text'},
       {key:'shift',label:'শিফট',type:'select',options:['সকাল','দুপুর','রাত','জেনারেল']},
@@ -2654,13 +2758,14 @@ const modalForms = {
     fields: [
       {key:'name',label:'নাম',type:'text',required:true},
       {key:'empId',label:'Employee ID',type:'text'},
-      {key:'designation',label:'পদবী / পদ',type:'text'},
+      {key:'designation',label:'পদবী / পদ',type:'select',optionsFn:()=>getDropdownOptions('designation')},
       {key:'type',label:'ধরন',type:'select',options:['labor','driver']},
-      {key:'factory',label:'Factory',type:'select',options:['EPF','TGL','BGL','GTM','GT-06','GT-08','EC','RFL']},
-      {key:'section',label:'ডিপার্টমেন্ট / সেকশন',type:'text'},
+      {key:'factory',label:'Factory',type:'select',options:FACTORY_OPTIONS},
+      {key:'warehouseId',label:'Warehouse ID',type:'select',optionsFn:()=>getDropdownOptions('warehouseId')},
+      {key:'section',label:'ডিপার্টমেন্ট / সেকশন',type:'select',optionsFn:()=>getDropdownOptions('section')},
       {key:'building',label:'বিল্ডিং',type:'text'},
       {key:'responsibility',label:'দায়িত্ব / WH Area',type:'text'},
-      {key:'whCode',label:'WH Dept. Code',type:'text'},
+      {key:'whCode',label:'WH Dept. Code',type:'select',optionsFn:()=>getDropdownOptions('whCode')},
       {key:'contact',label:'মোবাইল নম্বর',type:'text'},
       {key:'shift',label:'শিফট',type:'select',options:['সকাল','দুপুর','রাত','জেনারেল']},
       {key:'joinDate',label:'যোগদানের তারিখ',type:'date'},
@@ -2778,8 +2883,9 @@ function _rawOpenModal(type, id=null) {
     cfg.fields.map(f=>{
       const val = existingData[f.key]||'';
       if(f.type==='select') {
+        const options = ensureCurrentOption(f.optionsFn ? f.optionsFn() : (f.options || []), val);
         return `<div class="form-group"><label>${f.label}</label><select id="mf-${f.key}">
-          ${f.options.map(o=>`<option value="${o}"${val===o?' selected':''}>${o}</option>`).join('')}
+          ${renderSelectOptions(options, val)}
         </select></div>`;
       } else if(f.type==='textarea') {
         return `<div class="form-group" style="grid-column:1/-1"><label>${f.label}</label><textarea id="mf-${f.key}">${val}</textarea></div>`;
@@ -2806,6 +2912,9 @@ function saveModal() {
     if(f.required && !el?.value?.trim()) { el.style.borderColor='var(--danger)'; el.focus(); return; }
     record[f.key] = el?.value||'';
   }
+  const actionLabel = editId ? 'আপডেট' : 'যোগ';
+  const identityLabel = record.name || record.title || record.doNo || record.machineId || record.deviceId || 'রেকর্ড';
+  if(!askConfirmation(`আপনি কি নিশ্চিতভাবে এই ${cfg.title} ${actionLabel} করতে চান?\n\nরেকর্ড: ${identityLabel}`)) return;
   
   const dbMap = {officer:'officers',labor:'labors',floor:'floors',report:'reports',whlistitem:'warehouseList'};
   const dbKey = dbMap[type] || type;
@@ -2875,6 +2984,7 @@ function _rawDeleteRecord(dbKey, id) {
 
 // ============ WAREHOUSE INFO ============
 function _rawSaveWhInfo() {
+  if(!askConfirmation('ওয়্যারহাউস তথ্য পরিবর্তন সেভ করতে চান?')) return;
   DB.whInfo = {
     name: document.getElementById('wh-name').value,
     location: document.getElementById('wh-loc').value,
@@ -2906,6 +3016,10 @@ function importExcel(e) {
   const file = e.target.files[0];
   if(!file) return;
   if(typeof XLSX === 'undefined') { alert('SheetJS লোড হয়নি। Internet চেক করুন।'); return; }
+  if(!askConfirmation(`"${file.name}" Excel ফাইল ইমপোর্ট করা হবে। মিল থাকা রেকর্ড আপডেট হবে এবং নতুন রেকর্ড যোগ হবে।\n\nচালিয়ে যাবেন?`)) {
+    e.target.value = '';
+    return;
+  }
 
   const statusEl = document.getElementById('excel-import-status');
   if(statusEl) { statusEl.textContent = '⏳ Excel পড়া হচ্ছে...'; statusEl.style.color = 'var(--warning)'; }
@@ -2930,9 +3044,10 @@ function importExcel(e) {
         const mapped = offRows.map(r => ({
           id:           r['ID'] || r['id'] || uid(),
           name:         String(r['Name'] || r['নাম'] || '').trim(),
-          empId:        String(r['Employee ID'] || r['empId'] || '').trim(),
+          empId:        String(r['Employee ID'] || r['Emp ID'] || r['empId'] || '').trim(),
           designation:  String(r['Designation'] || r['পদবী'] || '').trim(),
           factory:      String(r['Factory'] || '').trim(),
+          warehouseId:  String(r['Warehouse ID'] || r['WH ID'] || r['warehouseId'] || '').trim(),
           section:      String(r['Section'] || r['সেকশন'] || '').trim(),
           building:     String(r['Building'] || '').trim(),
           responsibility: String(r['Responsibility'] || '').trim(),
@@ -2945,10 +3060,7 @@ function importExcel(e) {
           status:       String(r['Status'] || 'সক্রিয়').trim(),
         })).filter(r => r.name);
         // Merge: skip existing IDs, add new
-        const existingIds = new Set(DB.officers.map(o => o.id));
-        const newOff = mapped.filter(o => !existingIds.has(o.id));
-        DB.officers.push(...newOff);
-        imported += newOff.length;
+        imported += mergeImportedRecords('officers', mapped);
       }
 
       // ── Labour ────────────────────────────────────────────────────────────
@@ -2957,10 +3069,11 @@ function importExcel(e) {
         const mapped = labRows.map(r => ({
           id:           r['ID'] || r['id'] || uid(),
           name:         String(r['Name'] || r['নাম'] || '').trim(),
-          empId:        String(r['Employee ID'] || r['empId'] || '').trim(),
+          empId:        String(r['Employee ID'] || r['Emp ID'] || r['empId'] || '').trim(),
           designation:  String(r['Designation'] || '').trim(),
           type:         String(r['Type'] || r['ধরন'] || 'labor').trim(),
           factory:      String(r['Factory'] || '').trim(),
+          warehouseId:  String(r['Warehouse ID'] || r['WH ID'] || r['warehouseId'] || '').trim(),
           section:      String(r['Section'] || '').trim(),
           building:     String(r['Building'] || '').trim(),
           responsibility: String(r['Responsibility'] || '').trim(),
@@ -2971,10 +3084,7 @@ function importExcel(e) {
           nid:          String(r['NID'] || '').trim(),
           status:       String(r['Status'] || 'সক্রিয়').trim(),
         })).filter(r => r.name);
-        const existingIds = new Set(DB.labors.map(l => l.id));
-        const newLab = mapped.filter(l => !existingIds.has(l.id));
-        DB.labors.push(...newLab);
-        imported += newLab.length;
+        imported += mergeImportedRecords('labors', mapped);
       }
 
       // ── WH List ───────────────────────────────────────────────────────────
@@ -2984,14 +3094,11 @@ function importExcel(e) {
           id:      r['ID'] || r['id'] || uid(),
           sl:      r['SL'] || '',
           fty:     String(r['Factory'] || '').trim(),
-          place:   String(r['Warehouse Place'] || '').trim(),
+          place:   String(r['Warehouse Place'] || r['WH Place'] || '').trim(),
           items:   String(r['Items'] || '').trim(),
           misCode: String(r['MIS Code'] || '').trim(),
         })).filter(r => r.place);
-        const existingIds = new Set(DB.warehouseList.map(w => w.id));
-        const newWH = mapped.filter(w => !existingIds.has(w.id));
-        DB.warehouseList.push(...newWH);
-        imported += newWH.length;
+        imported += mergeImportedRecords('warehouseList', mapped);
       }
 
       // ── Forklift ──────────────────────────────────────────────────────────
@@ -3005,16 +3112,13 @@ function importExcel(e) {
           capacity:        String(r['Capacity'] || '').trim(),
           location:        String(r['Location'] || '').trim(),
           operator:        String(r['Operator'] || '').trim(),
-          operatorId:      String(r['Operator ID'] || '').trim(),
-          operatorContact: String(r['Contact'] || '').trim(),
+          operatorId:      String(r['Operator ID'] || r['Op.ID'] || '').trim(),
+          operatorContact: String(r['Contact'] || r['Op.Contact'] || '').trim(),
           lastService:     String(r['Last Service'] || '').trim(),
           nextService:     String(r['Next Service'] || '').trim(),
           status:          String(r['Status'] || 'সক্রিয়').trim(),
         })).filter(r => r.machineId);
-        const existingIds = new Set(DB.forklift.map(f => f.id));
-        const newFK = mapped.filter(f => !existingIds.has(f.id));
-        DB.forklift.push(...newFK);
-        imported += newFK.length;
+        imported += mergeImportedRecords('forklift', mapped);
       }
 
       // ── PDA ───────────────────────────────────────────────────────────────
@@ -3024,18 +3128,15 @@ function importExcel(e) {
           id:           r['ID'] || r['id'] || uid(),
           deviceId:     String(r['Device ID'] || '').trim(),
           model:        String(r['Model'] || '').trim(),
-          imei:         String(r['IMEI/SN'] || '').trim(),
+          imei:         String(r['IMEI/SN'] || r['IMEI'] || '').trim(),
           fty:          String(r['Factory'] || '').trim(),
-          deptUse:      String(r['Dept Use'] || '').trim(),
+          deptUse:      String(r['Dept Use'] || r['Dept'] || '').trim(),
           assignedTo:   String(r['Assigned To'] || '').trim(),
-          assignedDate: String(r['Assigned Date'] || '').trim(),
+          assignedDate: String(r['Assigned Date'] || r['Date'] || '').trim(),
           charge:       String(r['Charge %'] || '').trim(),
           status:       String(r['Status'] || 'সক্রিয়').trim(),
         })).filter(r => r.deviceId);
-        const existingIds = new Set(DB.pda.map(p => p.id));
-        const newPDA = mapped.filter(p => !existingIds.has(p.id));
-        DB.pda.push(...newPDA);
-        imported += newPDA.length;
+        imported += mergeImportedRecords('pda', mapped);
       }
 
       // ── Delivery ──────────────────────────────────────────────────────────
@@ -3048,17 +3149,14 @@ function importExcel(e) {
           vehicle:     String(r['Vehicle'] || '').trim(),
           driver:      String(r['Driver'] || '').trim(),
           product:     String(r['Product'] || '').trim(),
-          quantity:    String(r['Quantity'] || '').trim(),
+          quantity:    String(r['Quantity'] || r['Qty'] || '').trim(),
           unit:        String(r['Unit'] || '').trim(),
           destination: String(r['Destination'] || '').trim(),
           receivedBy:  String(r['Received By'] || '').trim(),
           status:      String(r['Status'] || '').trim(),
           note:        String(r['Note'] || '').trim(),
         })).filter(r => r.doNo);
-        const existingIds = new Set(DB.delivery.map(d => d.id));
-        const newDlv = mapped.filter(d => !existingIds.has(d.id));
-        DB.delivery.push(...newDlv);
-        imported += newDlv.length;
+        imported += mergeImportedRecords('delivery', mapped);
       }
 
       // ── Stock ─────────────────────────────────────────────────────────────
@@ -3066,30 +3164,27 @@ function importExcel(e) {
       if(stkRows && stkRows.length > 0) {
         const mapped = stkRows.map(r => ({
           id:         r['ID'] || r['id'] || uid(),
-          name:       String(r['Item Name'] || '').trim(),
+          name:       String(r['Item Name'] || r['Name'] || '').trim(),
           code:       String(r['Code'] || '').trim(),
           category:   String(r['Category'] || '').trim(),
           location:   String(r['Location'] || '').trim(),
-          quantity:   String(r['Quantity'] || '').trim(),
+          quantity:   String(r['Quantity'] || r['Qty'] || '').trim(),
           unit:       String(r['Unit'] || '').trim(),
           minLevel:   String(r['Min Level'] || '').trim(),
           supplier:   String(r['Supplier'] || '').trim(),
           lastUpdate: String(r['Last Update'] || '').trim(),
         })).filter(r => r.name);
-        const existingIds = new Set(DB.stock.map(s => s.id));
-        const newStk = mapped.filter(s => !existingIds.has(s.id));
-        DB.stock.push(...newStk);
-        imported += newStk.length;
+        imported += mergeImportedRecords('stock', mapped);
       }
 
       // ── Save and update ───────────────────────────────────────────────────
       saveDB();
       updateDashboard();
       if(typeof window.fbSaveAll === 'function') window.fbSaveAll(DB);
-      addActivity(`Excel ইমপোর্ট সম্পন্ন — ${imported}টি নতুন রেকর্ড যোগ হয়েছে`, 'var(--success)');
+      addActivity(`Excel ইমপোর্ট সম্পন্ন — ${imported}টি রেকর্ড যোগ/আপডেট হয়েছে`, 'var(--success)');
 
       if(statusEl) {
-        statusEl.textContent = `✅ সফল! ${imported}টি নতুন রেকর্ড ইমপোর্ট হয়েছে`;
+        statusEl.textContent = `✅ সফল! ${imported}টি রেকর্ড যোগ/আপডেট হয়েছে`;
         statusEl.style.color = 'var(--success)';
       }
     } catch(err) {
@@ -3107,6 +3202,10 @@ function importExcel(e) {
 function importData(e) {
   const file = e.target.files[0];
   if(!file) return;
+  if(!askConfirmation(`"${file.name}" JSON ব্যাকআপ ইমপোর্ট করলে বর্তমান ওয়েব ডাটার উপর নতুন ডাটা বসবে।\n\nইমপোর্ট করতে চান?`)) {
+    e.target.value = '';
+    return;
+  }
   const reader = new FileReader();
   reader.onload = ev => {
     try {
@@ -3131,7 +3230,7 @@ function importData(e) {
 
 function _rawClearAllData() {
   if(!confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এই কাজ পূর্বাবস্থায় ফেরানো যাবে না!')) return;
-  DB = { whInfo:{}, officers:[], labors:[], delivery:[], stock:[], floors:[], forklift:[], pda:[], reports:[], fired:[] };
+  DB = { whInfo:{}, officers:[], labors:[], delivery:[], stock:[], floors:[], forklift:[], pda:[], reports:[], warehouseList:[], fired:[] };
   saveDB();
   addActivity('সকল ডেটা মুছে ফেলা হয়েছে', 'var(--danger)');
   alert('✅ সব ডেটা মুছে ফেলা হয়েছে।');
@@ -5173,10 +5272,10 @@ function exportExcel() {
     XLSX.utils.book_append_sheet(wb, wsSummary, 'Summary');
 
     // ── Sheet 2: Officers ────────────────────────────────────
-    const offHeaders = ['#','Name','Employee ID','Designation','Factory','Section','Building','Responsibility','WH Code','Contact','Email','Shift','Join Date','NID','Status'];
+    const offHeaders = ['#','Name','Employee ID','Designation','Factory','Warehouse ID','Section','Building','Responsibility','WH Code','Contact','Email','Shift','Join Date','NID','Status'];
     const offRows = DB.officers.map((o,i) => [
       i+1, o.name||'', o.empId||'', o.designation||'', o.factory||'',
-      o.section||'', o.building||'', o.responsibility||'', o.whCode||'',
+      o.warehouseId||'', o.section||'', o.building||'', o.responsibility||'', o.whCode||'',
       o.contact||'', o.email||'', o.shift||'', o.joinDate||'', o.nid||'', o.status||'সক্রিয়'
     ]);
     const wsOff = XLSX.utils.aoa_to_sheet([offHeaders, ...offRows]);
@@ -5184,10 +5283,10 @@ function exportExcel() {
     XLSX.utils.book_append_sheet(wb, wsOff, 'Officers');
 
     // ── Sheet 3: Labour ──────────────────────────────────────
-    const labHeaders = ['#','Name','Employee ID','Designation','Type','Factory','Section','Building','Responsibility','WH Code','Contact','Shift','Join Date','NID','Status'];
+    const labHeaders = ['#','Name','Employee ID','Designation','Type','Factory','Warehouse ID','Section','Building','Responsibility','WH Code','Contact','Shift','Join Date','NID','Status'];
     const labRows = DB.labors.map((l,i) => [
       i+1, l.name||'', l.empId||'', l.designation||'', l.type||'', l.factory||'',
-      l.section||'', l.building||'', l.responsibility||'', l.whCode||'',
+      l.warehouseId||'', l.section||'', l.building||'', l.responsibility||'', l.whCode||'',
       l.contact||'', l.shift||'', l.joinDate||'', l.nid||'', l.status||'সক্রিয়'
     ]);
     const wsLab = XLSX.utils.aoa_to_sheet([labHeaders, ...labRows]);
@@ -5369,14 +5468,14 @@ function _doExcelExport() {
   }
 
   // Officers
-  const offCols = ['#','Name','Emp ID','Designation','Factory','Section','Building','Responsibility','WH Code','Contact','Status'];
-  const offData = DB.officers.map((o,i) => [i+1, o.name||'', o.empId||'', o.designation||'', o.factory||'', o.section||'', o.building||'', o.responsibility||'', o.whCode||'', o.contact||'', o.status||'']);
+  const offCols = ['#','Name','Emp ID','Designation','Factory','Warehouse ID','Section','Building','Responsibility','WH Code','Contact','Status'];
+  const offData = DB.officers.map((o,i) => [i+1, o.name||'', o.empId||'', o.designation||'', o.factory||'', o.warehouseId||'', o.section||'', o.building||'', o.responsibility||'', o.whCode||'', o.contact||'', o.status||'']);
   const offSheet = XLSX.utils.aoa_to_sheet([offCols, ...offData]);
   XLSX.utils.book_append_sheet(wb, offSheet, 'Officers');
 
   // Labour
-  const labCols = ['#','Name','Emp ID','Designation','Type','Factory','Section','Building','Responsibility','WH Code','Contact','Status'];
-  const labData = DB.labors.map((l,i) => [i+1, l.name||'', l.empId||'', l.designation||'', l.type||'', l.factory||'', l.section||'', l.building||'', l.responsibility||'', l.whCode||'', l.contact||'', l.status||'']);
+  const labCols = ['#','Name','Emp ID','Designation','Type','Factory','Warehouse ID','Section','Building','Responsibility','WH Code','Contact','Status'];
+  const labData = DB.labors.map((l,i) => [i+1, l.name||'', l.empId||'', l.designation||'', l.type||'', l.factory||'', l.warehouseId||'', l.section||'', l.building||'', l.responsibility||'', l.whCode||'', l.contact||'', l.status||'']);
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([labCols,...labData]), 'Labour');
 
   // WH List
