@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance & Leave — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
+[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--cardh:#212b3d;--bdr:#2a3548;--bdrh:#3d5070;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--aglow:rgba(0,201,167,.20);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--tag:#00C9A7;--err:#f85149;--wrn:#e3b341;--ok:#3fb950;--nav:#0d1117;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shd:0 4px 24px rgba(0,0,0,.6);--shs:0 2px 10px rgba(0,0,0,.4)}
+[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--cardh:#f5f9ff;--bdr:#d0dae8;--bdrh:#a0b8d8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--aglow:rgba(21,101,192,.14);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--tag:#1565C0;--err:#c62828;--wrn:#e65100;--ok:#2e7d32;--nav:#fff;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shd:0 4px 20px rgba(21,101,192,.10);--shs:0 2px 8px rgba(21,101,192,.08)}
+[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--cardh:#2f2f33;--bdr:#3f3f46;--bdrh:#58585f;--acc:#D4A017;--adim:rgba(212,160,23,.10);--aglow:rgba(212,160,23,.20);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--tag:#D4A017;--err:#ef4444;--wrn:#f59e0b;--ok:#22c55e;--nav:#111113;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shd:0 4px 24px rgba(0,0,0,.7);--shs:0 2px 10px rgba(0,0,0,.5)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb,'Josefin Sans',sans-serif);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
+.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;box-shadow:var(--shs)}
+.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);letter-spacing:.5px;white-space:nowrap}
+.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400;letter-spacing:.2px}
+.sep{flex:1}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
+.tnav a:hover{background:var(--adim);color:var(--acc)}
+.tnav a.ON{background:var(--tbg);color:var(--acc)}
+.ctrl{display:flex;align-items:center;gap:10px}
+.clbl{font-size:10px;color:var(--tm)}
+.tdots{display:flex;gap:5px}
+.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.tdot[data-t="slate"]{background:#00C9A7}
+.tdot[data-t="arctic"]{background:#1565C0}
+.tdot[data-t="ember"]{background:#D4A017}
+.tdot.active{border-color:var(--th);transform:scale(1.2)}
+.fsw{display:flex;gap:4px}
+.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
+.fbtn:hover,.fbtn.active{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
+.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
+.sb-sec{margin-bottom:4px}
+.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
+.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
+.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.MN{margin-left:200px;padding:20px;position:relative;z-index:1;min-height:calc(100vh - 52px)}
+.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
+.ph-ico{width:38px;height:38px;background:var(--adim);border:1px solid var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.ph-title{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--th)}
+.ph-sub{font-size:11px;color:var(--tm)}
+.ph-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.15)}
+.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
+.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--adim)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
+.b-err{background:rgba(248,81,73,.15);color:var(--err)}
+.b-acc{background:var(--tbg);color:var(--acc)}
+.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
+.b-purple{background:rgba(188,130,255,.15);color:#bc82ff}
+.b-orange{background:rgba(240,136,62,.15);color:#f0883e}
+.fctl{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;transition:border .2s;font-family:var(--fb)}
+.si:focus{border-color:var(--acc)}
+.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer;font-family:var(--fb)}
+.fsel option{background:var(--sur)}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:16px}
+.stc{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.stc:hover{background:var(--cardh);border-color:var(--acc)}
+.stc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stc.c-green::before{background:linear-gradient(90deg,#00C9A7,#00a585)}
+.stc.c-blue::before{background:linear-gradient(90deg,#58a6ff,#1f6feb)}
+.stc.c-orange::before{background:linear-gradient(90deg,#f0883e,#d06b2a)}
+.stc.c-purple::before{background:linear-gradient(90deg,#bc82ff,#9d4edd)}
+.stc.c-yellow::before{background:linear-gradient(90deg,#e3b341,#c9922a)}
+.stc.c-red::before{background:linear-gradient(90deg,#f85149,#c9302c)}
+.stc.active-filter{box-shadow:0 0 0 2px var(--acc);background:var(--adim)}
+.stc-num{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--acc)}
+.stc-lbl{font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.stc-sub{font-size:11px;color:var(--tb)}
+.btn-add{background:linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 70%,black));color:#0d1117;border:none;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:700;font-family:var(--fh);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn-add:hover{opacity:.88;transform:translateY(-1px)}
+.btn-sec{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fh);transition:all .2s}
+.btn-sec:hover{background:var(--cardh);color:var(--th)}
+.btn-err{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:var(--err);padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fh);transition:all .2s}
+.abtn{border:none;border-radius:5px;cursor:pointer;padding:4px 8px;font-size:12px;transition:all .2s;background:transparent;color:var(--tm)}
+.abtn:hover{background:var(--adim);color:var(--acc)}
+.a-del:hover{background:rgba(248,81,73,.12);color:var(--err)}
+/* Rank badge */
+.rank{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--fh)}
+.rank-1{background:linear-gradient(135deg,#FFD700,#FFA500);color:#1a1000}
+.rank-2{background:linear-gradient(135deg,#C0C0C0,#A0A0A0);color:#1a1a1a}
+.rank-3{background:linear-gradient(135deg,#CD7F32,#A0522D);color:#fff}
+.rank-n{background:var(--card);color:var(--tm)}
+/* Staff info card */
+.staff-lookup{background:var(--adim);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;margin-top:6px;display:none}
+.staff-lookup.show{display:block}
+/* Modal */
+.OV{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.OV.show{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.OV-box{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:24px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:var(--shd);animation:slideUp .25s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.OV-box h3{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--th);margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--tm);margin-bottom:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr{display:flex;flex-direction:column;gap:5px}
+.fr.full{grid-column:1/-1}
+.fr label{font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.fr input,.fr select,.fr textarea{background:var(--card);border:1px solid var(--bdr);border-radius:7px;padding:9px 11px;color:var(--th);font-size:12px;font-family:var(--fb);outline:none;transition:all .2s;width:100%}
+.fr input:focus,.fr select:focus,.fr textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--adim)}
+.fr select option{background:var(--sur)}
+.fr textarea{resize:vertical;min-height:60px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+/* Staff detail panel */
+.staff-detail{background:rgba(0,0,0,.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;display:none}
+.staff-detail.show{display:block}
+/* Summary panel */
+.summary-panel{background:var(--adim);border:1px solid var(--bdr);border-radius:10px;padding:14px;margin-bottom:16px}
+.sum-title{font-family:var(--fh);font-size:13px;font-weight:600;color:var(--th);margin-bottom:10px}
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.sum-item{text-align:center}
+.sum-num{font-family:var(--fh);font-size:20px;font-weight:700}
+.sum-lbl{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.4px}
+/* Toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:11px 22px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:all .3s ease;pointer-events:none;white-space:nowrap;box-shadow:var(--shd)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.tok{border-color:var(--ok);color:var(--ok);background:rgba(63,185,80,.1)}
+.toast.terr{border-color:var(--err);color:var(--err);background:rgba(248,81,73,.1)}
+/* Tabs */
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--bdr)}
+.tab{padding:9px 16px;border:none;background:transparent;color:var(--tm);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--fb);transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab:hover{color:var(--th)}
+.tab.ON{color:var(--acc);border-bottom-color:var(--acc)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}.form-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav class="TB">
+  <div class="brand">EPFBD<small>Warehouse Management System</small></div>
+  <div class="sep"></div>
+  <div class="tnav">
+    <a href="../index.html">Dashboard</a>
+    <a href="../manpower/all_manpower.html">Manpower</a>
+    <a href="../warehouse/wh_list.html">Warehouse</a>
+    <a href="../equipment/pda_devices.html">Equipment</a>
+    <a href="../kpi/staff_kpi.html">KPI</a>
+    <a href="attendance.html" class="ON">HR</a>
+  </div>
+  <div class="ctrl">
+    <span class="clbl">Theme</span>
+    <div class="tdots">
+      <div class="tdot" data-t="slate" onclick="setTheme('slate')"></div>
+      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')"></div>
+      <div class="tdot" data-t="ember" onclick="setTheme('ember')"></div>
+    </div>
+    <span class="clbl">Font</span>
+    <div class="fsw">
+      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="CLK" class="clk">--:--:--</div>
+  </div>
+</nav>
+<aside class="SB">
+  <div class="sb-sec"><div class="sb-hd">Main</div>
+    <a class="sb-a" href="../index.html">🏠 Dashboard</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Manpower</div>
+    <a class="sb-a" href="../manpower/all_manpower.html">👥 All Manpower</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Warehouse</div>
+    <a class="sb-a" href="../warehouse/wh_list.html">🏭 WH List</a>
+    <a class="sb-a" href="../warehouse/mis_login.html">🔑 MIS Login</a>
+    <a class="sb-a" href="../warehouse/mail_list.html">📧 Mail List</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Equipment</div>
+    <a class="sb-a" href="../equipment/pda_devices.html">📱 PDA / Scanner</a>
+    <a class="sb-a" href="../equipment/barcode_printer.html">🖨 Barcode Printer</a>
+    <a class="sb-a" href="../equipment/forklift.html">🚜 Forklift</a>
+    <a class="sb-a" href="../equipment/maintenance_log.html">🔧 Maintenance</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">HR</div>
+    <a class="sb-a ON" href="attendance.html">📋 Attendance & Leave</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Performance</div>
+    <a class="sb-a" href="../kpi/staff_kpi.html">⭐ Staff KPI</a>
+  </div>
+</aside>
+
+<main class="MN">
+<div class="ph">
+  <div class="ph-ico">📋</div>
+  <div>
+    <div class="ph-title">Attendance, Leave & Discipline</div>
+    <div class="ph-sub">Officer · Labour · Driver — ছুটি / অনুপস্থিতি / সতর্কপত্র / বিলম্ব রেকর্ড</div>
+  </div>
+  <div class="ph-right">
+    <button class="btn-add" onclick="openAdd()">＋ নতুন রেকর্ড</button>
+    <span class="pill" id="totalPill">0 রেকর্ড</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="st-grid" id="statsGrid"></div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+  <button class="tab ON" onclick="switchTab('all',this)">📋 সব রেকর্ড</button>
+  <button class="tab" onclick="switchTab('leave',this)">🌴 ছুটি</button>
+  <button class="tab" onclick="switchTab('absent',this)">❌ অনুপস্থিত</button>
+  <button class="tab" onclick="switchTab('warning',this)">⚠️ সতর্কপত্র</button>
+  <button class="tab" onclick="switchTab('late',this)">⏰ বিলম্ব</button>
+  <button class="tab" onclick="switchTab('ranking',this)">🏆 র‍্যাংকিং</button>
+</div>
+
+<!-- All Records / Filtered tabs -->
+<div class="tab-content active" id="tab-all">
+  <!-- Filters -->
+  <div class="fctl">
+    <input class="si" id="srch" placeholder="🔍 ID, নাম, কারণ…" oninput="renderAll()" style="width:200px">
+    <select class="fsel" id="fType" onchange="renderAll()">
+      <option value="">সব ধরন</option>
+      <option value="leave">ছুটি</option>
+      <option value="absent">অনুপস্থিত</option>
+      <option value="warning">সতর্কপত্র</option>
+      <option value="late">বিলম্ব</option>
+    </select>
+    <select class="fsel" id="fYear" onchange="renderAll()">
+      <option value="">সব বছর</option>
+    </select>
+    <select class="fsel" id="fMonth" onchange="renderAll()">
+      <option value="">সব মাস</option>
+      <option value="1">জানুয়ারি</option><option value="2">ফেব্রুয়ারি</option>
+      <option value="3">মার্চ</option><option value="4">এপ্রিল</option>
+      <option value="5">মে</option><option value="6">জুন</option>
+      <option value="7">জুলাই</option><option value="8">আগস্ট</option>
+      <option value="9">সেপ্টেম্বর</option><option value="10">অক্টোবর</option>
+      <option value="11">নভেম্বর</option><option value="12">ডিসেম্বর</option>
+    </select>
+    <select class="fsel" id="fRole" onchange="renderAll()">
+      <option value="">সব পদ</option>
+      <option>Officer</option>
+      <option>Labour</option>
+      <option>Driver</option>
+    </select>
+    <select class="fsel" id="fFty" onchange="renderAll()">
+      <option value="">সব ফ্যাক্টরি</option>
+      <option>EPF</option>
+      <option>TGL</option>
+      <option>BGL</option>
+      <option>GTM</option>
+    </select>
+  </div>
+  <div class="card">
+    <div class="card-hd">
+      <span>📋</span>
+      <div class="card-hd-title">রেকর্ড তালিকা</div>
+      <span class="card-hd-badge" id="allBadge">0</span>
+      <div style="margin-left:auto;font-size:11px;color:var(--tm)">বেশি সংখ্যক উপরে দেখাবে</div>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr>
+        <th>#</th><th>স্টাফ ID</th><th>নাম</th><th>পদ / ধরন</th>
+        <th>ধরন</th><th>উপ-ধরন</th><th>তারিখ</th><th>বছর</th><th>মাস</th>
+        <th>মোট দিন/ঘণ্টা</th><th>কারণ</th><th>ফ্যাক্টরি</th><th>বার্ষিক মোট</th><th>Action</th>
+      </tr></thead>
+      <tbody id="allBody"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- Ranking Tab -->
+<div class="tab-content" id="tab-ranking">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div id="rankLeave" class="card"></div>
+    <div id="rankAbsent" class="card"></div>
+    <div id="rankWarning" class="card"></div>
+    <div id="rankLate" class="card"></div>
+  </div>
+</div>
+
+</main>
+
+<!-- Add/Edit Modal -->
+<div class="OV" id="modal">
+  <div class="OV-box">
+    <h3 id="modalTitle">নতুন রেকর্ড যোগ করুন</h3>
+    <div class="modal-sub">স্টাফের হাজিরা / ছুটি / সতর্কপত্র / বিলম্বের তথ্য দিন</div>
+
+    <!-- Staff Lookup -->
+    <div class="form-grid" style="margin-bottom:12px">
+      <div class="fr">
+        <label>স্টাফ ID</label>
+        <input id="fStaffId" placeholder="e.g. 30678" oninput="lookupStaff()">
+      </div>
+      <div class="fr">
+        <label>নাম (Auto)</label>
+        <input id="fName" placeholder="ID দিলে নাম আসবে…" readonly style="background:rgba(0,201,167,.05)">
+      </div>
+    </div>
+    <div class="staff-detail" id="staffDetail"></div>
+
+    <div class="form-grid">
+      <div class="fr">
+        <label>পদের ধরন</label>
+        <select id="fRole">
+          <option>Officer</option>
+          <option>Labour</option>
+          <option>Driver</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>ফ্যাক্টরি</label>
+        <select id="fFty2">
+          <option>EPF</option>
+          <option>TGL</option>
+          <option>BGL</option>
+          <option>GTM</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>রেকর্ডের ধরন</label>
+        <select id="fRecType" onchange="updateSubtype()">
+          <option value="leave">ছুটি (Leave)</option>
+          <option value="absent">অনুপস্থিত (Absent)</option>
+          <option value="warning">সতর্কপত্র (Warning)</option>
+          <option value="late">বিলম্ব (Late)</option>
+        </select>
+      </div>
+      <div class="fr" id="subtypeWrap">
+        <label>ছুটির ধরন</label>
+        <select id="fSubtype">
+          <option value="CL">CL — Casual Leave</option>
+          <option value="SL">SL — Sick Leave</option>
+          <option value="EL">EL — Earned Leave</option>
+          <option value="NP">NP — No Pay Leave</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>তারিখ (Date)</label>
+        <input id="fDate" type="date">
+      </div>
+      <div class="fr">
+        <label>মোট দিন / ঘণ্টা</label>
+        <input id="fDays" type="number" value="1" min="1" step="0.5">
+      </div>
+      <div class="fr full">
+        <label>কারণ (Reason)</label>
+        <textarea id="fReason" rows="2" placeholder="কারণ বিস্তারিত লিখুন…"></textarea>
+      </div>
+      <div class="fr full">
+        <label>মন্তব্য</label>
+        <textarea id="fNote" rows="2" placeholder="ম্যানেজারের মন্তব্য (ঐচ্ছিক)…"></textarea>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-err" onclick="closeModal()">বাতিল</button>
+      <button class="btn-add" onclick="saveRecord()">💾 সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Staff Database (EPF sample — full dataset for lookup)
+const STAFF=[
+  {id:'30678',name:'Md. Abdullah-Al-Masud',desig:'Manager',type:'Officer',factory:'EPF'},
+  {id:'30353',name:'Golam Rabbani',desig:'Executive',type:'Officer',factory:'EPF'},
+  {id:'32668',name:'Md. Abdul Baten',desig:'Jr. Executive',type:'Officer',factory:'EPF'},
+  {id:'33508',name:'Md. Abdul Malek',desig:'Executive',type:'Officer',factory:'EPF'},
+  {id:'33359',name:'Md. Fajlar Rahman',desig:'Labour',type:'Labour',factory:'EPF'},
+  {id:'33317',name:'Sree. Dhaneswar Roy',desig:'Labour',type:'Labour',factory:'EPF'},
+  {id:'33504',name:'Ripon Kazi',desig:'Labour',type:'Labour',factory:'EPF'},
+  {id:'33506',name:'Sree. Hembabu',desig:'Labour',type:'Labour',factory:'EPF'},
+  {id:'31947',name:'Md. Anisur Rahman',desig:'Labour',type:'Labour',factory:'EPF'},
+  {id:'30569',name:'Md. Anarul Islam',desig:'Executive',type:'Officer',factory:'EPF'},
+  {id:'30355',name:'Md. Moshiur Rahman',desig:'Executive',type:'Officer',factory:'EPF'},
+  {id:'30866',name:'MD. Mithun Sarker',desig:'Executive',type:'Officer',factory:'EPF'},
+  {id:'30894',name:'Md. Javed Hossain',desig:'Executive',type:'Officer',factory:'EPF'},
+  {id:'33376',name:'Md. Monowar Hossain',desig:'Driver',type:'Driver',factory:'EPF'},
+  {id:'33219',name:'Manik Roy',desig:'Driver',type:'Driver',factory:'EPF'},
+  {id:'33083',name:'Md. Sadak Alli',desig:'Driver',type:'Driver',factory:'EPF'},
+  {id:'33886',name:'Ripon Roy',desig:'Driver',type:'Driver',factory:'EPF'},
+  {id:'30877',name:'Md. Mominur',desig:'Driver',type:'Driver',factory:'EPF'},
+  {id:'34545',name:'Apon Chandre Roy',desig:'Jr. Executive',type:'Officer',factory:'EPF'},
+  {id:'32907',name:'Jagodish Roy',desig:'Executive',type:'Officer',factory:'EPF'},
+];
+
+// ── Records data (sample data for demo)
+let DATA=[
+  {id:1,staffId:'30353',name:'Golam Rabbani',role:'Officer',factory:'EPF',type:'leave',subtype:'CL',date:'2025-03-10',days:1,reason:'পারিবারিক কাজ',note:'অনুমোদিত'},
+  {id:2,staffId:'33359',name:'Md. Fajlar Rahman',role:'Labour',factory:'EPF',type:'absent',subtype:'—',date:'2025-03-15',days:1,reason:'অসুস্থতা',note:''},
+  {id:3,staffId:'30353',name:'Golam Rabbani',role:'Officer',factory:'EPF',type:'late',subtype:'—',date:'2025-04-02',days:1,reason:'যানজট',note:'সতর্ক করা হয়েছে'},
+  {id:4,staffId:'33317',name:'Sree. Dhaneswar Roy',role:'Labour',factory:'EPF',type:'absent',subtype:'—',date:'2025-04-10',days:2,reason:'ব্যক্তিগত',note:''},
+  {id:5,staffId:'33504',name:'Ripon Kazi',role:'Labour',factory:'EPF',type:'leave',subtype:'SL',date:'2025-05-05',days:3,reason:'অসুস্থতা (মেডিক্যাল)',note:'ডাক্তারি সার্টিফিকেট দাখিল'},
+  {id:6,staffId:'33219',name:'Manik Roy',role:'Driver',factory:'EPF',type:'warning',subtype:'—',date:'2025-05-12',days:1,reason:'বেপরোয়া গাড়ি চালানো',note:'১ম সতর্কতা'},
+  {id:7,staffId:'30353',name:'Golam Rabbani',role:'Officer',factory:'EPF',type:'leave',subtype:'EL',date:'2025-06-01',days:5,reason:'বার্ষিক ছুটি',note:'অনুমোদিত'},
+  {id:8,staffId:'33359',name:'Md. Fajlar Rahman',role:'Labour',factory:'EPF',type:'late',subtype:'—',date:'2025-06-15',days:1,reason:'পরিবহন সমস্যা',note:''},
+  {id:9,staffId:'33359',name:'Md. Fajlar Rahman',role:'Labour',factory:'EPF',type:'late',subtype:'—',date:'2025-07-01',days:1,reason:'ট্রাফিক জ্যাম',note:''},
+  {id:10,staffId:'33317',name:'Sree. Dhaneswar Roy',role:'Labour',factory:'EPF',type:'warning',subtype:'—',date:'2025-07-20',days:1,reason:'অনুমতি ছাড়া অনুপস্থিতি',note:'২য় সতর্কতা'},
+];
+let nextId=11;
+let editId=null;
+let activeFilter='';
+
+// ── Months
+const MONTHS=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+
+const TYPE_LABELS={leave:'ছুটি',absent:'অনুপস্থিত',warning:'সতর্কপত্র',late:'বিলম্ব'};
+const TYPE_COLORS={leave:'b-acc',absent:'b-err',warning:'b-wrn',late:'b-orange'};
+const SUBTYPE_COLORS={CL:'b-blue',SL:'b-ok',EL:'b-purple',NP:'b-grey'};
+const ROLE_COLORS={Officer:'b-acc',Labour:'b-blue',Driver:'b-orange'};
+
+function typeBadge(t){return `<span class="badge ${TYPE_COLORS[t]||'b-grey'}">${TYPE_LABELS[t]||t}</span>`;}
+function subtypeBadge(s){if(!s||s==='—')return '<span style="color:var(--tm)">—</span>';return `<span class="badge ${SUBTYPE_COLORS[s]||'b-grey'}">${s}</span>`;}
+function roleBadge(r){return `<span class="badge ${ROLE_COLORS[r]||'b-grey'}">${r}</span>`;}
+
+function getYear(d){return d?new Date(d).getFullYear():'-';}
+function getMonth(d){return d?new Date(d).getMonth()+1:'-';}
+function getMonthName(d){return d?MONTHS[new Date(d).getMonth()]:'-';}
+function fmtDate(d){if(!d)return '—';const dt=new Date(d);return dt.getDate().toString().padStart(2,'0')+' '+MONTHS[dt.getMonth()]+' '+dt.getFullYear();}
+
+function yearlyTotal(staffId,type){
+  return DATA.filter(r=>r.staffId===staffId&&r.type===type).reduce((a,b)=>a+(parseFloat(b.days)||0),0);
+}
+
+function getFiltered(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const ft=document.getElementById('fType').value;
+  const fy=document.getElementById('fYear').value;
+  const fm=document.getElementById('fMonth').value;
+  const fr=document.getElementById('fRole').value;
+  const ff=document.getElementById('fFty').value;
+  return DATA.filter(d=>{
+    if(ft&&d.type!==ft)return false;
+    if(fy&&getYear(d.date)!=fy)return false;
+    if(fm&&getMonth(d.date)!=fm)return false;
+    if(fr&&d.role!==fr)return false;
+    if(ff&&d.factory!==ff)return false;
+    if(q&&!(d.staffId.includes(q)||d.name.toLowerCase().includes(q)||(d.reason||'').toLowerCase().includes(q)))return false;
+    return true;
+  });
+}
+
+function renderAll(){
+  let filt=getFiltered();
+  // Sort by staff total count desc
+  const totalMap={};
+  filt.forEach(r=>{totalMap[r.staffId]=(totalMap[r.staffId]||0)+1;});
+  filt.sort((a,b)=>(totalMap[b.staffId]||0)-(totalMap[a.staffId]||0));
+
+  const tb=document.getElementById('allBody');
+  tb.innerHTML=filt.map((d,i)=>`<tr>
+    <td style="color:var(--tm)">${i+1}</td>
+    <td><span style="font-family:monospace;font-size:11px;color:var(--acc)">${d.staffId}</span></td>
+    <td><strong style="color:var(--th)">${d.name}</strong></td>
+    <td>${roleBadge(d.role)}</td>
+    <td>${typeBadge(d.type)}</td>
+    <td>${subtypeBadge(d.subtype)}</td>
+    <td style="white-space:nowrap;font-size:11px">${fmtDate(d.date)}</td>
+    <td style="font-size:11px">${getYear(d.date)}</td>
+    <td style="font-size:11px">${getMonthName(d.date)}</td>
+    <td style="text-align:center;font-weight:700;color:var(--th)">${d.days}</td>
+    <td style="font-size:11px;max-width:160px;word-break:break-word">${d.reason||'—'}</td>
+    <td><span class="badge b-grey">${d.factory}</span></td>
+    <td style="text-align:center"><span class="badge b-wrn" title="বার্ষিক মোট ${d.type}">${yearlyTotal(d.staffId,d.type)}</span></td>
+    <td style="white-space:nowrap">
+      <button class="abtn" onclick="editRecord(${d.id})" title="Edit">✏️</button>
+      <button class="abtn a-del" onclick="delRecord(${d.id})" title="Delete">🗑</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('allBadge').textContent=filt.length;
+}
+
+function buildStats(){
+  const leave=DATA.filter(d=>d.type==='leave').length;
+  const absent=DATA.filter(d=>d.type==='absent').length;
+  const warning=DATA.filter(d=>d.type==='warning').length;
+  const late=DATA.filter(d=>d.type==='late').length;
+  const total=DATA.length;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stc c-green ${activeFilter===''?'active-filter':''}" onclick="filterStat('')">
+      <div class="stc-num">${total}</div><div class="stc-lbl">মোট রেকর্ড</div><div class="stc-sub">সব ধরন</div>
+    </div>
+    <div class="stc c-blue ${activeFilter==='leave'?'active-filter':''}" onclick="filterStat('leave')">
+      <div class="stc-num">${leave}</div><div class="stc-lbl">ছুটি</div><div class="stc-sub">CL · SL · EL · NP</div>
+    </div>
+    <div class="stc c-red ${activeFilter==='absent'?'active-filter':''}" onclick="filterStat('absent')">
+      <div class="stc-num">${absent}</div><div class="stc-lbl">অনুপস্থিত</div><div class="stc-sub">Unauthorized</div>
+    </div>
+    <div class="stc c-yellow ${activeFilter==='warning'?'active-filter':''}" onclick="filterStat('warning')">
+      <div class="stc-num">${warning}</div><div class="stc-lbl">সতর্কপত্র</div><div class="stc-sub">Warning Letters</div>
+    </div>
+    <div class="stc c-orange ${activeFilter==='late'?'active-filter':''}" onclick="filterStat('late')">
+      <div class="stc-num">${late}</div><div class="stc-lbl">বিলম্ব</div><div class="stc-sub">Late Arrivals</div>
+    </div>
+  `;
+  document.getElementById('totalPill').textContent=total+' রেকর্ড';
+}
+
+function filterStat(type){
+  activeFilter=type;
+  document.getElementById('fType').value=type;
+  buildStats();renderAll();
+  // Switch to all tab
+  document.querySelectorAll('.tab').forEach((t,i)=>{if(i===0)t.classList.add('ON');else t.classList.remove('ON');});
+  document.querySelectorAll('.tab-content').forEach((c,i)=>{if(i===0)c.classList.add('active');else c.classList.remove('active');});
+}
+
+function buildRanking(){
+  const types=['leave','absent','warning','late'];
+  const titles={leave:'🌴 ছুটির র‍্যাংকিং',absent:'❌ অনুপস্থিতির র‍্যাংকিং',warning:'⚠️ সতর্কপত্র র‍্যাংকিং',late:'⏰ বিলম্বের র‍্যাংকিং'};
+  const ids={leave:'rankLeave',absent:'rankAbsent',warning:'rankWarning',late:'rankLate'};
+
+  types.forEach(type=>{
+    const map={};
+    DATA.filter(d=>d.type===type).forEach(d=>{
+      if(!map[d.staffId])map[d.staffId]={name:d.name,role:d.role,factory:d.factory,total:0,days:0};
+      map[d.staffId].total++;
+      map[d.staffId].days+=(parseFloat(d.days)||0);
+    });
+    const sorted=Object.entries(map).sort((a,b)=>b[1].total-a[1].total).slice(0,10);
+    const el=document.getElementById(ids[type]);
+    if(!sorted.length){
+      el.innerHTML=`<div class="card-hd"><span class="card-hd-title">${titles[type]}</span></div><div style="padding:20px;text-align:center;color:var(--tm);font-size:12px">কোনো রেকর্ড নেই</div>`;
+      return;
+    }
+    el.innerHTML=`
+      <div class="card-hd">
+        <div class="card-hd-title">${titles[type]}</div>
+        <span class="card-hd-badge">${sorted.length}</span>
+      </div>
+      <table class="tbl">
+        <thead><tr><th>র‍্যাংক</th><th>নাম</th><th>পদ</th><th>ঘটনা</th><th>মোট দিন</th></tr></thead>
+        <tbody>${sorted.map(([sid,v],i)=>`<tr>
+          <td><div class="rank ${i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-n'}">${i+1}</div></td>
+          <td><strong style="color:var(--th)">${v.name}</strong><div style="font-size:10px;color:var(--tm)">${sid}</div></td>
+          <td>${roleBadge(v.role)}</td>
+          <td style="font-weight:700;color:var(--err);text-align:center">${v.total}</td>
+          <td style="font-weight:700;color:var(--wrn);text-align:center">${v.days}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+  });
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('ON'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('ON');
+  if(name==='ranking'){
+    document.getElementById('tab-ranking').classList.add('active');
+    buildRanking();
+  }else{
+    document.getElementById('tab-all').classList.add('active');
+    if(name!=='all'){
+      document.getElementById('fType').value=name;
+    }else{
+      document.getElementById('fType').value='';
+    }
+    renderAll();
+  }
+}
+
+function populateYears(){
+  const years=[...new Set(DATA.map(d=>getYear(d.date)).filter(y=>y!=='-'))].sort((a,b)=>b-a);
+  const sel=document.getElementById('fYear');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">সব বছর</option>'+years.map(y=>`<option value="${y}" ${y==cur?'selected':''}>${y}</option>`).join('');
+}
+
+function lookupStaff(){
+  const id=document.getElementById('fStaffId').value.trim();
+  const s=STAFF.find(x=>x.id===id);
+  const det=document.getElementById('staffDetail');
+  if(s){
+    document.getElementById('fName').value=s.name;
+    document.getElementById('fRole').value=s.type;
+    document.getElementById('fFty2').value=s.factory;
+    det.className='staff-detail show';
+    det.innerHTML=`<span style="color:var(--acc)">✅</span> <strong style="color:var(--th)">${s.name}</strong> &nbsp;·&nbsp; ${s.desig} &nbsp;·&nbsp; ${s.type} &nbsp;·&nbsp; ${s.factory}`;
+  }else if(id.length>=4){
+    document.getElementById('fName').value='';
+    det.className='staff-detail show';
+    det.innerHTML=`<span style="color:var(--err)">❌</span> ID পাওয়া যায়নি। নাম ম্যানুয়ালি দিন।`;
+    document.getElementById('fName').removeAttribute('readonly');
+  }else{
+    det.className='staff-detail';
+    document.getElementById('fName').value='';
+  }
+}
+
+function updateSubtype(){
+  const t=document.getElementById('fRecType').value;
+  const wrap=document.getElementById('subtypeWrap');
+  wrap.style.display=t==='leave'?'flex':'none';
+}
+
+function openAdd(){
+  editId=null;
+  document.getElementById('modalTitle').textContent='নতুন রেকর্ড যোগ করুন';
+  document.getElementById('fStaffId').value='';
+  document.getElementById('fName').value='';
+  document.getElementById('fName').setAttribute('readonly','true');
+  document.getElementById('fRole').value='Officer';
+  document.getElementById('fFty2').value='EPF';
+  document.getElementById('fRecType').value='leave';
+  document.getElementById('fSubtype').value='CL';
+  document.getElementById('fDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('fDays').value=1;
+  document.getElementById('fReason').value='';
+  document.getElementById('fNote').value='';
+  document.getElementById('staffDetail').className='staff-detail';
+  updateSubtype();
+  document.getElementById('modal').classList.add('show');
+}
+
+function editRecord(id){
+  const d=DATA.find(x=>x.id===id);if(!d)return;
+  editId=id;
+  document.getElementById('modalTitle').textContent='রেকর্ড সম্পাদনা — '+d.name;
+  document.getElementById('fStaffId').value=d.staffId;
+  document.getElementById('fName').value=d.name;
+  document.getElementById('fName').removeAttribute('readonly');
+  document.getElementById('fRole').value=d.role;
+  document.getElementById('fFty2').value=d.factory;
+  document.getElementById('fRecType').value=d.type;
+  document.getElementById('fSubtype').value=d.subtype||'CL';
+  document.getElementById('fDate').value=d.date;
+  document.getElementById('fDays').value=d.days;
+  document.getElementById('fReason').value=d.reason||'';
+  document.getElementById('fNote').value=d.note||'';
+  document.getElementById('staffDetail').className='staff-detail';
+  updateSubtype();
+  document.getElementById('modal').classList.add('show');
+}
+
+function saveRecord(){
+  const staffId=document.getElementById('fStaffId').value.trim();
+  const name=document.getElementById('fName').value.trim();
+  if(!staffId){showToast('স্টাফ ID আবশ্যক!','terr');return;}
+  if(!name){showToast('নাম আবশ্যক!','terr');return;}
+  const type=document.getElementById('fRecType').value;
+  const rec={
+    staffId,name,
+    role:document.getElementById('fRole').value,
+    factory:document.getElementById('fFty2').value,
+    type,
+    subtype:type==='leave'?document.getElementById('fSubtype').value:'—',
+    date:document.getElementById('fDate').value,
+    days:parseFloat(document.getElementById('fDays').value)||1,
+    reason:document.getElementById('fReason').value.trim(),
+    note:document.getElementById('fNote').value.trim(),
+  };
+  if(editId){
+    const idx=DATA.findIndex(x=>x.id===editId);
+    DATA[idx]={...rec,id:editId};
+    showToast('✅ রেকর্ড আপডেট হয়েছে','tok');
+  }else{
+    DATA.push({...rec,id:nextId++});
+    showToast('✅ নতুন রেকর্ড যোগ হয়েছে','tok');
+  }
+  closeModal();populateYears();buildStats();renderAll();
+}
+
+function delRecord(id){
+  if(!confirm('এই রেকর্ড মুছে ফেলবেন?'))return;
+  DATA=DATA.filter(x=>x.id!==id);
+  buildStats();renderAll();populateYears();
+  showToast('🗑 রেকর্ড মুছে গেছে','tok');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+function showToast(msg,cls='tok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+cls+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wms-theme',t);document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('active',d.dataset.t===t))}
+function setFont(f){document.documentElement.setAttribute('data-font',f);localStorage.setItem('wms-font',f);document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===f))}
+function startClock(){const c=document.getElementById('CLK');setInterval(()=>{c.textContent=new Date().toLocaleTimeString('en-GB')},1000);}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+(function init(){
+  const t=localStorage.getItem('wms-theme')||'slate';
+  const f=localStorage.getItem('wms-font')||'ubuntu';
+  setTheme(t);setFont(f);startClock();
+  populateYears();buildStats();renderAll();
+})();
+</script>
+</body>
+</html>

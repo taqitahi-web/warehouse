@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forklift — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
+[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--cardh:#212b3d;--bdr:#2a3548;--bdrh:#3d5070;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--aglow:rgba(0,201,167,.20);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--ok:#3fb950;--err:#f85149;--wrn:#e3b341;--nav:#0d1117;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shs:0 2px 10px rgba(0,0,0,.4);--shd:0 4px 24px rgba(0,0,0,.6);--ra:rgba(0,201,167,.025)}
+[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--cardh:#f5f9ff;--bdr:#d0dae8;--bdrh:#a0b8d8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--aglow:rgba(21,101,192,.14);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--ok:#2e7d32;--err:#c62828;--wrn:#e65100;--nav:#fff;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shs:0 2px 8px rgba(21,101,192,.08);--shd:0 4px 20px rgba(21,101,192,.10);--ra:rgba(21,101,192,.025)}
+[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--cardh:#2f2f33;--bdr:#3f3f46;--bdrh:#58585f;--acc:#D4A017;--adim:rgba(212,160,23,.10);--aglow:rgba(212,160,23,.20);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--ok:#22c55e;--err:#ef4444;--wrn:#f59e0b;--nav:#111113;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shs:0 2px 10px rgba(0,0,0,.5);--shd:0 4px 24px rgba(0,0,0,.7);--ra:rgba(212,160,23,.025)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
+/* ── TOOLBAR ── */
+.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;padding:0 16px;height:52px;box-shadow:var(--shs)}
+.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);white-space:nowrap}
+.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400}
+.sep{flex:1}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
+.tnav a:hover{background:var(--adim);color:var(--acc)}
+.tnav a.ON{background:var(--tbg);color:var(--acc)}
+.ctrl{display:flex;align-items:center;gap:8px}
+.clbl{font-size:10px;color:var(--tm)}
+.tdots{display:flex;gap:5px}
+.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.tdot[data-t="slate"]{background:#00C9A7}.tdot[data-t="arctic"]{background:#1565C0}.tdot[data-t="ember"]{background:#D4A017}
+.tdot.ON{border-color:var(--th);transform:scale(1.2)}
+.fsw{display:flex;gap:4px}
+.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
+.fbtn:hover,.fbtn.ON{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
+/* ── SIDEBAR ── */
+.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
+.sb-sec{margin-bottom:4px}
+.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
+.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
+.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+/* ── MAIN ── */
+.MN{margin-left:200px;padding:20px;position:relative;z-index:1;min-height:calc(100vh - 52px)}
+.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
+.ph-ico{width:40px;height:40px;background:var(--adim);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ph-title{font-family:var(--fh);font-size:19px;font-weight:700;color:var(--th)}
+.ph-sub{font-size:11px;color:var(--tm)}
+.ph-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* ── STAT CARDS ── */
+.stg{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px;margin-bottom:18px}
+.stc{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:13px 15px}
+.stc-num{font-family:var(--fh);font-size:28px;font-weight:700;color:var(--acc)}
+.stc-lbl{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.stc-sub{font-size:11px;color:var(--tb);margin-top:3px}
+/* ── FILTER BAR ── */
+.brow{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.brow.fu{justify-content:space-between}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;transition:border .2s;font-family:var(--fb)}
+.si:focus{border-color:var(--acc)}
+.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer;font-family:var(--fb)}
+.abtn{border:none;border-radius:5px;cursor:pointer;padding:5px 9px;font-size:13px;transition:all .2s;background:var(--adim)}
+.a-add{background:var(--acc);color:#000;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--fb)}
+.a-add:hover{opacity:.85}
+.a-edit{color:var(--wrn)}
+.a-edit:hover{background:rgba(227,179,65,.2)}
+.a-del{color:var(--err)}
+.a-del:hover{background:rgba(248,81,73,.2)}
+/* ── TABLE ── */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
+.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
+.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--adim)}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700}
+.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.b-acc{background:var(--tbg);color:var(--acc)}
+.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
+.b-err{background:rgba(248,81,73,.15);color:var(--err)}
+.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
+.b-purple{background:rgba(163,113,247,.15);color:#a371f7}
+.chip{display:inline-block;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;font-family:monospace}
+.qty-big{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--th)}
+/* ── OVERLAY / MODAL ── */
+.OV{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.OV.show{display:flex}
+.OV-box{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shd)}
+.OV-box h3{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--th);margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr{display:flex;flex-direction:column;gap:5px}
+.fr label{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.4px}
+.fr input,.fr select,.fr textarea{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--th);font-size:12px;font-family:var(--fb);outline:none;transition:border .2s;width:100%}
+.fr input:focus,.fr select:focus,.fr textarea:focus{border-color:var(--acc)}
+.fr textarea{resize:vertical;min-height:60px}
+.fr select option{background:var(--card)}
+.frow-full{grid-column:1/-1}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.btn{border:none;border-radius:7px;padding:9px 20px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--fb);transition:all .2s}
+.btn-acc{background:var(--acc);color:#000}
+.btn-acc:hover{opacity:.85}
+.btn-sec{background:var(--adim);color:var(--acc);border:1px solid var(--bdr)}
+.btn-sec:hover{background:var(--tbg)}
+.btn-err{background:rgba(248,81,73,.15);color:var(--err);border:1px solid rgba(248,81,73,.3)}
+.btn-err:hover{background:rgba(248,81,73,.25)}
+/* ── PIN ── */
+.pin-pad{display:flex;flex-direction:column;align-items:center;gap:14px}
+.pin-dots{display:flex;gap:10px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
+.pin-dot.F{background:var(--acc);border-color:var(--acc)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:200px}
+.pkey{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--th);transition:all .2s;user-select:none}
+.pkey:hover{background:var(--adim);border-color:var(--acc);color:var(--acc)}
+.pin-err{color:var(--err);font-size:12px;display:none}
+/* ── TOAST ── */
+.toast-el{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:10px 22px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast-el.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.tok{border-color:var(--ok);color:var(--ok)}
+.terr{border-color:var(--err);color:var(--err)}
+/* ── SYNC BADGE ── */
+#sync-ind{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--adim);color:var(--tm)}
+@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
+</style>
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<nav class="TB">
+  <div class="brand">EPFBD<small>WMS</small></div>
+  <span id="sync-ind">⏳ Connecting…</span>
+  <div class="sep"></div>
+  <div class="tnav">
+    <a href="../index.html">Dashboard</a>
+    <a href="../manpower/all_manpower.html">Manpower</a>
+    <a href="../warehouse/wh_list.html">Warehouse</a>
+    <a href="pda_devices.html">Equipment</a>
+    <a href="../kpi/staff_kpi.html">KPI</a>
+  </div>
+  <div class="ctrl">
+    <span class="clbl">Theme</span>
+    <div class="tdots">
+      <div class="tdot" data-t="slate" onclick="setTheme('slate')"></div>
+      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')"></div>
+      <div class="tdot" data-t="ember" onclick="setTheme('ember')"></div>
+    </div>
+    <span class="clbl">Font</span>
+    <div class="fsw">
+      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="CLK" class="clk">--:--:--</div>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<aside class="SB">
+  <div class="sb-sec"><div class="sb-hd">Main</div>
+    <a class="sb-a" href="../index.html">🏠 Dashboard</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Manpower</div>
+    <a class="sb-a" href="../manpower/all_manpower.html">👥 All Manpower</a>
+    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span> EPF</a>
+    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span> TGL</a>
+    <a class="sb-a" href="../manpower/BGL_manpower.html"><span class="sb-badge">BGL</span> BGL</a>
+    <a class="sb-a" href="../manpower/GTM_manpower.html"><span class="sb-badge">GTM</span> GTM</a>
+    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span> RFL</a>
+    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span> EC</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Warehouse</div>
+    <a class="sb-a" href="../warehouse/wh_list.html">🏭 WH List</a>
+    <a class="sb-a" href="../warehouse/mis_login.html">🔑 MIS Login</a>
+    <a class="sb-a" href="../warehouse/mail_list.html">📧 Mail List</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Equipment</div>
+    <a class="sb-a" href="pda_devices.html">📱 PDA / Scanner</a>
+    <a class="sb-a ON" href="forklift.html">🚜 Forklift</a>
+    <a class="sb-a" href="maintenance_log.html">🔧 Maintenance</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Setup</div>
+    <a class="sb-a" href="../firebase-setup.html">🔥 Firebase Setup</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="MN">
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-ico">🚜</div>
+  <div>
+    <div class="ph-title">Forklift & Lifting Equipment</div>
+    <div class="ph-sub">EPF & TGL — All forklift units & capacity tracking</div>
+  </div>
+  <div class="ph-right">
+    <span id="sync-pill" style="font-size:11px;padding:4px 12px;border-radius:20px;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)">Loading…</span>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stg" id="STATS"></div>
+
+<!-- FILTER + ADD -->
+<div class="brow fu">
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <input class="si" id="fq" placeholder="🔍 Search name, category…" style="width:220px" oninput="render()">
+    <select class="fsel" id="ffac" onchange="render()">
+      <option value="">All Factory</option>
+      <option>EPF</option>
+      <option>TGL</option>
+    </select>
+    <select class="fsel" id="fcat" onchange="render()">
+      <option value="">All Category</option>
+      <option>Diesel Forklift</option>
+      <option>Charger forklift</option>
+      <option>Manual Forklift</option>
+    </select>
+  </div>
+  <button class="abtn a-add" onclick="openPin(()=>openAdd())">＋ Add Equipment</button>
+</div>
+
+<!-- TABLE -->
+<div class="card">
+  <div class="card-hd">
+    <div class="card-hd-title">🚜 Forklift & Lifting Equipment</div>
+    <span class="card-hd-badge" id="BADGE">0</span>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Category</th>
+        <th>Equipment Name</th>
+        <th style="text-align:center">Qty</th>
+        <th>Capacity</th>
+        <th>Factory</th>
+        <th>Remarks</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="TBODY"></tbody>
+  </table>
+  </div>
+</div>
+
+<!-- Summary by Factory -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+  <div class="card" id="epf-summary">
+    <div class="card-hd"><div class="card-hd-title">🏭 EPF Factory Summary</div></div>
+    <div style="overflow-x:auto"><table class="tbl" id="epf-tbl"></table></div>
+  </div>
+  <div class="card" id="tgl-summary">
+    <div class="card-hd"><div class="card-hd-title">🏭 TGL Factory Summary</div></div>
+    <div style="overflow-x:auto"><table class="tbl" id="tgl-tbl"></table></div>
+  </div>
+</div>
+
+</main>
+
+<!-- ═══ MODAL: ADD / EDIT ═══ -->
+<div class="OV" id="OV-FORM">
+  <div class="OV-box">
+    <h3 id="FT">Add Equipment</h3>
+    <input type="hidden" id="EI">
+    <input type="hidden" id="EK">
+    <div class="form-grid">
+      <div class="fr frow-full">
+        <label>Equipment Name *</label>
+        <input id="FN" placeholder="e.g. EQ-Forklift-FD30" list="eq-list">
+        <datalist id="eq-list">
+          <option value="EQ-DieselForklift-LG70(T)-85KW/2200r">
+          <option value="EQ-Forklift-FD30">
+          <option value="EQ-DieselForklift-CPC30-T3">
+          <option value="EQ-Forklift-CQD20">
+          <option value="EQ-ElectricFourWheelFlatbedTruck">
+          <option value="EQ-Forklift-CPD-08">
+          <option value="EQ-BalancedStacker-CPD10">
+          <option value="EQ-Semelectric Forklift">
+          <option value="EQ-Truck-mountedElectricForklift-500KG-1.6M">
+          <option value="EQ-ManualForklift-AC30">
+          <option value="EQ-ModularForklift-T02">
+          <option value="EQ-Truck-Mounted Electric Forklift-500KG-1.6m">
+        </datalist>
+      </div>
+      <div class="fr">
+        <label>Category *</label>
+        <select id="FC">
+          <option value="">— Select —</option>
+          <option>Diesel Forklift</option>
+          <option>Charger forklift</option>
+          <option>Manual Forklift</option>
+          <option>Electric Forklift</option>
+          <option>Stacker</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>Factory *</label>
+        <select id="FF">
+          <option value="">— Select —</option>
+          <option>EPF</option>
+          <option>TGL</option>
+          <option>BGL</option>
+          <option>GTM</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>Quantity *</label>
+        <input id="FQ" type="number" min="1" placeholder="e.g. 2">
+      </div>
+      <div class="fr">
+        <label>Weight Capacity</label>
+        <select id="FW">
+          <option value="">— Select —</option>
+          <option>0.5-Ton</option>
+          <option>01-Ton</option>
+          <option>1.5-Ton</option>
+          <option>02-Ton</option>
+          <option>03-Ton</option>
+          <option>05-Ton</option>
+          <option>07-Ton</option>
+          <option>10-Ton</option>
+        </select>
+      </div>
+      <div class="fr frow-full">
+        <label>Remarks</label>
+        <textarea id="FR" placeholder="Optional notes…"></textarea>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-sec" onclick="closeOv('OV-FORM')">Cancel</button>
+      <button class="btn btn-acc" onclick="saveRecord()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: DELETE CONFIRM ═══ -->
+<div class="OV" id="OV-DEL">
+  <div class="OV-box" style="max-width:380px;text-align:center">
+    <h3>⚠️ Delete Confirm</h3>
+    <p style="font-size:13px;color:var(--tb);margin:12px 0 20px"><strong id="DNAME" style="color:var(--th)"></strong> — এই record মুছে ফেলবেন?</p>
+    <div class="modal-btns" style="justify-content:center">
+      <button class="btn btn-sec" onclick="closeOv('OV-DEL')">Cancel</button>
+      <button class="btn btn-err" onclick="confirmDel()">🗑 Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: PIN ═══ -->
+<div class="OV" id="OV-PIN">
+  <div class="OV-box" style="max-width:300px">
+    <h3 style="text-align:center">🔐 Enter PIN</h3>
+    <div class="pin-pad">
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-grid">
+        <div class="pkey" onclick="pressPin('1')">1</div><div class="pkey" onclick="pressPin('2')">2</div><div class="pkey" onclick="pressPin('3')">3</div>
+        <div class="pkey" onclick="pressPin('4')">4</div><div class="pkey" onclick="pressPin('5')">5</div><div class="pkey" onclick="pressPin('6')">6</div>
+        <div class="pkey" onclick="pressPin('7')">7</div><div class="pkey" onclick="pressPin('8')">8</div><div class="pkey" onclick="pressPin('9')">9</div>
+        <div class="pkey" onclick="pressPin('del')">⌫</div><div class="pkey" onclick="pressPin('0')">0</div>
+        <div class="pkey" onclick="pressPin('ok')" style="color:var(--ok);border-color:var(--ok)">✓</div>
+      </div>
+      <div class="pin-err" id="pin-err">❌ Wrong PIN. Try again.</div>
+    </div>
+  </div>
+</div>
+
+<div id="TOAST" class="toast-el"></div>
+
+<script src="../firebase-db.js"></script>
+<script>
+// ══ THEME / FONT / CLOCK ══
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('ON',d.dataset.t===t));localStorage.setItem('wms-theme',t);}
+function setFont(f){document.documentElement.setAttribute('data-font',f);document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('ON',b.dataset.f===f));localStorage.setItem('wms-font',f);}
+function startClock(){const tick=()=>{const n=new Date(),p=v=>String(v).padStart(2,'0'),el=document.getElementById('CLK');if(el)el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());};tick();setInterval(tick,1000);}
+function initApp(){setTheme(localStorage.getItem('wms-theme')||'slate');setFont(localStorage.getItem('wms-font')||'ubuntu');startClock();}
+
+// ══ PIN ══
+const PIN='9625'; let pinBuf='',pinCb=null,pendDel=null;
+function openPin(cb){pinCb=cb;pinBuf='';updDots();document.getElementById('pin-err').style.display='none';showOv('OV-PIN');}
+function pressPin(v){
+  if(v==='del'){pinBuf=pinBuf.slice(0,-1);}
+  else if(v==='ok'){checkPin();return;}
+  else{if(pinBuf.length>=4)return;pinBuf+=v;if(pinBuf.length===4){setTimeout(checkPin,150);}}
+  updDots();
+}
+function checkPin(){if(pinBuf===PIN){closeOv('OV-PIN');pinBuf='';if(typeof pinCb==='function')pinCb();}else{document.getElementById('pin-err').style.display='block';pinBuf='';updDots();}}
+function updDots(){[0,1,2,3].forEach(i=>document.getElementById('pd'+i).classList.toggle('F',i<pinBuf.length));}
+function showOv(id){document.getElementById(id).classList.add('show');}
+function closeOv(id){const e=document.getElementById(id);if(e)e.classList.remove('show');pinBuf='';updDots();document.getElementById('pin-err').style.display='none';}
+document.addEventListener('click',e=>{document.querySelectorAll('.OV.show').forEach(o=>{if(e.target===o)closeOv(o.id);});});
+function toast(msg,type,ms=2500){const el=document.getElementById('TOAST');el.textContent=msg;el.className='toast-el show '+(type==='err'?'terr':'tok');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);}
+
+// ══ BASE DATA (from Excel) ══
+const FB_NODE = 'forklift';
+const BASE = [
+  {sl:1,cat:'Diesel Forklift',  name:'EQ-DieselForklift-LG70(T)-85KW/2200r',       qty:1, unit:'Pcs',cap:'07-Ton',factory:'EPF',remarks:''},
+  {sl:2,cat:'Diesel Forklift',  name:'EQ-Forklift-FD30',                             qty:2, unit:'Pcs',cap:'03-Ton',factory:'EPF',remarks:''},
+  {sl:3,cat:'Diesel Forklift',  name:'EQ-DieselForklift-CPC30-T3',                  qty:2, unit:'Pcs',cap:'03-Ton',factory:'EPF',remarks:''},
+  {sl:4,cat:'Charger forklift', name:'EQ-Forklift-CQD20',                            qty:2, unit:'Pcs',cap:'02-Ton',factory:'EPF',remarks:''},
+  {sl:5,cat:'Charger forklift', name:'EQ-ElectricFourWheelFlatbedTruck',             qty:1, unit:'Pcs',cap:'01-Ton',factory:'EPF',remarks:''},
+  {sl:6,cat:'Charger forklift', name:'EQ-Forklift-CPD-08',                           qty:4, unit:'Pcs',cap:'0.5-Ton',factory:'EPF',remarks:''},
+  {sl:7,cat:'Charger forklift', name:'EQ-BalancedStacker-CPD10',                     qty:7, unit:'Pcs',cap:'01-Ton',factory:'EPF',remarks:''},
+  {sl:8,cat:'Charger forklift', name:'EQ-Semelectric Forklift',                      qty:1, unit:'Pcs',cap:'1.5-Ton',factory:'EPF',remarks:''},
+  {sl:9,cat:'Charger forklift', name:'EQ-Truck-mountedElectricForklift-500KG-1.6M', qty:1, unit:'Pcs',cap:'0.5-Ton',factory:'EPF',remarks:''},
+  {sl:10,cat:'Manual Forklift', name:'EQ-ManualForklift-AC30',                       qty:16,unit:'Pcs',cap:'03-Ton',factory:'EPF',remarks:''},
+  {sl:11,cat:'Charger forklift',name:'EQ-ModularForklift-T02',                       qty:1, unit:'Pcs',cap:'—',    factory:'EPF',remarks:''},
+  {sl:12,cat:'Diesel Forklift', name:'EQ-Forklift-FD30',                             qty:1, unit:'Pcs',cap:'03-Ton',factory:'TGL',remarks:''},
+  {sl:13,cat:'Diesel Forklift', name:'EQ-DieselForklift-CPC30-T3',                  qty:3, unit:'Pcs',cap:'03-Ton',factory:'TGL',remarks:''},
+  {sl:14,cat:'Charger forklift',name:'EQ-Forklift-CQD20',                            qty:1, unit:'Pcs',cap:'02-Ton',factory:'TGL',remarks:''},
+  {sl:15,cat:'Charger forklift',name:'EQ-Truck-Mounted Electric Forklift-500KG-1.6m',qty:6,unit:'Pcs',cap:'0.5-Ton',factory:'TGL',remarks:''},
+  {sl:16,cat:'Manual Forklift', name:'EQ-ManualForklift-AC30',                       qty:14,unit:'Pcs',cap:'03-Ton',factory:'TGL',remarks:''},
+  {sl:17,cat:'Charger forklift',name:'EQ-ModularForklift-T02',                       qty:1, unit:'Pcs',cap:'—',    factory:'TGL',remarks:''},
+  {sl:18,cat:'Charger forklift',name:'EQ-Truck-Mounted Electric Forklift-500KG-1.6m',qty:2,unit:'Pcs',cap:'0.5-Ton',factory:'TGL',remarks:''},
+  {sl:19,cat:'Charger forklift',name:'EQ-BalancedStacker-CPD10',                     qty:1, unit:'Pcs',cap:'01-Ton',factory:'TGL',remarks:''},
+];
+
+// ══ FIREBASE SYNC ══
+let _extraCache=[], _ovCache={};
+
+async function _initFbSync(){
+  if(!window.WmsDb){await new Promise(r=>setTimeout(r,700));}
+  const ind=document.getElementById('sync-ind');
+  const pill=document.getElementById('sync-pill');
+  if(!window.WmsDb){
+    if(ind)ind.textContent='💾 Local Only';
+    if(pill)pill.textContent='💾 Local Only';
+    _loadLocal(); render(); buildStats(); buildSummary();
+    return;
+  }
+  const cloud=WmsDb.isCloud();
+  if(ind){ind.textContent=cloud?'☁ Cloud Sync ON':'💾 Local Only';ind.style.color=cloud?'var(--ok)':'var(--wrn)';}
+  if(pill){pill.textContent=cloud?'☁ Cloud Sync ON':'💾 Local Only';pill.style.color=cloud?'var(--ok)':'var(--wrn)';}
+
+  WmsDb.listen(FB_NODE, data=>{
+    _extraCache=data;
+    render(); buildStats(); buildSummary();
+  });
+  WmsDb.listenOverrides(FB_NODE, ov=>{
+    _ovCache=ov;
+    render(); buildStats(); buildSummary();
+  });
+}
+
+function _loadLocal(){
+  _extraCache=JSON.parse(localStorage.getItem('wms_'+FB_NODE)||'[]');
+  _ovCache=JSON.parse(localStorage.getItem(FB_NODE+'_ov')||'{}');
+}
+
+function getAll(){
+  const base=BASE.map((r,i)=>Object.assign({},r,_ovCache[i]||{}));
+  return [...base,..._extraCache];
+}
+
+// ══ CATEGORY BADGE ══
+function catBadge(c){
+  const m={'Diesel Forklift':'b-err','Charger forklift':'b-ok','Manual Forklift':'b-blue','Electric Forklift':'b-acc','Stacker':'b-purple'};
+  return `<span class="badge ${m[c]||'b-grey'}">${c}</span>`;
+}
+function facBadge(f){
+  return `<span class="badge ${f==='EPF'?'b-acc':'b-wrn'}">${f}</span>`;
+}
+
+// ══ RENDER TABLE ══
+function render(){
+  const q=(document.getElementById('fq')?.value||'').toLowerCase();
+  const ff=document.getElementById('ffac')?.value||'';
+  const fc=document.getElementById('fcat')?.value||'';
+  const bLen=BASE.length;
+  const all=getAll().map((r,i)=>({...r,_gi:i}));
+  const filt=all.filter(r=>{
+    if(ff&&r.factory!==ff)return false;
+    if(fc&&r.cat!==fc)return false;
+    if(q&&!(r.name.toLowerCase().includes(q)||r.cat.toLowerCase().includes(q)||(r.remarks||'').toLowerCase().includes(q)))return false;
+    return true;
+  });
+  document.getElementById('BADGE').textContent=filt.reduce((s,r)=>s+(r.qty||0),0)+' units';
+  document.getElementById('TBODY').innerHTML=filt.map((r,i)=>{
+    const isBase=r._gi<bLen;
+    const editB=`<button class="abtn a-edit" onclick="openPin(()=>openEdit(${r._gi}))" title="Edit">✏️</button>`;
+    const delB=isBase?'':`<button class="abtn a-del" onclick="openPin(()=>askDel(${r._gi-bLen},'${r.name.replace(/'/g,"\\'")}'))" title="Delete">🗑</button>`;
+    return `<tr>
+      <td style="color:var(--tm);font-family:monospace;font-size:11px">${i+1}</td>
+      <td>${catBadge(r.cat)}</td>
+      <td style="color:var(--th);font-weight:500;max-width:240px;word-break:break-all">${r.name}</td>
+      <td style="text-align:center"><span class="qty-big">${r.qty}</span><span style="font-size:10px;color:var(--tm)"> pcs</span></td>
+      <td><span class="badge b-grey">${r.cap||'—'}</span></td>
+      <td>${facBadge(r.factory)}</td>
+      <td style="font-size:11px;color:var(--tm);max-width:140px">${r.remarks||'—'}</td>
+      <td><div style="display:flex;gap:4px">${editB}${delB}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══ STATS ══
+function buildStats(){
+  const all=getAll();
+  const totalUnits=all.reduce((s,r)=>s+(r.qty||0),0);
+  const epfQty=all.filter(r=>r.factory==='EPF').reduce((s,r)=>s+(r.qty||0),0);
+  const tglQty=all.filter(r=>r.factory==='TGL').reduce((s,r)=>s+(r.qty||0),0);
+  const diesel=all.filter(r=>r.cat==='Diesel Forklift').reduce((s,r)=>s+(r.qty||0),0);
+  const charger=all.filter(r=>r.cat==='Charger forklift').reduce((s,r)=>s+(r.qty||0),0);
+  const manual=all.filter(r=>r.cat==='Manual Forklift').reduce((s,r)=>s+(r.qty||0),0);
+  document.getElementById('STATS').innerHTML=`
+    <div class="stc"><div class="stc-num">${totalUnits}</div><div class="stc-lbl">Total Units</div><div class="stc-sub">All factories</div></div>
+    <div class="stc"><div class="stc-num" style="color:var(--acc)">${epfQty}</div><div class="stc-lbl">EPF Factory</div><div class="stc-sub">${all.filter(r=>r.factory==='EPF').length} types</div></div>
+    <div class="stc"><div class="stc-num" style="color:var(--wrn)">${tglQty}</div><div class="stc-lbl">TGL Factory</div><div class="stc-sub">${all.filter(r=>r.factory==='TGL').length} types</div></div>
+    <div class="stc"><div class="stc-num" style="color:var(--err)">${diesel}</div><div class="stc-lbl">Diesel</div><div class="stc-sub">Heavy duty</div></div>
+    <div class="stc"><div class="stc-num" style="color:var(--ok)">${charger}</div><div class="stc-lbl">Charger / Electric</div><div class="stc-sub">Battery powered</div></div>
+    <div class="stc"><div class="stc-num" style="color:var(--tb)">${manual}</div><div class="stc-lbl">Manual</div><div class="stc-sub">Hand operated</div></div>
+  `;
+}
+
+// ══ FACTORY SUMMARY TABLES ══
+function buildSummary(){
+  const all=getAll();
+  ['EPF','TGL'].forEach(fac=>{
+    const rows=all.filter(r=>r.factory===fac);
+    const totalQty=rows.reduce((s,r)=>s+(r.qty||0),0);
+    const tbody=rows.map(r=>`<tr>
+      <td>${catBadge(r.cat)}</td>
+      <td style="font-size:11px;color:var(--th);word-break:break-all">${r.name}</td>
+      <td style="text-align:center;font-weight:700;color:var(--th)">${r.qty}</td>
+      <td><span class="badge b-grey">${r.cap||'—'}</span></td>
+    </tr>`).join('');
+    document.getElementById(fac.toLowerCase()+'-tbl').innerHTML=`
+      <thead><tr>
+        <th>Category</th><th>Name</th><th style="text-align:center">Qty</th><th>Capacity</th>
+      </tr></thead>
+      <tbody>${tbody}</tbody>
+      <tfoot><tr style="border-top:2px solid var(--bdr)">
+        <td colspan="2" style="font-weight:700;color:var(--th);padding:10px 12px">Total</td>
+        <td style="text-align:center;font-weight:700;color:var(--acc);font-family:var(--fh);font-size:16px;padding:10px 12px">${totalQty}</td>
+        <td></td>
+      </tr></tfoot>`;
+  });
+}
+
+// ══ ADD / EDIT ══
+function openAdd(){
+  document.getElementById('FT').textContent='Add Equipment';
+  document.getElementById('EI').value='';
+  document.getElementById('EK').value='';
+  ['FN','FQ','FR'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['FC','FF','FW'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  showOv('OV-FORM');
+}
+function openEdit(gi){
+  const r=getAll()[gi]; if(!r)return;
+  document.getElementById('FT').textContent='Edit: '+r.name.slice(0,30)+'…';
+  document.getElementById('EI').value=gi;
+  document.getElementById('EK').value=r._fbKey||'';
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+  s('FN',r.name);s('FC',r.cat);s('FF',r.factory);s('FQ',r.qty);s('FW',r.cap);s('FR',r.remarks);
+  showOv('OV-FORM');
+}
+function saveRecord(){
+  const g=id=>(document.getElementById(id)?.value||'').trim();
+  const name=g('FN'),cat=g('FC'),factory=g('FF'),qtyStr=g('FQ');
+  if(!name||!cat||!factory||!qtyStr){toast('Name, Category, Factory & Qty required','err');return;}
+  const rec={name,cat,factory,qty:parseInt(qtyStr)||1,unit:'Pcs',cap:g('FW')||'—',remarks:g('FR'),_upd:new Date().toISOString()};
+  const giStr=g('EI'),fbKey=g('EK'),bLen=BASE.length;
+  if(giStr!==''){
+    const gi=parseInt(giStr);
+    if(gi<bLen){
+      WmsDb?.setOverride(FB_NODE,gi,Object.assign({},BASE[gi],rec)).then(()=>toast('Updated ✓','tok'));
+      if(!WmsDb){const ov=JSON.parse(localStorage.getItem(FB_NODE+'_ov')||'{}');ov[gi]=Object.assign({},BASE[gi],rec);localStorage.setItem(FB_NODE+'_ov',JSON.stringify(ov));render();buildStats();buildSummary();}
+    } else if(fbKey){
+      WmsDb?.update(FB_NODE,fbKey,rec).then(()=>toast('Updated ✓','tok'));
+    }
+  } else {
+    WmsDb?.push(FB_NODE,rec).then(()=>toast('Added ✓','tok'));
+    if(!WmsDb){const ex=JSON.parse(localStorage.getItem('wms_'+FB_NODE)||'[]');ex.push(rec);localStorage.setItem('wms_'+FB_NODE,JSON.stringify(ex));_loadLocal();render();buildStats();buildSummary();}
+  }
+  closeOv('OV-FORM');
+}
+
+// ══ DELETE ══
+function askDel(extraIdx,name){pendDel=extraIdx;document.getElementById('DNAME').textContent=name;showOv('OV-DEL');}
+function confirmDel(){
+  if(pendDel===null)return;
+  const exRec=_extraCache[pendDel];
+  if(exRec&&exRec._fbKey&&window.WmsDb){
+    WmsDb.remove(FB_NODE,exRec._fbKey).then(()=>{toast('Deleted','err');closeOv('OV-DEL');pendDel=null;});
+  } else {
+    const ex=JSON.parse(localStorage.getItem('wms_'+FB_NODE)||'[]');
+    ex.splice(pendDel,1);localStorage.setItem('wms_'+FB_NODE,JSON.stringify(ex));
+    _loadLocal();render();buildStats();buildSummary();
+    toast('Deleted','err');closeOv('OV-DEL');pendDel=null;
+  }
+}
+
+// ══ INIT ══
+initApp();
+_initFbSync().then(()=>{
+  if(!window.WmsDb){_loadLocal();render();buildStats();buildSummary();}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDA & Devices — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
+[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--cardh:#212b3d;--bdr:#2a3548;--bdrh:#3d5070;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--aglow:rgba(0,201,167,.20);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--tag:#00C9A7;--err:#f85149;--wrn:#e3b341;--ok:#3fb950;--nav:#0d1117;--tln:#00C9A7;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--bof:#00C9A7;--blb:#e3b341;--bdrv:#f0883e;--shd:0 4px 24px rgba(0,0,0,.6);--shs:0 2px 10px rgba(0,0,0,.4);--ra:rgba(0,201,167,.025)}
+[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--cardh:#f5f9ff;--bdr:#d0dae8;--bdrh:#a0b8d8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--aglow:rgba(21,101,192,.14);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--tag:#1565C0;--err:#c62828;--wrn:#e65100;--ok:#2e7d32;--nav:#fff;--tln:#1565C0;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--bof:#1565C0;--blb:#00838f;--bdrv:#e65100;--shd:0 4px 20px rgba(21,101,192,.10);--shs:0 2px 8px rgba(21,101,192,.08);--ra:rgba(21,101,192,.025)}
+[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--cardh:#2f2f33;--bdr:#3f3f46;--bdrh:#58585f;--acc:#D4A017;--adim:rgba(212,160,23,.10);--aglow:rgba(212,160,23,.20);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--tag:#D4A017;--err:#ef4444;--wrn:#f59e0b;--ok:#22c55e;--nav:#111113;--tln:#D4A017;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--bof:#D4A017;--blb:#94a3b8;--bdrv:#b87333;--shd:0 4px 24px rgba(0,0,0,.7);--shs:0 2px 10px rgba(0,0,0,.5);--ra:rgba(212,160,23,.025)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb,'Josefin Sans',sans-serif);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
+.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;box-shadow:var(--shs)}
+.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);letter-spacing:.5px;white-space:nowrap}
+.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400;letter-spacing:.2px}
+.sep{flex:1}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
+.tnav a:hover{background:var(--adim);color:var(--acc)}
+.tnav a.ON{background:var(--tbg);color:var(--acc)}
+.ctrl{display:flex;align-items:center;gap:10px}
+.clbl{font-size:10px;color:var(--tm)}
+.tdots{display:flex;gap:5px}
+.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.tdot[data-t="slate"]{background:#00C9A7}
+.tdot[data-t="arctic"]{background:#1565C0}
+.tdot[data-t="ember"]{background:#D4A017}
+.tdot.active{border-color:var(--th);transform:scale(1.2)}
+.fsw{display:flex;gap:4px}
+.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
+.fbtn:hover,.fbtn.active{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
+.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
+.sb-sec{margin-bottom:4px}
+.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
+.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
+.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+.MN{margin-left:200px;padding:20px;position:relative;z-index:1;min-height:calc(100vh - 52px)}
+.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
+.ph-ico{width:38px;height:38px;background:var(--adim);border:1px solid var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.ph-title{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--th)}
+.ph-sub{font-size:11px;color:var(--tm)}
+.ph-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
+.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
+.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--adim)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
+.b-err{background:rgba(248,81,73,.15);color:var(--err)}
+.b-acc{background:var(--tbg);color:var(--acc)}
+.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
+.fctl{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;width:220px;outline:none;transition:border .2s}
+.si:focus{border-color:var(--acc)}
+.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.stc{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.stc-num{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--acc)}
+.stc-lbl{font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.stc-sub{font-size:11px;color:var(--tb)}
+@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
+</style>
+</head>
+<body>
+<nav class="TB">
+  <div class="brand">EPFBD<small>Warehouse Management System</small></div>
+  <div class="sep"></div>
+  <div class="tnav">
+    <a href="../index.html">Dashboard</a>
+    <a href="../manpower/all_manpower.html">Manpower</a>
+    <a href="../warehouse/wh_list.html">Warehouse</a>
+    <a href="pda_devices.html" class="ON">Equipment</a>
+    <a href="../kpi/staff_kpi.html">KPI</a>
+    <a href="../reports/pdf_library.html">Reports</a>
+  </div>
+  <div class="ctrl">
+    <span class="clbl">Theme</span>
+    <div class="tdots">
+      <div class="tdot" data-t="slate" onclick="setTheme('slate')" title="Slate Night"></div>
+      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')" title="Arctic Light"></div>
+      <div class="tdot" data-t="ember" onclick="setTheme('ember')" title="Ember Gold"></div>
+    </div>
+    <span class="clbl">Font</span>
+    <div class="fsw">
+      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="CLK" class="clk">--:--:--</div>
+  </div>
+</nav>
+<aside class="SB">
+  <div class="sb-sec"><div class="sb-hd">Main</div>
+    <a class="sb-a" href="../index.html">&#127968; Dashboard</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Manpower</div>
+    <a class="sb-a" href="../manpower/all_manpower.html">&#128101; All Manpower</a>
+    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span>EPF</a>
+    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span>TGL</a>
+    <a class="sb-a" href="../manpower/BGL_manpower.html"><span class="sb-badge">BGL</span>BGL</a>
+    <a class="sb-a" href="../manpower/GTM_manpower.html"><span class="sb-badge">GTM</span>GTM</a>
+    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span>RFL</a>
+    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span>EC</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Warehouse</div>
+    <a class="sb-a" href="../warehouse/wh_list.html">&#127981; WH List</a>
+    <a class="sb-a" href="../warehouse/mis_login.html">&#128272; MIS Login</a>
+    <a class="sb-a" href="../warehouse/mail_list.html">&#128140; Mail List</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Equipment</div>
+    <a class="sb-a ON" href="pda_devices.html">&#128241; PDA / Scanner</a>
+    <a class="sb-a" href="barcode_printer.html">&#128424; Barcode Printer</a>
+    <a class="sb-a" href="forklift.html">&#127959; Forklift</a>
+    <a class="sb-a" href="maintenance_log.html">&#128295; Maintenance</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Performance</div>
+    <a class="sb-a" href="../kpi/staff_kpi.html">&#11088; Staff KPI</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Others</div>
+    <a class="sb-a" href="../sop/policies.html">&#128221; SOP & Policy</a>
+    <a class="sb-a" href="../incident/incident_log.html">&#9888; Incidents</a>
+    <a class="sb-a" href="../pallet/wooden_pallet.html">&#129683; Pallets</a>
+    <a class="sb-a" href="../vendor/vendor_list.html">&#129309; Vendors</a>
+  </div>
+</aside>
+<main class="MN">
+<div class="ph">
+  <div class="ph-ico">&#128241;</div>
+  <div>
+    <div class="ph-title">PDA & Smart Devices</div>
+    <div class="ph-sub">Warehouse Smart Device Summary — 2025</div>
+  </div>
+  <div class="ph-right">
+    <span class="pill" id="totalCount">Loading…</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="st-grid" id="statsGrid"></div>
+
+<!-- Filters -->
+<div class="fctl">
+  <input class="si" id="srch" placeholder="&#128269; Search device, person, ID…" oninput="render()">
+  <select class="fsel" id="fFty" onchange="render()">
+    <option value="">All Factory</option>
+    <option>EPF</option>
+    <option>TGL</option>
+  </select>
+  <select class="fsel" id="fCat" onchange="render()">
+    <option value="">All Category</option>
+    <option>PDA</option>
+    <option>Scanner</option>
+  </select>
+  <select class="fsel" id="fDept" onchange="render()">
+    <option value="">All Dept</option>
+    <option>SM</option>
+    <option>MM</option>
+    <option>PM</option>
+    <option>EQ</option>
+  </select>
+</div>
+
+<!-- PDA / Smart Device Table -->
+<div class="card">
+  <div class="card-hd">
+    <div class="card-hd-title">&#128241; Smart Devices (PDA & Scanners)</div>
+    <span class="card-hd-badge" id="pdaBadge">0</span>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Category</th>
+        <th>Device Name</th>
+        <th>IMEI / S/N</th>
+        <th>Dept</th>
+        <th>Factory</th>
+        <th>Responsible</th>
+        <th>Device ID</th>
+        <th>Received</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody id="pdaBody"></tbody>
+  </table>
+  </div>
+</div>
+
+<!-- Barcode Printer Table -->
+<div class="card">
+  <div class="card-hd">
+    <div class="card-hd-title">&#128424; Barcode Printers</div>
+    <span class="card-hd-badge">5</span>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>WH Name</th>
+        <th>Model</th>
+        <th>Serial No.</th>
+        <th>Dept Use</th>
+        <th>Factory</th>
+        <th>Responsible</th>
+        <th>Device ID</th>
+      </tr>
+    </thead>
+    <tbody id="bpBody"></tbody>
+  </table>
+  </div>
+</div>
+
+</main>
+<script>
+const DEVICES=[
+  {sl:1,cat:'PDA',name:'YGF F20',imei:'A025050A8021807',qty:1,dept:'SM',fty:'EPF',person:'Anarul / Chandon',devid:'WH-PDA-03(SM)',received:'Unknown',remarks:''},
+  {sl:2,cat:'PDA',name:'YGF F20',imei:'A025050A8021586',qty:1,dept:'MM',fty:'EPF',person:'Rabbani / Malek',devid:'WH-PDA-02(MM)',received:'Unknown',remarks:''},
+  {sl:3,cat:'PDA',name:'YGF F20',imei:'A025050A8021687',qty:1,dept:'MM',fty:'TGL',person:'Nurun Nabi / Ershad',devid:'WH-PDA-04(MM)',received:'Unknown',remarks:'Sent to TGL on 13 Oct 2025'},
+  {sl:4,cat:'PDA',name:'YGF F20',imei:'A025050A8021548',qty:1,dept:'SM',fty:'TGL',person:'Dhanonjoy / Abdul Qaiyum',devid:'WH-PDA-05(MM)',received:'Unknown',remarks:'Sent to TGL on 13 Oct 2025'},
+  {sl:5,cat:'PDA',name:'YGF F7',imei:'867043050031931',qty:1,dept:'MM',fty:'EPF',person:'Rabbani / Malek',devid:'WH-PDA-01(MM)',received:'Unknown',remarks:'Sent to TGL on 13 Oct 2025'},
+  {sl:6,cat:'PDA',name:'YGF F7',imei:'—',qty:1,dept:'SM',fty:'EPF',person:'—',devid:'WH-PDA-06(SM-3E)',received:'18-11-2025',remarks:'05-01-2026 sent to China'},
+  {sl:7,cat:'PDA',name:'YGF F7',imei:'—',qty:1,dept:'PM',fty:'EPF',person:'—',devid:'WH-PDA-07(PM)',received:'01-01-2026',remarks:''},
+  {sl:8,cat:'PDA',name:'YGF F7',imei:'—',qty:1,dept:'PM',fty:'EPF',person:'—',devid:'WH-PDA-07',received:'—',remarks:''},
+  {sl:9,cat:'PDA',name:'YGF F7',imei:'—',qty:1,dept:'PM',fty:'EPF',person:'—',devid:'WH-PDA-07',received:'—',remarks:''},
+  {sl:10,cat:'PDA',name:'YGF F7',imei:'—',qty:1,dept:'—',fty:'EPF',person:'—',devid:'WH-PDA-07',received:'01-01-2026',remarks:''},
+  {sl:11,cat:'Scanner',name:'MARK',imei:'V24Q04R02',qty:1,dept:'—',fty:'EPF',person:'Not in use',devid:'—',received:'Unknown',remarks:'Decommissioned'},
+  {sl:12,cat:'Scanner',name:'Chiteng',imei:'CT1030',qty:1,dept:'—',fty:'EPF',person:'Not in use',devid:'—',received:'Unknown',remarks:'Decommissioned'},
+  {sl:13,cat:'Scanner',name:'Honeywell Voyager',imei:'1202g',qty:1,dept:'—',fty:'EPF',person:'Not in use',devid:'—',received:'Unknown',remarks:'Decommissioned'},
+  {sl:14,cat:'Scanner',name:'Honeywell Eclipse',imei:'—',qty:1,dept:'—',fty:'EPF',person:'Not in use',devid:'—',received:'Unknown',remarks:'Decommissioned'},
+];
+
+const PRINTERS=[
+  {sl:1,wh:'BDC515',model:'CP-2140EX',serial:'24A63262',dept:'EQ',fty:'EPF',person:'Mithun',devid:'WH-BP-01(EQ)'},
+  {sl:2,wh:'BDC310',model:'CP-2140EX Pro',serial:'24A54001',dept:'SM',fty:'EPF',person:'Anarul',devid:'WH-BP-02(SM)'},
+  {sl:3,wh:'BDC110',model:'CP-2140EX Pro',serial:'24A54002',dept:'MM',fty:'EPF',person:'Malek',devid:'WH-BP-03(MM)'},
+  {sl:4,wh:'General',model:'CP-2140EX Pro',serial:'24A54002',dept:'WH',fty:'EPF',person:'Masud',devid:'—'},
+  {sl:5,wh:'BDW110',model:'CP-2140EX Pro',serial:'24M56783',dept:'MM',fty:'TGL',person:'Malek',devid:'WH-BP-04(MM)'},
+];
+
+function deptBadge(d){
+  const m={SM:'b-acc',MM:'b-blue',PM:'b-wrn',EQ:'b-ok',FG:'b-grey'};
+  return `<span class="badge ${m[d]||'b-grey'}">${d}</span>`;
+}
+
+function render(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const ff=document.getElementById('fFty').value;
+  const fc=document.getElementById('fCat').value;
+  const fd=document.getElementById('fDept').value;
+  let filt=DEVICES.filter(d=>{
+    if(ff&&d.fty!==ff)return false;
+    if(fc&&d.cat!==fc)return false;
+    if(fd&&d.dept!==fd)return false;
+    if(q&&!(d.name.toLowerCase().includes(q)||d.person.toLowerCase().includes(q)||d.devid.toLowerCase().includes(q)||(d.imei||'').toLowerCase().includes(q)))return false;
+    return true;
+  });
+  const tb=document.getElementById('pdaBody');
+  tb.innerHTML=filt.map((d,i)=>`<tr>
+    <td>${i+1}</td>
+    <td><span class="badge ${d.cat==='PDA'?'b-ok':'b-blue'}">${d.cat}</span></td>
+    <td><strong>${d.name}</strong></td>
+    <td style="font-family:monospace;font-size:11px">${d.imei||'—'}</td>
+    <td>${deptBadge(d.dept)}</td>
+    <td><span class="badge b-grey">${d.fty}</span></td>
+    <td>${d.person}</td>
+    <td style="font-family:monospace;font-size:11px;color:var(--acc)">${d.devid}</td>
+    <td style="font-size:11px">${d.received}</td>
+    <td style="font-size:11px;color:var(--tm)">${d.remarks}</td>
+  </tr>`).join('');
+  document.getElementById('pdaBadge').textContent=filt.length;
+}
+
+function buildStats(){
+  const pdas=DEVICES.filter(d=>d.cat==='PDA').length;
+  const scanners=DEVICES.filter(d=>d.cat==='Scanner').length;
+  const epf=DEVICES.filter(d=>d.fty==='EPF').length;
+  const tgl=DEVICES.filter(d=>d.fty==='TGL').length;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stc"><div class="stc-num">${DEVICES.length}</div><div class="stc-lbl">Total Devices</div><div class="stc-sub">PDA + Scanners</div></div>
+    <div class="stc"><div class="stc-num">${pdas}</div><div class="stc-lbl">PDA Units</div><div class="stc-sub">YGF F7 / F20</div></div>
+    <div class="stc"><div class="stc-num">${scanners}</div><div class="stc-lbl">Scanners</div><div class="stc-sub">Decommissioned</div></div>
+    <div class="stc"><div class="stc-num">${epf}</div><div class="stc-lbl">EPF Factory</div><div class="stc-sub">Assigned</div></div>
+    <div class="stc"><div class="stc-num">${tgl}</div><div class="stc-lbl">TGL Factory</div><div class="stc-sub">Assigned</div></div>
+    <div class="stc"><div class="stc-num">${PRINTERS.length}</div><div class="stc-lbl">Barcode Printers</div><div class="stc-sub">CP-2140EX series</div></div>
+  `;
+  document.getElementById('totalCount').textContent=DEVICES.length+' Devices';
+}
+
+function buildPrinters(){
+  document.getElementById('bpBody').innerHTML=PRINTERS.map(p=>`<tr>
+    <td>${p.sl}</td>
+    <td><strong style="color:var(--acc)">${p.wh}</strong></td>
+    <td>${p.model}</td>
+    <td style="font-family:monospace;font-size:11px">${p.serial}</td>
+    <td>${deptBadge(p.dept)}</td>
+    <td><span class="badge b-grey">${p.fty}</span></td>
+    <td>${p.person}</td>
+    <td style="font-family:monospace;font-size:11px;color:var(--acc)">${p.devid}</td>
+  </tr>`).join('');
+}
+
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wms-theme',t);document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('active',d.dataset.t===t))}
+function setFont(f){document.documentElement.setAttribute('data-font',f);localStorage.setItem('wms-font',f);document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===f))}
+function startClock(){const c=document.getElementById('CLK');setInterval(()=>{c.textContent=new Date().toLocaleTimeString('en-GB')},1000)}
+function init(){
+  const t=localStorage.getItem('wms-theme')||'slate';
+  const f=localStorage.getItem('wms-font')||'ubuntu';
+  setTheme(t);setFont(f);startClock();buildStats();buildPrinters();render();
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIS Login — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
+[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--cardh:#212b3d;--bdr:#2a3548;--bdrh:#3d5070;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--aglow:rgba(0,201,167,.20);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--tag:#00C9A7;--err:#f85149;--wrn:#e3b341;--ok:#3fb950;--nav:#0d1117;--tln:#00C9A7;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shd:0 4px 24px rgba(0,0,0,.6);--shs:0 2px 10px rgba(0,0,0,.4);--ra:rgba(0,201,167,.025)}
+[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--cardh:#f5f9ff;--bdr:#d0dae8;--bdrh:#a0b8d8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--aglow:rgba(21,101,192,.14);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--tag:#1565C0;--err:#c62828;--wrn:#e65100;--ok:#2e7d32;--nav:#fff;--tln:#1565C0;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shd:0 4px 20px rgba(21,101,192,.10);--shs:0 2px 8px rgba(21,101,192,.08);--ra:rgba(21,101,192,.025)}
+[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--cardh:#2f2f33;--bdr:#3f3f46;--bdrh:#58585f;--acc:#D4A017;--adim:rgba(212,160,23,.10);--aglow:rgba(212,160,23,.20);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--tag:#D4A017;--err:#ef4444;--wrn:#f59e0b;--ok:#22c55e;--nav:#111113;--tln:#D4A017;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shd:0 4px 24px rgba(0,0,0,.7);--shs:0 2px 10px rgba(0,0,0,.5);--ra:rgba(212,160,23,.025)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fb);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
+.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;box-shadow:var(--shs)}
+.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);letter-spacing:.5px;white-space:nowrap}
+.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400}
+.sep{flex:1}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
+.tnav a:hover{background:var(--adim);color:var(--acc)}
+.tnav a.ON{background:var(--tbg);color:var(--acc)}
+.ctrl{display:flex;align-items:center;gap:10px}
+.clbl{font-size:10px;color:var(--tm)}
+.tdots{display:flex;gap:5px}
+.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.tdot[data-t="slate"]{background:#00C9A7}
+.tdot[data-t="arctic"]{background:#1565C0}
+.tdot[data-t="ember"]{background:#D4A017}
+.tdot.active{border-color:var(--th);transform:scale(1.2)}
+.fsw{display:flex;gap:4px}
+.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
+.fbtn:hover,.fbtn.active{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
+.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
+.sb-sec{margin-bottom:4px}
+.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
+.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
+.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+.MN{margin-left:200px;padding:20px;position:relative;z-index:1;min-height:calc(100vh - 52px)}
+.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
+.ph-ico{width:38px;height:38px;background:var(--adim);border:1px solid var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.ph-title{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--th)}
+.ph-sub{font-size:11px;color:var(--tm)}
+.ph-right{margin-left:auto}
+.pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)}
+.alert{background:rgba(248,81,73,.10);border:1px solid rgba(248,81,73,.30);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--err);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
+.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
+.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--adim)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.b-acc{background:var(--tbg);color:var(--acc)}
+.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
+.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
+.fctl{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;width:240px;outline:none;transition:border .2s}
+.si:focus{border-color:var(--acc)}
+/* PIN gate */
+.pin-gate{display:flex;align-items:center;justify-content:center;min-height:300px}
+.pin-box{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:28px 32px;text-align:center;max-width:320px;width:100%}
+.pin-box h3{font-family:var(--fh);color:var(--th);margin-bottom:6px}
+.pin-box p{font-size:12px;color:var(--tm);margin-bottom:18px}
+.pin-in{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:10px;color:var(--th);font-size:18px;letter-spacing:6px;text-align:center;width:100%;outline:none;transition:border .2s;margin-bottom:12px}
+.pin-in:focus{border-color:var(--acc)}
+.btn{background:var(--acc);color:#000;border:none;padding:9px 24px;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.p-err{color:var(--err);font-size:11px;margin-top:8px}
+.pwd-cell{font-family:monospace;font-size:11px;cursor:pointer;user-select:none;color:var(--acc)}
+.pwd-cell.hidden{color:var(--tm);letter-spacing:2px}
+@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
+</style>
+
+<style id="dark-override">
+/* ── DARK MODE OVERRIDE ── */
+body{background:#0a0a0a!important;color:#f0f0f0!important}
+.kpi-c,.fi2,.sys-row,.mc,.ch-card,.act-i{background:#141414!important;border-color:#242424!important;color:#f0f0f0!important}
+.kpi-num{color:#f0f0f0!important}
+.kpi-lbl{color:#b0b8c8!important}
+.kpi-ch.nc{background:rgba(255,255,255,.06)!important;color:#b0b8c8!important}
+.mc-title{color:#f0f0f0!important}
+.mc-desc{color:#5a6478!important}
+.mc-arr{color:#5a6478!important}
+.sh-title{color:#f0f0f0!important}
+.sh-sub{color:#5a6478!important}
+.ann{background:linear-gradient(135deg,rgba(129,140,248,.1),rgba(167,139,250,.1))!important;border-color:rgba(129,140,248,.2)!important}
+.ann-t{color:#a78bfa!important}
+.ann-cl{color:#5a6478!important}
+.ann-cl:hover{color:#f0f0f0!important}
+.fn{color:#f0f0f0!important}
+.fk{color:#5a6478!important}
+.fv{color:#b0b8c8!important}
+.wsn{color:#f0f0f0!important}
+.act-text{color:#f0f0f0!important}
+.act-sub{color:#5a6478!important}
+.sys-lbl{color:#f0f0f0!important}
+.hdr{background:rgba(10,10,10,.92)!important}
+select option{background:#141414!important;color:#f0f0f0!important}
+input,select,textarea{background:#111111!important;color:#f0f0f0!important;border-color:#242424!important}
+input::placeholder,textarea::placeholder{color:#5a6478!important}
+.OV-box{background:#141414!important;border-color:#242424!important}
+.welcome{background:linear-gradient(135deg,#0a1a0d 0%,#0d1a14 50%,#0a0d14 100%)!important}
+.bg-grid .ch-card{background:#141414!important;border-color:#242424!important}
+.kpi-pb-bg{background:#242424!important}
+.fp{background:#242424!important}
+.fi2{background:#141414!important;border-color:#242424!important}
+.fi2:hover{background:#1a1a1a!important}
+</style>
+</head>
+<body>
+<nav class="TB">
+  <div class="brand">EPFBD<small>Warehouse Management System</small></div>
+  <div class="sep"></div>
+  <div class="tnav">
+    <a href="../index.html">Dashboard</a>
+    <a href="../manpower/all_manpower.html">Manpower</a>
+    <a href="wh_list.html" class="ON">Warehouse</a>
+    <a href="../equipment/pda_devices.html">Equipment</a>
+    <a href="../kpi/staff_kpi.html">KPI</a>
+  </div>
+  <div class="ctrl">
+    <span class="clbl">Theme</span>
+    <div class="tdots">
+      <div class="tdot" data-t="slate" onclick="setTheme('slate')" title="Slate Night"></div>
+      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')" title="Arctic Light"></div>
+      <div class="tdot" data-t="ember" onclick="setTheme('ember')" title="Ember Gold"></div>
+    </div>
+    <span class="clbl">Font</span>
+    <div class="fsw">
+      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="CLK" class="clk">--:--:--</div>
+  </div>
+</nav>
+<aside class="SB">
+  <div class="sb-sec"><div class="sb-hd">Main</div>
+    <a class="sb-a" href="../index.html">&#127968; Dashboard</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Manpower</div>
+    <a class="sb-a" href="../manpower/all_manpower.html">&#128101; All Manpower</a>
+    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span>EPF</a>
+    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span>TGL</a>
+    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span>RFL</a>
+    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span>EC</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Warehouse</div>
+    <a class="sb-a" href="wh_list.html">&#127981; WH List</a>
+    <a class="sb-a ON" href="mis_login.html">&#128272; MIS Login</a>
+    <a class="sb-a" href="mail_list.html">&#128140; Mail List</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Equipment</div>
+    <a class="sb-a" href="../equipment/pda_devices.html">&#128241; PDA / Scanner</a>
+    <a class="sb-a" href="../equipment/forklift.html">&#127959; Forklift</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Performance</div>
+    <a class="sb-a" href="../kpi/staff_kpi.html">&#11088; Staff KPI</a>
+  </div>
+</aside>
+<main class="MN">
+<div class="ph">
+  <div class="ph-ico">&#128272;</div>
+  <div>
+    <div class="ph-title">MIS ID & Password</div>
+    <div class="ph-sub">Warehouse MIS login credentials — All units</div>
+  </div>
+  <div class="ph-right">
+    <span class="pill">19 Accounts</span>
+  </div>
+</div>
+
+<div class="alert">&#9888; Confidential — This page is PIN protected. Do not share credentials. Click any password to reveal/hide.</div>
+
+<!-- PIN Gate -->
+<div id="pinGate" class="pin-gate">
+  <div class="pin-box">
+    <h3>&#128274; PIN Required</h3>
+    <p>Enter your 4-digit PIN to view MIS credentials</p>
+    <input class="pin-in" id="pinIn" type="password" maxlength="4" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()">
+    <br>
+    <button class="btn" onclick="checkPin()">Unlock</button>
+    <div class="p-err" id="pinErr"></div>
+  </div>
+</div>
+
+<!-- Content (hidden until PIN ok) -->
+<div id="content" style="display:none">
+
+<div class="fctl">
+  <input class="si" id="srch" placeholder="&#128269; Search name, ID, WH code…" oninput="render()">
+</div>
+
+<div class="card">
+  <div class="card-hd">
+    <div class="card-hd-title">&#128272; MIS Login Credentials</div>
+    <span class="card-hd-badge" id="cnt">0</span>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>MIS ID</th>
+        <th>Password</th>
+        <th>Full Name</th>
+        <th>Employee ID</th>
+        <th>Designation</th>
+        <th>WH Code</th>
+        <th>Department</th>
+        <th>Location</th>
+      </tr>
+    </thead>
+    <tbody id="tb"></tbody>
+  </table>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+</main>
+<script>
+const DATA=[
+  {sl:1,id:'mm-bdc110',pwd:'@Q63j9M@Yb8@',name:'Rabbani',empid:'BDC110',desg:'Executive-2',wh:'BDC110',dept:'Main Material',loc:'3B Warehouse(EPF)'},
+  {sl:2,id:'Dilip',pwd:'@58hE96ce@',name:'Abdur Rahim',empid:'BDC150',desg:'Executive-2',wh:'BDC150',dept:'Cutting 3A',loc:'3B Warehouse(EPF)'},
+  {sl:3,id:'mpmm1',pwd:'@!Qp3u96fE7@',name:'Md. Moshiur Rahman',empid:'BDC150',desg:'Executive-2',wh:'BDC150',dept:'Cutting 3A',loc:'3B Warehouse(EPF)'},
+  {sl:4,id:'mpmm2',pwd:'@@ap7W36mH5@',name:'Tofajaol',empid:'BDC170',desg:'Executive-2',wh:'BDC170',dept:'Cutting 3A',loc:'3B Main WH'},
+  {sl:5,id:'pm-bdc210',pwd:'@q52Dc37f@U@',name:'Raton Ali',empid:'BDC210',desg:'Jr. Executive',wh:'BDC210',dept:'Packing Materials',loc:'3C Human Hair WH'},
+  {sl:6,id:'sm-bdc310',pwd:'@St73qQ5!Me@',name:'Anarul Islam',empid:'BDC310',desg:'Executive-2',wh:'BDC310',dept:'Sub Material',loc:'3A Human Hair'},
+  {sl:7,id:'fg-bdc410',pwd:'@eU7X53u!f8@',name:'Md. Mozzamel Haque',empid:'BDC410',desg:'Executive-2',wh:'BDC410',dept:'Finished Goods',loc:'Finished Goods WH'},
+  {sl:8,id:'ele-bdc515',pwd:'@Rz47h!W8R5@',name:'Md. Mithun Sarker',empid:'BDC515',desg:'Executive-2',wh:'BDC515',dept:'Electronic WH',loc:'TGL Main WH'},
+  {sl:9,id:'mm-bdc110',pwd:'@Q63j9M@Yb8@',name:'Al Faruque',empid:'BDC610-3A',desg:'Executive-3',wh:'BDC610-3A',dept:'Human Hair',loc:'TGL Warehouse'},
+  {sl:10,id:'mm-bdc110',pwd:'@Q63j9M@Yb8@',name:'Paritosh',empid:'BDC610(3B)',desg:'Executive-3',wh:'BDC610(3B)',dept:'Human Hair',loc:'TGL Warehouse'},
+  {sl:11,id:'hh-bdc620',pwd:'@9V37sF!Gq8@',name:'Md. Najmul Islam',empid:'BDC620',desg:'Executive-1',wh:'BDC620',dept:'Human Hair',loc:'GT-08 Warehouse'},
+  {sl:12,id:'tgl07hh1',pwd:'@E7n45Jk3@',name:'Nurunnabi',empid:'BDW110',desg:'Executive-3',wh:'BDW110',dept:'Main Material',loc:'GT-07 Warehouse'},
+  {sl:13,id:'tgl07mm4',pwd:'@3bM9rY24@',name:'Shafikul Islam',empid:'BDW150',desg:'—',wh:'BDW150',dept:'Cutting',loc:'GT-07 Warehouse'},
+  {sl:14,id:'tgl07mm2',pwd:'@g3B64vK9@',name:'Shafikul Islam',empid:'BDW170',desg:'—',wh:'BDW170',dept:'Cutting',loc:'GT-07 Warehouse'},
+  {sl:15,id:'tgl07hh1',pwd:'@E7n45Jk3@',name:'Shamim',empid:'BDW210',desg:'—',wh:'BDW210',dept:'Packing Materials',loc:'GT-07 Warehouse'},
+  {sl:16,id:'SM-BDW310',pwd:'@Vt6v@75ap8@',name:'Dhanonjoy Roy',empid:'BDW310',desg:'—',wh:'BDW310',dept:'Sub Material',loc:'GT-07 Warehouse'},
+  {sl:17,id:'fg-bdc410',pwd:'@eU7X53u!f8@',name:'Rion Shah',empid:'BDW410',desg:'—',wh:'BDW410',dept:'Finished Goods',loc:'GT-07 Warehouse'},
+  {sl:18,id:'—',pwd:'—',name:'Mijar',empid:'BDW515',desg:'—',wh:'BDW515',dept:'Electronic WH',loc:'GT-07 Warehouse'},
+  {sl:19,id:'hh3c-bdc620',pwd:'@9V37sf!Gq8@',name:'Ashamony',empid:'BDW610',desg:'—',wh:'BDW610',dept:'Human Hair',loc:'GT-07 Warehouse'},
+];
+let visible={};
+
+function render(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const filt=DATA.filter(d=>!q||(d.name.toLowerCase().includes(q)||d.id.toLowerCase().includes(q)||d.wh.toLowerCase().includes(q)||d.empid.toLowerCase().includes(q)));
+  document.getElementById('cnt').textContent=filt.length;
+  document.getElementById('tb').innerHTML=filt.map(d=>{
+    const show=visible[d.sl];
+    const pwdHtml=`<span class="pwd-cell ${show?'':'hidden'}" onclick="togglePwd(${d.sl})">${show?d.pwd:'••••••••'}</span>`;
+    return `<tr>
+      <td>${d.sl}</td>
+      <td style="font-family:monospace;font-size:11px;color:var(--acc)">${d.id}</td>
+      <td>${pwdHtml}</td>
+      <td><strong>${d.name}</strong></td>
+      <td style="font-family:monospace;font-size:11px">${d.empid}</td>
+      <td><span class="badge b-grey">${d.desg}</span></td>
+      <td><span class="badge b-acc">${d.wh}</span></td>
+      <td>${d.dept}</td>
+      <td style="font-size:11px;color:var(--tm)">${d.loc}</td>
+    </tr>`;
+  }).join('');
+}
+
+function togglePwd(sl){visible[sl]=!visible[sl];render()}
+
+function checkPin(){
+  const v=document.getElementById('pinIn').value;
+  if(v==='9625'){
+    document.getElementById('pinGate').style.display='none';
+    document.getElementById('content').style.display='block';
+    render();
+  } else {
+    document.getElementById('pinErr').textContent='Incorrect PIN. Try again.';
+    document.getElementById('pinIn').value='';
+  }
+}
+
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wms-theme',t);document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('active',d.dataset.t===t))}
+function setFont(f){document.documentElement.setAttribute('data-font',f);localStorage.setItem('wms-font',f);document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===f))}
+function startClock(){const c=document.getElementById('CLK');setInterval(()=>{c.textContent=new Date().toLocaleTimeString('en-GB')},1000)}
+function init(){const t=localStorage.getItem('wms-theme')||'slate';const f=localStorage.getItem('wms-font')||'ubuntu';setTheme(t);setFont(f);startClock()}
+init();
+</script>
+</body>
+</html>

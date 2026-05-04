@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barcode Printer — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
+[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--cardh:#212b3d;--bdr:#2a3548;--bdrh:#3d5070;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--aglow:rgba(0,201,167,.20);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--tag:#00C9A7;--err:#f85149;--wrn:#e3b341;--ok:#3fb950;--nav:#0d1117;--tln:#00C9A7;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--bof:#00C9A7;--blb:#e3b341;--bdrv:#f0883e;--shd:0 4px 24px rgba(0,0,0,.6);--shs:0 2px 10px rgba(0,0,0,.4)}
+[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--cardh:#f5f9ff;--bdr:#d0dae8;--bdrh:#a0b8d8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--aglow:rgba(21,101,192,.14);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--tag:#1565C0;--err:#c62828;--wrn:#e65100;--ok:#2e7d32;--nav:#fff;--tln:#1565C0;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--bof:#1565C0;--blb:#00838f;--bdrv:#e65100;--shd:0 4px 20px rgba(21,101,192,.10);--shs:0 2px 8px rgba(21,101,192,.08)}
+[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--cardh:#2f2f33;--bdr:#3f3f46;--bdrh:#58585f;--acc:#D4A017;--adim:rgba(212,160,23,.10);--aglow:rgba(212,160,23,.20);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--tag:#D4A017;--err:#ef4444;--wrn:#f59e0b;--ok:#22c55e;--nav:#111113;--tln:#D4A017;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--bof:#D4A017;--blb:#94a3b8;--bdrv:#b87333;--shd:0 4px 24px rgba(0,0,0,.7);--shs:0 2px 10px rgba(0,0,0,.5)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb,'Josefin Sans',sans-serif);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
+.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;box-shadow:var(--shs)}
+.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);letter-spacing:.5px;white-space:nowrap}
+.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400;letter-spacing:.2px}
+.sep{flex:1}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
+.tnav a:hover{background:var(--adim);color:var(--acc)}
+.tnav a.ON{background:var(--tbg);color:var(--acc)}
+.ctrl{display:flex;align-items:center;gap:10px}
+.clbl{font-size:10px;color:var(--tm)}
+.tdots{display:flex;gap:5px}
+.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.tdot[data-t="slate"]{background:#00C9A7}
+.tdot[data-t="arctic"]{background:#1565C0}
+.tdot[data-t="ember"]{background:#D4A017}
+.tdot.active{border-color:var(--th);transform:scale(1.2)}
+.fsw{display:flex;gap:4px}
+.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
+.fbtn:hover,.fbtn.active{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
+.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
+.sb-sec{margin-bottom:4px}
+.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
+.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
+.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+.MN{margin-left:200px;padding:20px;position:relative;z-index:1;min-height:calc(100vh - 52px)}
+.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
+.ph-ico{width:38px;height:38px;background:var(--adim);border:1px solid var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.ph-title{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--th)}
+.ph-sub{font-size:11px;color:var(--tm)}
+.ph-right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.15)}
+.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
+.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:rgba(0,0,0,.2);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--adim)}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
+.b-err{background:rgba(248,81,73,.15);color:var(--err)}
+.b-acc{background:var(--tbg);color:var(--acc)}
+.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
+.b-purple{background:rgba(188,130,255,.15);color:#bc82ff}
+.b-pink{background:rgba(255,100,180,.15);color:#ff64b4}
+.fctl{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;transition:border .2s}
+.si:focus{border-color:var(--acc)}
+.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer}
+.fsel option{background:var(--card)}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.stc{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden}
+.stc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stc.c-green::before{background:linear-gradient(90deg,#00C9A7,#00a585)}
+.stc.c-blue::before{background:linear-gradient(90deg,#58a6ff,#1f6feb)}
+.stc.c-orange::before{background:linear-gradient(90deg,#f0883e,#d06b2a)}
+.stc.c-purple::before{background:linear-gradient(90deg,#bc82ff,#9d4edd)}
+.stc.c-yellow::before{background:linear-gradient(90deg,#e3b341,#c9922a)}
+.stc-num{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--acc)}
+.stc-lbl{font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.stc-sub{font-size:11px;color:var(--tb)}
+.btn-add{background:linear-gradient(135deg,var(--acc),color-mix(in srgb,var(--acc) 70%,black));color:#0d1117;border:none;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:700;font-family:var(--fh);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.btn-add:hover{opacity:.88;transform:translateY(-1px)}
+.btn-sec{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fh);transition:all .2s}
+.btn-sec:hover{background:var(--cardh);color:var(--th)}
+.btn-err{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:var(--err);padding:8px 16px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fh);transition:all .2s}
+.btn-err:hover{background:rgba(248,81,73,.2)}
+.abtn{border:none;border-radius:5px;cursor:pointer;padding:4px 8px;font-size:12px;transition:all .2s;background:transparent;color:var(--tm)}
+.abtn:hover{background:var(--adim);color:var(--acc)}
+.a-del:hover{background:rgba(248,81,73,.12);color:var(--err)}
+/* Modal */
+.OV{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.OV.show{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.OV-box{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shd);animation:slideUp .25s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.OV-box h3{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--th);margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--tm);margin-bottom:20px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr{display:flex;flex-direction:column;gap:5px}
+.fr.full{grid-column:1/-1}
+.fr label{font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px}
+.fr input,.fr select,.fr textarea{background:var(--card);border:1px solid var(--bdr);border-radius:7px;padding:9px 11px;color:var(--th);font-size:12px;font-family:var(--fb);outline:none;transition:all .2s;width:100%}
+.fr input:focus,.fr select:focus,.fr textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px var(--adim)}
+.fr select option{background:var(--sur)}
+.fr textarea{resize:vertical;min-height:64px}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+/* Toast */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:11px 22px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:all .3s ease;pointer-events:none;white-space:nowrap;box-shadow:var(--shd)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.tok{border-color:var(--ok);color:var(--ok);background:rgba(63,185,80,.1)}
+.toast.terr{border-color:var(--err);color:var(--err);background:rgba(248,81,73,.1)}
+@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
+</style>
+</head>
+<body>
+<nav class="TB">
+  <div class="brand">EPFBD<small>Warehouse Management System</small></div>
+  <div class="sep"></div>
+  <div class="tnav">
+    <a href="../index.html">Dashboard</a>
+    <a href="../manpower/all_manpower.html">Manpower</a>
+    <a href="../warehouse/wh_list.html">Warehouse</a>
+    <a href="pda_devices.html" class="ON">Equipment</a>
+    <a href="../kpi/staff_kpi.html">KPI</a>
+    <a href="../hr/attendance.html">HR</a>
+  </div>
+  <div class="ctrl">
+    <span class="clbl">Theme</span>
+    <div class="tdots">
+      <div class="tdot" data-t="slate" onclick="setTheme('slate')" title="Slate Night"></div>
+      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')" title="Arctic Light"></div>
+      <div class="tdot" data-t="ember" onclick="setTheme('ember')" title="Ember Gold"></div>
+    </div>
+    <span class="clbl">Font</span>
+    <div class="fsw">
+      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="CLK" class="clk">--:--:--</div>
+  </div>
+</nav>
+<aside class="SB">
+  <div class="sb-sec"><div class="sb-hd">Main</div>
+    <a class="sb-a" href="../index.html">🏠 Dashboard</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Manpower</div>
+    <a class="sb-a" href="../manpower/all_manpower.html">👥 All Manpower</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Warehouse</div>
+    <a class="sb-a" href="../warehouse/wh_list.html">🏭 WH List</a>
+    <a class="sb-a" href="../warehouse/mis_login.html">🔑 MIS Login</a>
+    <a class="sb-a" href="../warehouse/mail_list.html">📧 Mail List</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Equipment</div>
+    <a class="sb-a" href="pda_devices.html">📱 PDA / Scanner</a>
+    <a class="sb-a ON" href="barcode_printer.html">🖨 Barcode Printer</a>
+    <a class="sb-a" href="forklift.html">🚜 Forklift</a>
+    <a class="sb-a" href="maintenance_log.html">🔧 Maintenance</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">HR</div>
+    <a class="sb-a" href="../hr/attendance.html">📋 Attendance & Leave</a>
+  </div>
+  <div class="sb-sec"><div class="sb-hd">Performance</div>
+    <a class="sb-a" href="../kpi/staff_kpi.html">⭐ Staff KPI</a>
+  </div>
+</aside>
+<main class="MN">
+<div class="ph">
+  <div class="ph-ico">🖨</div>
+  <div>
+    <div class="ph-title">Barcode Printer Management</div>
+    <div class="ph-sub">EPFBD Warehouse — Barcode Printer Summary 2025</div>
+  </div>
+  <div class="ph-right">
+    <button class="btn-add" onclick="openAdd()">＋ Add Printer</button>
+    <span class="pill" id="totalPill">Loading…</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="st-grid" id="statsGrid"></div>
+
+<!-- Filters -->
+<div class="fctl">
+  <input class="si" id="srch" placeholder="🔍 Search WH, person, model, ID…" oninput="render()" style="width:230px">
+  <select class="fsel" id="fFty" onchange="render()">
+    <option value="">All Factory</option>
+    <option>EPF</option>
+    <option>TGL</option>
+  </select>
+  <select class="fsel" id="fDept" onchange="render()">
+    <option value="">All Dept</option>
+    <option>SM</option>
+    <option>MM</option>
+    <option>WH</option>
+    <option>EQ</option>
+  </select>
+  <select class="fsel" id="fModel" onchange="render()">
+    <option value="">All Model</option>
+    <option>CP-2140EX</option>
+    <option>CP-2140EX Pro</option>
+  </select>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-hd">
+    <span style="font-size:18px">🖨</span>
+    <div class="card-hd-title">Barcode Printers — CP-2140EX Series</div>
+    <span class="card-hd-badge" id="tblBadge">0</span>
+    <div style="margin-left:auto;font-size:11px;color:var(--tm)">Warehouse Barcode Printer List Summary</div>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>WH Name</th>
+        <th>Model No.</th>
+        <th>Device S/N</th>
+        <th>Qty</th>
+        <th>Dept Use</th>
+        <th>Factory</th>
+        <th>Responsible Person</th>
+        <th>Device ID</th>
+        <th>Status</th>
+        <th>Remarks</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="tblBody"></tbody>
+  </table>
+  </div>
+</div>
+
+</main>
+
+<!-- Add/Edit Modal -->
+<div class="OV" id="modal">
+  <div class="OV-box">
+    <h3 id="modalTitle">Add Barcode Printer</h3>
+    <div class="modal-sub" id="modalSub">Fill in the printer details below</div>
+    <div class="form-grid">
+      <div class="fr">
+        <label>WH Name</label>
+        <input id="fWH" placeholder="e.g. BDC515">
+      </div>
+      <div class="fr">
+        <label>Model No.</label>
+        <select id="fModel2">
+          <option>CP-2140EX</option>
+          <option>CP-2140EX Pro</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>Device S/N (IMEI)</label>
+        <input id="fSN" placeholder="e.g. 24A63262">
+      </div>
+      <div class="fr">
+        <label>Qty</label>
+        <input id="fQty" type="number" value="1" min="1">
+      </div>
+      <div class="fr">
+        <label>Dept Use</label>
+        <select id="fDept2">
+          <option>SM</option>
+          <option>MM</option>
+          <option>WH</option>
+          <option>EQ</option>
+          <option>PM</option>
+          <option>FG</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>Factory</label>
+        <select id="fFty2">
+          <option>EPF</option>
+          <option>TGL</option>
+          <option>BGL</option>
+          <option>GTM</option>
+        </select>
+      </div>
+      <div class="fr">
+        <label>Responsible Person</label>
+        <input id="fPerson" placeholder="e.g. Mithun">
+      </div>
+      <div class="fr">
+        <label>Device ID (Own)</label>
+        <input id="fDevID" placeholder="e.g. WH-BP-01(EQ)">
+      </div>
+      <div class="fr">
+        <label>Status</label>
+        <select id="fStatus">
+          <option>Active</option>
+          <option>Maintenance</option>
+          <option>Inactive</option>
+        </select>
+      </div>
+      <div class="fr full">
+        <label>Remarks</label>
+        <textarea id="fRemarks" rows="2" placeholder="Optional remarks…"></textarea>
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-err" onclick="closeModal()">Cancel</button>
+      <button class="btn-add" onclick="saveRecord()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let DATA=[
+  {id:1,wh:'BDC515',model:'CP-2140EX',sn:'24A63262',qty:1,dept:'EQ',fty:'EPF',person:'Mithun',devid:'WH-BP-01(EQ)',status:'Active',remarks:''},
+  {id:2,wh:'BDC310',model:'CP-2140EX Pro',sn:'24A54001',qty:1,dept:'SM',fty:'EPF',person:'Anarul',devid:'WH-BP-02(SM)',status:'Active',remarks:''},
+  {id:3,wh:'BDC110',model:'CP-2140EX Pro',sn:'24A54002',qty:1,dept:'MM',fty:'EPF',person:'Malek',devid:'WH-BP-03(MM)',status:'Active',remarks:''},
+  {id:4,wh:'General',model:'CP-2140EX Pro',sn:'24A54002',qty:1,dept:'WH',fty:'EPF',person:'Masud',devid:'—',status:'Active',remarks:''},
+  {id:5,wh:'BDW110',model:'CP-2140EX Pro',sn:'24M56783',qty:1,dept:'MM',fty:'TGL',person:'Malek',devid:'WH-BP-04(MM)',status:'Active',remarks:''},
+];
+let nextId=6;
+let editId=null;
+
+const DEPT_COLORS={SM:'b-acc',MM:'b-blue',WH:'b-purple',EQ:'b-ok',PM:'b-wrn',FG:'b-pink'};
+const STATUS_COLORS={Active:'b-ok',Maintenance:'b-wrn',Inactive:'b-err'};
+
+function deptBadge(d){return `<span class="badge ${DEPT_COLORS[d]||'b-grey'}">${d}</span>`;}
+function statusBadge(s){return `<span class="badge ${STATUS_COLORS[s]||'b-grey'}">${s}</span>`;}
+
+function render(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const ff=document.getElementById('fFty').value;
+  const fd=document.getElementById('fDept').value;
+  const fm=document.getElementById('fModel').value;
+  let filt=DATA.filter(d=>{
+    if(ff&&d.fty!==ff)return false;
+    if(fd&&d.dept!==fd)return false;
+    if(fm&&d.model!==fm)return false;
+    if(q&&!(d.wh.toLowerCase().includes(q)||d.person.toLowerCase().includes(q)||d.model.toLowerCase().includes(q)||(d.devid||'').toLowerCase().includes(q)||(d.sn||'').toLowerCase().includes(q)))return false;
+    return true;
+  });
+  const tb=document.getElementById('tblBody');
+  tb.innerHTML=filt.map((d,i)=>`<tr>
+    <td style="color:var(--tm)">${i+1}</td>
+    <td><strong style="color:var(--acc)">${d.wh}</strong></td>
+    <td style="font-size:11px">${d.model}</td>
+    <td style="font-family:monospace;font-size:11px;color:var(--blb)">${d.sn||'—'}</td>
+    <td style="text-align:center">${d.qty}</td>
+    <td>${deptBadge(d.dept)}</td>
+    <td><span class="badge b-grey">${d.fty}</span></td>
+    <td>${d.person}</td>
+    <td style="font-family:monospace;font-size:11px;color:var(--acc)">${d.devid||'—'}</td>
+    <td>${statusBadge(d.status||'Active')}</td>
+    <td style="font-size:11px;color:var(--tm);max-width:150px">${d.remarks||'—'}</td>
+    <td style="white-space:nowrap">
+      <button class="abtn" onclick="editRecord(${d.id})" title="Edit">✏️</button>
+      <button class="abtn a-del" onclick="delRecord(${d.id})" title="Delete">🗑</button>
+    </td>
+  </tr>`).join('');
+  document.getElementById('tblBadge').textContent=filt.length;
+}
+
+function buildStats(){
+  const total=DATA.length;
+  const epf=DATA.filter(d=>d.fty==='EPF').length;
+  const tgl=DATA.filter(d=>d.fty==='TGL').length;
+  const active=DATA.filter(d=>(d.status||'Active')==='Active').length;
+  const models=[...new Set(DATA.map(d=>d.model))].length;
+  document.getElementById('statsGrid').innerHTML=`
+    <div class="stc c-green"><div class="stc-num">${total}</div><div class="stc-lbl">Total Printers</div><div class="stc-sub">All factories</div></div>
+    <div class="stc c-blue"><div class="stc-num">${epf}</div><div class="stc-lbl">EPF Factory</div><div class="stc-sub">Assigned units</div></div>
+    <div class="stc c-orange"><div class="stc-num">${tgl}</div><div class="stc-lbl">TGL Factory</div><div class="stc-sub">Assigned units</div></div>
+    <div class="stc c-purple"><div class="stc-num">${active}</div><div class="stc-lbl">Active</div><div class="stc-sub">In service</div></div>
+    <div class="stc c-yellow"><div class="stc-num">${models}</div><div class="stc-lbl">Models</div><div class="stc-sub">CP-2140EX series</div></div>
+  `;
+  document.getElementById('totalPill').textContent=total+' Printers';
+}
+
+function openAdd(){
+  editId=null;
+  document.getElementById('modalTitle').textContent='Add Barcode Printer';
+  document.getElementById('modalSub').textContent='Fill in the printer details below';
+  ['fWH','fSN','fPerson','fDevID','fRemarks'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fModel2').value='CP-2140EX Pro';
+  document.getElementById('fQty').value=1;
+  document.getElementById('fDept2').value='SM';
+  document.getElementById('fFty2').value='EPF';
+  document.getElementById('fStatus').value='Active';
+  document.getElementById('modal').classList.add('show');
+}
+
+function editRecord(id){
+  const d=DATA.find(x=>x.id===id);
+  if(!d)return;
+  editId=id;
+  document.getElementById('modalTitle').textContent='Edit Printer — '+d.wh;
+  document.getElementById('modalSub').textContent='Update the printer details';
+  document.getElementById('fWH').value=d.wh;
+  document.getElementById('fModel2').value=d.model;
+  document.getElementById('fSN').value=d.sn||'';
+  document.getElementById('fQty').value=d.qty;
+  document.getElementById('fDept2').value=d.dept;
+  document.getElementById('fFty2').value=d.fty;
+  document.getElementById('fPerson').value=d.person;
+  document.getElementById('fDevID').value=d.devid||'';
+  document.getElementById('fStatus').value=d.status||'Active';
+  document.getElementById('fRemarks').value=d.remarks||'';
+  document.getElementById('modal').classList.add('show');
+}
+
+function saveRecord(){
+  const wh=document.getElementById('fWH').value.trim();
+  if(!wh){showToast('WH Name আবশ্যক!','terr');return;}
+  const rec={
+    wh,
+    model:document.getElementById('fModel2').value,
+    sn:document.getElementById('fSN').value.trim(),
+    qty:parseInt(document.getElementById('fQty').value)||1,
+    dept:document.getElementById('fDept2').value,
+    fty:document.getElementById('fFty2').value,
+    person:document.getElementById('fPerson').value.trim(),
+    devid:document.getElementById('fDevID').value.trim(),
+    status:document.getElementById('fStatus').value,
+    remarks:document.getElementById('fRemarks').value.trim(),
+  };
+  if(editId){
+    const idx=DATA.findIndex(x=>x.id===editId);
+    DATA[idx]={...rec,id:editId};
+    showToast('✅ রেকর্ড আপডেট হয়েছে','tok');
+  }else{
+    DATA.push({...rec,id:nextId++});
+    showToast('✅ নতুন প্রিন্টার যোগ হয়েছে','tok');
+  }
+  closeModal();buildStats();render();
+}
+
+function delRecord(id){
+  if(!confirm('এই প্রিন্টার মুছে ফেলবেন?'))return;
+  DATA=DATA.filter(x=>x.id!==id);
+  buildStats();render();
+  showToast('🗑 রেকর্ড মুছে গেছে','tok');
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('show');}
+
+function showToast(msg,cls='tok'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+cls+' show';
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wms-theme',t);document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('active',d.dataset.t===t))}
+function setFont(f){document.documentElement.setAttribute('data-font',f);localStorage.setItem('wms-font',f);document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===f))}
+function startClock(){const c=document.getElementById('CLK');setInterval(()=>{c.textContent=new Date().toLocaleTimeString('en-GB')},1000);}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+(function init(){
+  const t=localStorage.getItem('wms-theme')||'slate';
+  const f=localStorage.getItem('wms-font')||'ubuntu';
+  setTheme(t);setFont(f);startClock();buildStats();render();
+})();
+</script>
+</body>
+</html>

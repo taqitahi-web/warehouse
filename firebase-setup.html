@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firebase Setup — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Josefin+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--bdr:#2a3548;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--ok:#3fb950;--err:#f85149;--wrn:#e3b341;--shs:0 2px 10px rgba(0,0,0,.4)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Josefin Sans',sans-serif;background:var(--bg);color:var(--tb);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.wrap{max-width:680px;width:100%}
+.logo{text-align:center;margin-bottom:28px}
+.logo h1{font-family:'Ubuntu',sans-serif;font-size:24px;color:var(--acc);font-weight:700}
+.logo p{font-size:12px;color:var(--tm);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:24px;margin-bottom:16px}
+.card h2{font-family:'Ubuntu',sans-serif;font-size:15px;font-weight:600;color:var(--th);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.steps{counter-reset:step}
+.step{display:flex;gap:14px;margin-bottom:20px;align-items:flex-start}
+.step-num{background:var(--acc);color:#000;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-body{flex:1}
+.step-body p{font-size:13px;color:var(--tb);line-height:1.6;margin-bottom:8px}
+.step-body code{background:var(--sur);border:1px solid var(--bdr);border-radius:4px;padding:2px 6px;font-family:monospace;font-size:11px;color:var(--acc)}
+.step-body a{color:var(--acc);text-decoration:none}
+.step-body a:hover{text-decoration:underline}
+.form-row{margin-bottom:12px}
+.form-row label{display:block;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.form-row input{width:100%;background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:9px 12px;color:var(--th);font-size:12px;font-family:monospace;outline:none;transition:border .2s}
+.form-row input:focus{border-color:var(--acc)}
+.form-row input.ok{border-color:var(--ok)}
+.form-row input.err{border-color:var(--err)}
+.btn{background:var(--acc);color:#000;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;font-family:'Josefin Sans',sans-serif;transition:opacity .2s;width:100%}
+.btn:hover{opacity:.85}
+.btn-sec{background:var(--card);color:var(--acc);border:1px solid var(--acc)}
+.btn-sec:hover{background:var(--adim)}
+.status-box{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:14px;font-size:12px;min-height:48px;font-family:monospace;color:var(--tm);line-height:1.7}
+.status-ok{color:var(--ok)}
+.status-err{color:var(--err)}
+.status-wrn{color:var(--wrn)}
+.tag{display:inline-block;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin:2px}
+.divider{height:1px;background:var(--bdr);margin:20px 0}
+.cfg-preview{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:14px;font-family:monospace;font-size:11px;color:var(--tb);white-space:pre;overflow-x:auto;line-height:1.8}
+.copy-btn{background:var(--adim);border:1px solid var(--bdr);color:var(--acc);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;float:right;margin-top:-4px}
+.alert{background:rgba(227,179,65,.10);border:1px solid rgba(227,179,65,.30);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--wrn);margin-bottom:14px;line-height:1.6}
+.pages-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.page-item{background:var(--sur);border:1px solid var(--bdr);border-radius:6px;padding:10px 12px;font-size:11px}
+.page-item strong{display:block;color:var(--th);margin-bottom:2px}
+.page-item span{color:var(--tm);font-size:10px}
+.sync-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.dot-ok{background:var(--ok)}
+.dot-off{background:var(--tm)}
+.dot-wrn{background:var(--wrn)}
+</style>
+
+<style id="dark-override">
+/* ── DARK MODE OVERRIDE ── */
+body{background:#0a0a0a!important;color:#f0f0f0!important}
+.kpi-c,.fi2,.sys-row,.mc,.ch-card,.act-i{background:#141414!important;border-color:#242424!important;color:#f0f0f0!important}
+.kpi-num{color:#f0f0f0!important}
+.kpi-lbl{color:#b0b8c8!important}
+.kpi-ch.nc{background:rgba(255,255,255,.06)!important;color:#b0b8c8!important}
+.mc-title{color:#f0f0f0!important}
+.mc-desc{color:#5a6478!important}
+.mc-arr{color:#5a6478!important}
+.sh-title{color:#f0f0f0!important}
+.sh-sub{color:#5a6478!important}
+.ann{background:linear-gradient(135deg,rgba(129,140,248,.1),rgba(167,139,250,.1))!important;border-color:rgba(129,140,248,.2)!important}
+.ann-t{color:#a78bfa!important}
+.ann-cl{color:#5a6478!important}
+.ann-cl:hover{color:#f0f0f0!important}
+.fn{color:#f0f0f0!important}
+.fk{color:#5a6478!important}
+.fv{color:#b0b8c8!important}
+.wsn{color:#f0f0f0!important}
+.act-text{color:#f0f0f0!important}
+.act-sub{color:#5a6478!important}
+.sys-lbl{color:#f0f0f0!important}
+.hdr{background:rgba(10,10,10,.92)!important}
+select option{background:#141414!important;color:#f0f0f0!important}
+input,select,textarea{background:#111111!important;color:#f0f0f0!important;border-color:#242424!important}
+input::placeholder,textarea::placeholder{color:#5a6478!important}
+.OV-box{background:#141414!important;border-color:#242424!important}
+.welcome{background:linear-gradient(135deg,#0a1a0d 0%,#0d1a14 50%,#0a0d14 100%)!important}
+.bg-grid .ch-card{background:#141414!important;border-color:#242424!important}
+.kpi-pb-bg{background:#242424!important}
+.fp{background:#242424!important}
+.fi2{background:#141414!important;border-color:#242424!important}
+.fi2:hover{background:#1a1a1a!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <h1>🔥 Firebase Setup</h1>
+    <p>EPFBD Warehouse Management System — Cloud Sync Configuration</p>
+  </div>
+
+  <!-- Step by step guide -->
+  <div class="card">
+    <h2>📋 Firebase Project তৈরির ধাপ</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p><strong style="color:var(--th)">Firebase Console যান:</strong> <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> — Google account দিয়ে login করুন</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p><strong style="color:var(--th)">New Project:</strong> "Add project" → Project name: <code>epfbd-wms</code> → Analytics off করুন → "Create project"</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p><strong style="color:var(--th)">Realtime Database চালু করুন:</strong> Left sidebar → Build → Realtime Database → "Create Database" → Location: <code>us-central1</code> → <strong>Start in test mode</strong> → Enable</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <p><strong style="color:var(--th)">Web App যোগ করুন:</strong> Project Overview → "&lt;/&gt;" icon → App nickname: <code>EPFBD WMS</code> → Register app → নিচে config copy করুন</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <p><strong style="color:var(--th)">Database Rules সেট করুন:</strong> Realtime Database → Rules → এই rule paste করুন:</p>
+          <div style="position:relative">
+            <button class="copy-btn" onclick="copyRules()">Copy</button>
+            <div class="cfg-preview" id="rules-pre">{
+  "rules": {
+    "wms": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}</div>
+          </div>
+          <p style="margin-top:8px;font-size:11px;color:var(--tm)">⚠️ Test mode — পরে PIN-based auth যোগ করা যাবে</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Config input -->
+  <div class="card">
+    <h2>⚙️ Firebase Config এখানে পেস্ট করুন</h2>
+    <div class="alert">
+      ⚠️ Firebase Console → Project Settings → Your apps → SDK setup → Config object থেকে values copy করুন
+    </div>
+    <div class="form-row">
+      <label>API Key</label>
+      <input type="text" id="apiKey" placeholder="AIzaSy...">
+    </div>
+    <div class="form-row">
+      <label>Auth Domain</label>
+      <input type="text" id="authDomain" placeholder="epfbd-wms.firebaseapp.com">
+    </div>
+    <div class="form-row">
+      <label>Database URL <span style="color:var(--acc)">★ Important</span></label>
+      <input type="text" id="databaseURL" placeholder="https://epfbd-wms-default-rtdb.firebaseio.com">
+    </div>
+    <div class="form-row">
+      <label>Project ID</label>
+      <input type="text" id="projectId" placeholder="epfbd-wms">
+    </div>
+    <div class="form-row">
+      <label>Storage Bucket</label>
+      <input type="text" id="storageBucket" placeholder="epfbd-wms.appspot.com">
+    </div>
+    <div class="form-row">
+      <label>Messaging Sender ID</label>
+      <input type="text" id="messagingSenderId" placeholder="123456789">
+    </div>
+    <div class="form-row">
+      <label>App ID</label>
+      <input type="text" id="appId" placeholder="1:123456789:web:abc123">
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-sec" style="width:auto;padding:10px 16px" onclick="testConnection()">🔌 Test Connection</button>
+      <button class="btn" onclick="saveConfig()">💾 Save Config to All Pages</button>
+    </div>
+    <div style="margin-top:12px">
+      <div class="status-box" id="status">Firebase config এখানে দিন এবং Test Connection চাপুন...</div>
+    </div>
+  </div>
+
+  <!-- Generated config preview -->
+  <div class="card" id="cfg-card" style="display:none">
+    <h2>✅ Generated Config <button class="copy-btn" onclick="copyCfg()" style="float:right">Copy</button></h2>
+    <div class="cfg-preview" id="cfg-preview"></div>
+    <div style="margin-top:16px">
+      <p style="font-size:12px;color:var(--tm);margin-bottom:12px">এই config টি নিচের সব পেজে inject করতে হবে। "Download Updated Pages" চাপলে automatically inject হবে।</p>
+      <button class="btn" onclick="downloadAll()">⬇️ Download All Pages (Firebase Enabled)</button>
+    </div>
+  </div>
+
+  <!-- Pages that will be synced -->
+  <div class="card">
+    <h2>📄 যে পেজগুলো Sync হবে</h2>
+    <div class="pages-grid" id="pagesGrid">
+      <div class="page-item"><strong>🏭 EPF Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/EPF_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 TGL Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/TGL_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 BGL Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/BGL_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 GTM Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/GTM_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 RFL Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/RFL_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 EC Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/EC_manpower.html</span></div>
+      <div class="page-item"><strong>📋 Warehouse List</strong><span><span class="sync-dot dot-off"></span>wh_list.html</span></div>
+      <div class="page-item"><strong>🔑 MIS Login</strong><span><span class="sync-dot dot-off"></span>warehouse/mis_login.html</span></div>
+    </div>
+    <div style="margin-top:12px;padding:10px;background:var(--sur);border-radius:6px;font-size:11px;color:var(--tm);line-height:1.8">
+      <strong style="color:var(--th)">Firebase DB Structure:</strong><br>
+      /wms/epf_manpower/ → EPF extra records + overrides<br>
+      /wms/tgl_manpower/ → TGL extra records + overrides<br>
+      /wms/bgl_manpower/ → BGL data<br>
+      /wms/gtm_manpower/ → GTM data<br>
+      /wms/rfl_manpower/ → RFL data<br>
+      /wms/ec_manpower/ → EC data<br>
+      /wms/wh_list/ → Warehouse list edits<br>
+      /wms/settings/ → Shared app settings
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+let fbApp = null, fbDb = null;
+
+function getConfig(){
+  return {
+    apiKey: document.getElementById('apiKey').value.trim(),
+    authDomain: document.getElementById('authDomain').value.trim(),
+    databaseURL: document.getElementById('databaseURL').value.trim(),
+    projectId: document.getElementById('projectId').value.trim(),
+    storageBucket: document.getElementById('storageBucket').value.trim(),
+    messagingSenderId: document.getElementById('messagingSenderId').value.trim(),
+    appId: document.getElementById('appId').value.trim(),
+  };
+}
+
+function setStatus(msg, type){
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-box ' + (type==='ok'?'status-ok':type==='err'?'status-err':'status-wrn');
+}
+
+window.testConnection = async function(){
+  const cfg = getConfig();
+  if(!cfg.databaseURL){ setStatus('❌ Database URL দিন!','err'); return; }
+  setStatus('⏳ Firebase connect করছে...','');
+  try {
+    if(fbApp){ try{ fbApp.delete(); }catch(e){} }
+    fbApp = initializeApp(cfg, 'test-'+Date.now());
+    fbDb = getDatabase(fbApp);
+    await set(ref(fbDb, 'wms/connection_test'), { ts: Date.now(), msg: 'EPFBD WMS Connected' });
+    const snap = await get(ref(fbDb, 'wms/connection_test'));
+    if(snap.exists()){
+      setStatus('✅ Firebase সংযুক্ত! Database URL: ' + cfg.databaseURL, 'ok');
+      localStorage.setItem('wms_fb_config', JSON.stringify(cfg));
+      showConfig(cfg);
+      updateDots(true);
+    }
+  } catch(e){
+    setStatus('❌ Error: ' + e.message, 'err');
+  }
+}
+
+function showConfig(cfg){
+  const preview = `const WMS_FB_CONFIG = ${JSON.stringify(cfg, null, 2)};`;
+  document.getElementById('cfg-preview').textContent = preview;
+  document.getElementById('cfg-card').style.display = 'block';
+}
+
+function updateDots(ok){
+  document.querySelectorAll('.sync-dot').forEach(d=>{
+    d.className = 'sync-dot ' + (ok?'dot-ok':'dot-off');
+  });
+}
+
+window.saveConfig = function(){
+  const cfg = getConfig();
+  if(!cfg.databaseURL){ setStatus('❌ আগে Test Connection করুন','err'); return; }
+  localStorage.setItem('wms_fb_config', JSON.stringify(cfg));
+  setStatus('✅ Config saved locally. এখন "Download All Pages" চাপুন।','ok');
+  showConfig(cfg);
+}
+
+window.copyRules = function(){
+  navigator.clipboard.writeText(document.getElementById('rules-pre').textContent);
+  document.querySelector('.copy-btn').textContent='Copied!';
+  setTimeout(()=>document.querySelector('.copy-btn').textContent='Copy',2000);
+}
+
+window.copyCfg = function(){
+  navigator.clipboard.writeText(document.getElementById('cfg-preview').textContent);
+}
+
+window.downloadAll = function(){
+  setStatus('⚠️ GitHub এ pages upload করার পর, প্রতিটি page এ Firebase config inject করতে হবে। নিচের config টি copy করে প্রতিটি পেজের <script> এর শুরুতে WMS_FB_CONFIG হিসেবে add করুন।','wrn');
+}
+
+// Load saved config
+const saved = localStorage.getItem('wms_fb_config');
+if(saved){
+  const cfg = JSON.parse(saved);
+  Object.keys(cfg).forEach(k=>{
+    const el = document.getElementById(k);
+    if(el) el.value = cfg[k];
+  });
+  showConfig(cfg);
+}
+</script>
+</body>
+</html>

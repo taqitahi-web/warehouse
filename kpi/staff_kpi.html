@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Dashboard — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
+[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--bdr:#2a3548;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--ok:#3fb950;--err:#f85149;--wrn:#e3b341;--nav:#0d1117;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shs:0 2px 10px rgba(0,0,0,.4);--shd:0 4px 24px rgba(0,0,0,.6);--ra:rgba(0,201,167,.025);--ch1:rgba(0,201,167,.7);--ch2:rgba(227,179,65,.7);--ch3:rgba(248,81,73,.7);--ch4:rgba(88,166,255,.7)}
+[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--bdr:#d0dae8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--ok:#2e7d32;--err:#c62828;--wrn:#e65100;--nav:#fff;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shs:0 2px 8px rgba(21,101,192,.08);--shd:0 4px 20px rgba(21,101,192,.10);--ra:rgba(21,101,192,.025);--ch1:rgba(21,101,192,.7);--ch2:rgba(230,81,0,.7);--ch3:rgba(198,40,40,.7);--ch4:rgba(46,125,50,.7)}
+[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--bdr:#3f3f46;--acc:#D4A017;--adim:rgba(212,160,23,.10);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--ok:#22c55e;--err:#ef4444;--wrn:#f59e0b;--nav:#111113;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shs:0 2px 10px rgba(0,0,0,.5);--shd:0 4px 24px rgba(0,0,0,.7);--ra:rgba(212,160,23,.025);--ch1:rgba(212,160,23,.7);--ch2:rgba(34,197,94,.7);--ch3:rgba(239,68,68,.7);--ch4:rgba(96,165,250,.7)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fb);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
+.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;padding:0 16px;height:52px;box-shadow:var(--shs)}
+.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);white-space:nowrap}
+.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400}
+.sep{flex:1}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
+.tnav a:hover{background:var(--adim);color:var(--acc)}
+.tnav a.ON{background:var(--tbg);color:var(--acc)}
+.ctrl{display:flex;align-items:center;gap:8px}
+.clbl{font-size:10px;color:var(--tm)}
+.tdots{display:flex;gap:5px}
+.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.tdot[data-t="slate"]{background:#00C9A7}.tdot[data-t="arctic"]{background:#1565C0}.tdot[data-t="ember"]{background:#D4A017}
+.tdot.ON{border-color:var(--th);transform:scale(1.2)}
+.fsw{display:flex;gap:4px}
+.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
+.fbtn:hover,.fbtn.ON{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
+.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
+.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
+.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
+.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+.MN{margin-left:200px;padding:20px;position:relative;z-index:1}
+.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ph-ico{width:40px;height:40px;background:var(--adim);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ph-title{font-family:var(--fh);font-size:19px;font-weight:700;color:var(--th)}
+.ph-sub{font-size:11px;color:var(--tm)}
+.ph-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* KPI selector bar */
+.kpi-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.kpi-tab{padding:8px 16px;border-radius:8px;border:1px solid var(--bdr);background:var(--card);color:var(--tm);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--fb);transition:all .2s}
+.kpi-tab:hover{color:var(--tb);border-color:var(--bdrh,var(--bdr))}
+.kpi-tab.ON{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer;font-family:var(--fb)}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;transition:border .2s;font-family:var(--fb)}
+.si:focus{border-color:var(--acc)}
+/* KPI Section */
+.kpi-sec{display:none}.kpi-sec.active{display:block}
+/* Stat grid */
+.stg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stc{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.stc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);opacity:.6}
+.stc.red::before{background:var(--err)}
+.stc.yellow::before{background:var(--wrn)}
+.stc.green::before{background:var(--ok)}
+.stc.blue::before{background:#58a6ff}
+.stc-num{font-family:var(--fh);font-size:28px;font-weight:700;color:var(--acc);line-height:1}
+.stc.red .stc-num{color:var(--err)}
+.stc.yellow .stc-num{color:var(--wrn)}
+.stc.green .stc-num{color:var(--ok)}
+.stc.blue .stc-num{color:#58a6ff}
+.stc-lbl{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+.stc-sub{font-size:11px;color:var(--tb);margin-top:4px}
+.stc-trend{font-size:11px;font-weight:600;margin-top:6px}
+.trend-up{color:var(--ok)}.trend-dn{color:var(--err)}.trend-nc{color:var(--tm)}
+/* Chart grid */
+.chg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chg3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.ch-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:16px;box-shadow:var(--shs)}
+.ch-title{font-family:var(--fh);font-size:13px;font-weight:600;color:var(--th);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.ch-sub{font-size:10px;color:var(--tm);font-weight:400}
+.ch-wrap{position:relative;height:200px}
+/* Table card */
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
+.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
+.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
+.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--adim)}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700}
+.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.b-acc{background:var(--tbg);color:var(--acc)}
+.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
+.b-err{background:rgba(248,81,73,.15);color:var(--err)}
+.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
+/* Progress bar */
+.prog{background:var(--sur);border-radius:20px;height:8px;overflow:hidden;margin-top:4px}
+.prog-bar{height:100%;border-radius:20px;background:var(--acc);transition:width .5s}
+.prog-bar.red{background:var(--err)}.prog-bar.yellow{background:var(--wrn)}.prog-bar.green{background:var(--ok)}
+/* Add button */
+.a-add{background:var(--acc);color:#000;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--fb);border:none;cursor:pointer}
+.a-add:hover{opacity:.85}
+.abtn{border:none;border-radius:5px;cursor:pointer;padding:4px 8px;font-size:12px;transition:all .2s;background:var(--adim)}
+.a-edit{color:var(--wrn)}.a-edit:hover{background:rgba(227,179,65,.2)}
+.a-del{color:var(--err)}.a-del:hover{background:rgba(248,81,73,.2)}
+/* Modal */
+.OV{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.OV.show{display:flex}
+.OV-box{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shd)}
+.OV-box h3{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--th);margin-bottom:18px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr{display:flex;flex-direction:column;gap:5px}
+.fr label{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.4px}
+.fr input,.fr select,.fr textarea{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--th);font-size:12px;font-family:var(--fb);outline:none;transition:border .2s;width:100%}
+.fr input:focus,.fr select:focus{border-color:var(--acc)}
+.fr select option{background:var(--card)}
+.ff{grid-column:1/-1}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.btn{border:none;border-radius:7px;padding:9px 20px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--fb);transition:all .2s}
+.btn-acc{background:var(--acc);color:#000}.btn-acc:hover{opacity:.85}
+.btn-sec{background:var(--adim);color:var(--acc);border:1px solid var(--bdr)}.btn-sec:hover{background:var(--tbg)}
+.btn-err{background:rgba(248,81,73,.15);color:var(--err);border:1px solid rgba(248,81,73,.3)}
+/* PIN */
+.pin-pad{display:flex;flex-direction:column;align-items:center;gap:14px}
+.pin-dots{display:flex;gap:10px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
+.pin-dot.F{background:var(--acc);border-color:var(--acc)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:200px}
+.pkey{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--th);transition:all .2s;user-select:none}
+.pkey:hover{background:var(--adim);border-color:var(--acc);color:var(--acc)}
+.pin-err{color:var(--err);font-size:12px;display:none}
+/* Toast */
+.toast-el{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:10px 22px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast-el.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.tok{border-color:var(--ok);color:var(--ok)}.terr{border-color:var(--err);color:var(--err)}
+#sync-ind{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--adim);color:var(--tm)}
+.brow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;justify-content:space-between}
+.divider{height:1px;background:var(--bdr);margin:20px 0}
+@media(max-width:900px){.chg,.chg3{grid-template-columns:1fr}}
+@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
+</style>
+
+<style id="dark-override">
+/* ── DARK MODE OVERRIDE ── */
+body{background:#0a0a0a!important;color:#f0f0f0!important}
+.kpi-c,.fi2,.sys-row,.mc,.ch-card,.act-i{background:#141414!important;border-color:#242424!important;color:#f0f0f0!important}
+.kpi-num{color:#f0f0f0!important}
+.kpi-lbl{color:#b0b8c8!important}
+.kpi-ch.nc{background:rgba(255,255,255,.06)!important;color:#b0b8c8!important}
+.mc-title{color:#f0f0f0!important}
+.mc-desc{color:#5a6478!important}
+.mc-arr{color:#5a6478!important}
+.sh-title{color:#f0f0f0!important}
+.sh-sub{color:#5a6478!important}
+.ann{background:linear-gradient(135deg,rgba(129,140,248,.1),rgba(167,139,250,.1))!important;border-color:rgba(129,140,248,.2)!important}
+.ann-t{color:#a78bfa!important}
+.ann-cl{color:#5a6478!important}
+.ann-cl:hover{color:#f0f0f0!important}
+.fn{color:#f0f0f0!important}
+.fk{color:#5a6478!important}
+.fv{color:#b0b8c8!important}
+.wsn{color:#f0f0f0!important}
+.act-text{color:#f0f0f0!important}
+.act-sub{color:#5a6478!important}
+.sys-lbl{color:#f0f0f0!important}
+.hdr{background:rgba(10,10,10,.92)!important}
+select option{background:#141414!important;color:#f0f0f0!important}
+input,select,textarea{background:#111111!important;color:#f0f0f0!important;border-color:#242424!important}
+input::placeholder,textarea::placeholder{color:#5a6478!important}
+.OV-box{background:#141414!important;border-color:#242424!important}
+.welcome{background:linear-gradient(135deg,#0a1a0d 0%,#0d1a14 50%,#0a0d14 100%)!important}
+.bg-grid .ch-card{background:#141414!important;border-color:#242424!important}
+.kpi-pb-bg{background:#242424!important}
+.fp{background:#242424!important}
+.fi2{background:#141414!important;border-color:#242424!important}
+.fi2:hover{background:#1a1a1a!important}
+</style>
+</head>
+<body>
+<nav class="TB">
+  <div class="brand">EPFBD<small>WMS</small></div>
+  <span id="sync-ind">&#9203; Connecting&hellip;</span>
+  <div class="sep"></div>
+  <div class="tnav">
+    <a href="../index.html">Dashboard</a>
+    <a href="../manpower/all_manpower.html">Manpower</a>
+    <a href="../warehouse/wh_list.html">Warehouse</a>
+    <a href="../equipment/forklift.html">Equipment</a>
+    <a href="staff_kpi.html" class="ON">KPI</a>
+  </div>
+  <div class="ctrl">
+    <span class="clbl">Theme</span>
+    <div class="tdots">
+      <div class="tdot" data-t="slate" onclick="setTheme('slate')"></div>
+      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')"></div>
+      <div class="tdot" data-t="ember" onclick="setTheme('ember')"></div>
+    </div>
+    <span class="clbl">Font</span>
+    <div class="fsw">
+      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="CLK" class="clk">--:--:--</div>
+  </div>
+</nav>
+
+<aside class="SB">
+  <div><div class="sb-hd">Main</div>
+    <a class="sb-a" href="../index.html">&#127968; Dashboard</a>
+  </div>
+  <div><div class="sb-hd">Manpower</div>
+    <a class="sb-a" href="../manpower/all_manpower.html">&#128101; All Manpower</a>
+    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span> EPF</a>
+    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span> TGL</a>
+    <a class="sb-a" href="../manpower/BGL_manpower.html"><span class="sb-badge">BGL</span> BGL</a>
+    <a class="sb-a" href="../manpower/GTM_manpower.html"><span class="sb-badge">GTM</span> GTM</a>
+    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span> RFL</a>
+    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span> EC</a>
+  </div>
+  <div><div class="sb-hd">Warehouse</div>
+    <a class="sb-a" href="../warehouse/wh_list.html">&#127981; WH List</a>
+    <a class="sb-a" href="../warehouse/mis_login.html">&#128272; MIS Login</a>
+    <a class="sb-a" href="../warehouse/mail_list.html">&#128140; Mail List</a>
+  </div>
+  <div><div class="sb-hd">Equipment</div>
+    <a class="sb-a" href="../equipment/pda_devices.html">&#128241; PDA / Scanner</a>
+    <a class="sb-a" href="../equipment/forklift.html">&#128663; Forklift</a>
+    <a class="sb-a" href="../equipment/maintenance_log.html">&#128295; Maintenance</a>
+  </div>
+  <div><div class="sb-hd">KPI</div>
+    <a class="sb-a ON" href="staff_kpi.html">&#11088; KPI Dashboard</a>
+  </div>
+  <div><div class="sb-hd">Setup</div>
+    <a class="sb-a" href="../firebase-setup.html">&#128293; Firebase Setup</a>
+  </div>
+</aside>
+
+<main class="MN">
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-ico">&#11088;</div>
+  <div>
+    <div class="ph-title">KPI Dashboard</div>
+    <div class="ph-sub">Daily In/Out &#183; Attendance &#183; Forklift &#183; Inventory Accuracy &#183; Damage/Loss — EPF &amp; TGL</div>
+  </div>
+  <div class="ph-right">
+    <select class="fsel" id="gFac" onchange="refreshAll()">
+      <option value="ALL">All Factory</option>
+      <option value="EPF">EPF</option>
+      <option value="TGL">TGL</option>
+    </select>
+    <select class="fsel" id="gMonth" onchange="refreshAll()"></select>
+    <span id="sync-pill" style="font-size:11px;padding:4px 12px;border-radius:20px;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)">Loading&hellip;</span>
+  </div>
+</div>
+
+<!-- KPI TABS -->
+<div class="kpi-bar">
+  <button class="kpi-tab ON" onclick="switchKpi('inout',this)">&#128230; Daily In/Out</button>
+  <button class="kpi-tab" onclick="switchKpi('attend',this)">&#128101; Attendance &amp; OT</button>
+  <button class="kpi-tab" onclick="switchKpi('forklift',this)">&#128663; Forklift Utilization</button>
+  <button class="kpi-tab" onclick="switchKpi('inventory',this)">&#128203; Inventory Accuracy</button>
+  <button class="kpi-tab" onclick="switchKpi('damage',this)">&#9888; Damage / Loss</button>
+</div>
+
+<!-- ═══════════════════════════════
+     SECTION 1: DAILY IN/OUT
+═══════════════════════════════ -->
+<div class="kpi-sec active" id="sec-inout">
+  <div class="stg" id="io-stats"></div>
+  <div class="chg3">
+    <div class="ch-card">
+      <div class="ch-title">Daily Receive &amp; Issue — This Month <span class="ch-sub" id="io-ch-lbl"></span></div>
+      <div class="ch-wrap"><canvas id="io-bar"></canvas></div>
+    </div>
+    <div class="ch-card">
+      <div class="ch-title">In vs Out Split <span class="ch-sub"></span></div>
+      <div class="ch-wrap"><canvas id="io-pie"></canvas></div>
+    </div>
+  </div>
+  <div class="brow">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input class="si" id="io-date" type="month" onchange="renderIoTable()">
+      <select class="fsel" id="io-fac" onchange="renderIoTable()">
+        <option value="">All Factory</option><option>EPF</option><option>TGL</option>
+      </select>
+      <select class="fsel" id="io-dept" onchange="renderIoTable()">
+        <option value="">All Dept</option>
+        <option>MM</option><option>PM</option><option>SM</option>
+        <option>HH</option><option>EQ</option><option>FG</option>
+      </select>
+    </div>
+    <button class="a-add" onclick="openPin(function(){openModal('io')})">&#65291; Add Record</button>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-hd-title">&#128230; In/Out Log</div><span class="card-hd-badge" id="io-badge">0</span></div>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Date</th><th>Factory</th><th>Dept</th><th>WH Code</th><th>Receive (IN)</th><th>Issue (OUT)</th><th>Unit</th><th>Remark</th><th>Act</th></tr></thead>
+      <tbody id="io-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SECTION 2: ATTENDANCE & OT
+═══════════════════════════════ -->
+<div class="kpi-sec" id="sec-attend">
+  <div class="stg" id="att-stats"></div>
+  <div class="chg">
+    <div class="ch-card">
+      <div class="ch-title">Monthly Attendance Rate <span class="ch-sub">%</span></div>
+      <div class="ch-wrap"><canvas id="att-line"></canvas></div>
+    </div>
+    <div class="ch-card">
+      <div class="ch-title">Overtime Hours by Department</div>
+      <div class="ch-wrap"><canvas id="att-ot"></canvas></div>
+    </div>
+  </div>
+  <div class="brow">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input class="si" id="att-date" type="month" onchange="renderAttTable()">
+      <select class="fsel" id="att-fac" onchange="renderAttTable()">
+        <option value="">All Factory</option><option>EPF</option><option>TGL</option>
+      </select>
+    </div>
+    <button class="a-add" onclick="openPin(function(){openModal('att')})">&#65291; Add Record</button>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-hd-title">&#128101; Attendance Record</div><span class="card-hd-badge" id="att-badge">0</span></div>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Month</th><th>Factory</th><th>Dept</th><th>Total Staff</th><th>Present</th><th>Absent</th><th>Att. %</th><th>OT Hours</th><th>Remark</th><th>Act</th></tr></thead>
+      <tbody id="att-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SECTION 3: FORKLIFT UTILIZATION
+═══════════════════════════════ -->
+<div class="kpi-sec" id="sec-forklift">
+  <div class="stg" id="fk-stats"></div>
+  <div class="chg">
+    <div class="ch-card">
+      <div class="ch-title">Forklift Usage Hours — Monthly</div>
+      <div class="ch-wrap"><canvas id="fk-bar"></canvas></div>
+    </div>
+    <div class="ch-card">
+      <div class="ch-title">Utilization % by Forklift</div>
+      <div class="ch-wrap"><canvas id="fk-util"></canvas></div>
+    </div>
+  </div>
+  <div class="brow">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input class="si" id="fk-date" type="month" onchange="renderFkTable()">
+      <select class="fsel" id="fk-fl" onchange="renderFkTable()">
+        <option value="">All Forklift</option>
+        <option>02 (FD-30)</option><option>03 (FD-30)</option><option>04 (FD-30)</option>
+        <option>05 (FD-30)</option><option>06 (CPC-30)</option><option>07 (CQD-20)</option><option>08 (CQD-20)</option>
+      </select>
+    </div>
+    <button class="a-add" onclick="openPin(function(){openModal('fk')})">&#65291; Add Record</button>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-hd-title">&#128663; Forklift Utilization Log</div><span class="card-hd-badge" id="fk-badge">0</span></div>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Month</th><th>Forklift</th><th>Factory</th><th>Working Days</th><th>Used Days</th><th>Util. %</th><th>Total Hours</th><th>Down Days</th><th>Down Reason</th><th>Act</th></tr></thead>
+      <tbody id="fk-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SECTION 4: INVENTORY ACCURACY
+═══════════════════════════════ -->
+<div class="kpi-sec" id="sec-inventory">
+  <div class="stg" id="inv-stats"></div>
+  <div class="chg">
+    <div class="ch-card">
+      <div class="ch-title">Accuracy % Trend — Monthly</div>
+      <div class="ch-wrap"><canvas id="inv-line"></canvas></div>
+    </div>
+    <div class="ch-card">
+      <div class="ch-title">Variance by Department</div>
+      <div class="ch-wrap"><canvas id="inv-bar"></canvas></div>
+    </div>
+  </div>
+  <div class="brow">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input class="si" id="inv-date" type="month" onchange="renderInvTable()">
+      <select class="fsel" id="inv-fac" onchange="renderInvTable()">
+        <option value="">All Factory</option><option>EPF</option><option>TGL</option>
+      </select>
+    </div>
+    <button class="a-add" onclick="openPin(function(){openModal('inv')})">&#65291; Add Record</button>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-hd-title">&#128203; Inventory Accuracy Log</div><span class="card-hd-badge" id="inv-badge">0</span></div>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Date</th><th>Factory</th><th>Dept/WH</th><th>System Qty</th><th>Physical Qty</th><th>Variance</th><th>Accuracy %</th><th>Counted By</th><th>Remark</th><th>Act</th></tr></thead>
+      <tbody id="inv-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SECTION 5: DAMAGE / LOSS
+═══════════════════════════════ -->
+<div class="kpi-sec" id="sec-damage">
+  <div class="stg" id="dmg-stats"></div>
+  <div class="chg">
+    <div class="ch-card">
+      <div class="ch-title">Damage/Loss Incidents — Monthly</div>
+      <div class="ch-wrap"><canvas id="dmg-bar"></canvas></div>
+    </div>
+    <div class="ch-card">
+      <div class="ch-title">Type Breakdown</div>
+      <div class="ch-wrap"><canvas id="dmg-pie"></canvas></div>
+    </div>
+  </div>
+  <div class="brow">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <input class="si" id="dmg-date" type="month" onchange="renderDmgTable()">
+      <select class="fsel" id="dmg-fac" onchange="renderDmgTable()">
+        <option value="">All Factory</option><option>EPF</option><option>TGL</option>
+      </select>
+      <select class="fsel" id="dmg-type" onchange="renderDmgTable()">
+        <option value="">All Type</option><option>Damage</option><option>Loss</option><option>Theft</option><option>Expired</option>
+      </select>
+    </div>
+    <button class="a-add" onclick="openPin(function(){openModal('dmg')})">&#65291; Add Report</button>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-hd-title">&#9888; Damage &amp; Loss Report</div><span class="card-hd-badge" id="dmg-badge">0</span></div>
+    <div style="overflow-x:auto">
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Date</th><th>Factory</th><th>Dept</th><th>Type</th><th>Item</th><th>Qty</th><th>Est. Value</th><th>Cause</th><th>Action Taken</th><th>Status</th><th>Act</th></tr></thead>
+      <tbody id="dmg-tbody"></tbody>
+    </table></div>
+  </div>
+</div>
+</main>
+
+<!-- ═══ MODALS ═══ -->
+<!-- IN/OUT -->
+<div class="OV" id="OV-io">
+  <div class="OV-box">
+    <h3 id="io-mtitle">Add In/Out Record</h3>
+    <input type="hidden" id="io-ei"><input type="hidden" id="io-ek">
+    <div class="fg">
+      <div class="fr"><label>Date *</label><input id="io-d" type="date"></div>
+      <div class="fr"><label>Factory *</label>
+        <select id="io-f"><option value="">&#8212; Select &#8212;</option><option>EPF</option><option>TGL</option><option>BGL</option><option>GTM</option></select>
+      </div>
+      <div class="fr"><label>Department *</label>
+        <select id="io-dept2"><option value="">&#8212; Select &#8212;</option><option>MM</option><option>PM</option><option>SM</option><option>HH</option><option>EQ</option><option>FG</option></select>
+      </div>
+      <div class="fr"><label>WH Code</label>
+        <input id="io-wh" list="wh-dl" placeholder="e.g. BDC110">
+        <datalist id="wh-dl"><option value="BDC110"><option value="BDC210"><option value="BDC310"><option value="BDC410"><option value="BDC515"><option value="BDC610"><option value="BDW110"><option value="BDW210"><option value="BDW310"><option value="BDW410"><option value="BDW515"><option value="BDW610"></datalist>
+      </div>
+      <div class="fr"><label>Receive (IN) *</label><input id="io-in" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="fr"><label>Issue (OUT) *</label><input id="io-out" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="fr"><label>Unit</label>
+        <select id="io-unit"><option>KG</option><option>Pcs</option><option>Roll</option><option>Box</option><option>Set</option><option>Liter</option></select>
+      </div>
+      <div class="fr ff"><label>Remark</label><input id="io-rk" placeholder="Optional&hellip;"></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-sec" onclick="closeOv('OV-io')">Cancel</button>
+      <button class="btn btn-acc" onclick="saveKpi('io')">&#128190; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ATTENDANCE -->
+<div class="OV" id="OV-att">
+  <div class="OV-box">
+    <h3 id="att-mtitle">Add Attendance Record</h3>
+    <input type="hidden" id="att-ei"><input type="hidden" id="att-ek">
+    <div class="fg">
+      <div class="fr"><label>Month *</label><input id="att-d" type="month"></div>
+      <div class="fr"><label>Factory *</label>
+        <select id="att-f"><option value="">&#8212; Select &#8212;</option><option>EPF</option><option>TGL</option><option>BGL</option><option>GTM</option></select>
+      </div>
+      <div class="fr"><label>Department</label>
+        <select id="att-dept"><option value="All">All</option><option>MM</option><option>PM</option><option>SM</option><option>HH</option><option>EQ</option><option>FG</option><option>Load/Unload</option></select>
+      </div>
+      <div class="fr"><label>Total Staff</label><input id="att-total" type="number" min="0" placeholder="0"></div>
+      <div class="fr"><label>Present Days (avg)</label><input id="att-pres" type="number" min="0" step="0.1" placeholder="0"></div>
+      <div class="fr"><label>Absent Days (avg)</label><input id="att-abs" type="number" min="0" step="0.1" placeholder="0"></div>
+      <div class="fr"><label>OT Hours (total)</label><input id="att-ot2" type="number" min="0" step="0.5" placeholder="0"></div>
+      <div class="fr ff"><label>Remark</label><input id="att-rk" placeholder="Optional&hellip;"></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-sec" onclick="closeOv('OV-att')">Cancel</button>
+      <button class="btn btn-acc" onclick="saveKpi('att')">&#128190; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORKLIFT -->
+<div class="OV" id="OV-fk">
+  <div class="OV-box">
+    <h3 id="fk-mtitle">Add Forklift Utilization</h3>
+    <input type="hidden" id="fk-ei"><input type="hidden" id="fk-ek">
+    <div class="fg">
+      <div class="fr"><label>Month *</label><input id="fk-d" type="month"></div>
+      <div class="fr"><label>Forklift *</label>
+        <select id="fk-fl2">
+          <option value="">&#8212; Select &#8212;</option>
+          <option>02 (FD-30)</option><option>03 (FD-30)</option><option>04 (FD-30)</option>
+          <option>05 (FD-30)</option><option>06 (CPC-30)</option><option>07 (CQD-20)</option><option>08 (CQD-20)</option>
+        </select>
+      </div>
+      <div class="fr"><label>Factory</label>
+        <select id="fk-fac"><option>EPF</option><option>TGL</option></select>
+      </div>
+      <div class="fr"><label>Working Days</label><input id="fk-wd" type="number" min="0" placeholder="26"></div>
+      <div class="fr"><label>Used Days</label><input id="fk-ud" type="number" min="0" placeholder="24"></div>
+      <div class="fr"><label>Total Hours</label><input id="fk-hrs" type="number" min="0" step="0.5" placeholder="192"></div>
+      <div class="fr"><label>Downtime Days</label><input id="fk-dn" type="number" min="0" placeholder="0"></div>
+      <div class="fr ff"><label>Downtime Reason</label><input id="fk-dr" placeholder="Maintenance, breakdown&hellip;"></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-sec" onclick="closeOv('OV-fk')">Cancel</button>
+      <button class="btn btn-acc" onclick="saveKpi('fk')">&#128190; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- INVENTORY -->
+<div class="OV" id="OV-inv">
+  <div class="OV-box">
+    <h3 id="inv-mtitle">Add Inventory Count</h3>
+    <input type="hidden" id="inv-ei"><input type="hidden" id="inv-ek">
+    <div class="fg">
+      <div class="fr"><label>Date *</label><input id="inv-d" type="date"></div>
+      <div class="fr"><label>Factory *</label>
+        <select id="inv-f"><option value="">&#8212; Select &#8212;</option><option>EPF</option><option>TGL</option><option>BGL</option><option>GTM</option></select>
+      </div>
+      <div class="fr"><label>Dept / WH *</label>
+        <select id="inv-dept"><option value="">&#8212; Select &#8212;</option><option>MM</option><option>PM</option><option>SM</option><option>HH</option><option>EQ</option><option>FG</option></select>
+      </div>
+      <div class="fr"><label>System Qty</label><input id="inv-sys" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="fr"><label>Physical Qty</label><input id="inv-phy" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="fr"><label>Counted By</label><input id="inv-by" placeholder="Name&hellip;"></div>
+      <div class="fr ff"><label>Remark</label><input id="inv-rk" placeholder="Optional&hellip;"></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-sec" onclick="closeOv('OV-inv')">Cancel</button>
+      <button class="btn btn-acc" onclick="saveKpi('inv')">&#128190; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DAMAGE -->
+<div class="OV" id="OV-dmg">
+  <div class="OV-box">
+    <h3 id="dmg-mtitle">Add Damage/Loss Report</h3>
+    <input type="hidden" id="dmg-ei"><input type="hidden" id="dmg-ek">
+    <div class="fg">
+      <div class="fr"><label>Date *</label><input id="dmg-d" type="date"></div>
+      <div class="fr"><label>Factory *</label>
+        <select id="dmg-f"><option value="">&#8212; Select &#8212;</option><option>EPF</option><option>TGL</option><option>BGL</option><option>GTM</option></select>
+      </div>
+      <div class="fr"><label>Department</label>
+        <select id="dmg-dept"><option value="">&#8212; Select &#8212;</option><option>MM</option><option>PM</option><option>SM</option><option>HH</option><option>EQ</option><option>FG</option><option>Load/Unload</option></select>
+      </div>
+      <div class="fr"><label>Type *</label>
+        <select id="dmg-type2"><option>Damage</option><option>Loss</option><option>Theft</option><option>Expired</option></select>
+      </div>
+      <div class="fr"><label>Item Name *</label><input id="dmg-item" placeholder="Material name&hellip;"></div>
+      <div class="fr"><label>Quantity</label><input id="dmg-qty" type="number" min="0" step="0.01" placeholder="0"></div>
+      <div class="fr"><label>Est. Value (BDT)</label><input id="dmg-val" type="number" min="0" placeholder="0"></div>
+      <div class="fr ff"><label>Cause</label><input id="dmg-cause" placeholder="Reason for damage/loss&hellip;"></div>
+      <div class="fr ff"><label>Action Taken</label><input id="dmg-action" placeholder="Steps taken&hellip;"></div>
+      <div class="fr"><label>Status</label>
+        <select id="dmg-st"><option>Open</option><option>Investigated</option><option>Resolved</option><option>Written Off</option></select>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-sec" onclick="closeOv('OV-dmg')">Cancel</button>
+      <button class="btn btn-acc" onclick="saveKpi('dmg')">&#128190; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE -->
+<div class="OV" id="OV-del">
+  <div class="OV-box" style="max-width:360px;text-align:center">
+    <h3>&#9888; Delete Confirm</h3>
+    <p style="font-size:13px;margin:14px 0 20px">এই KPI record মুছে ফেলবেন?</p>
+    <div class="mbtns" style="justify-content:center">
+      <button class="btn btn-sec" onclick="closeOv('OV-del')">Cancel</button>
+      <button class="btn btn-err" onclick="confirmDel()">&#128465; Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN -->
+<div class="OV" id="OV-PIN">
+  <div class="OV-box" style="max-width:300px">
+    <h3 style="text-align:center">&#128272; Enter PIN</h3>
+    <div class="pin-pad">
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-grid">
+        <div class="pkey" onclick="pressPin('1')">1</div><div class="pkey" onclick="pressPin('2')">2</div><div class="pkey" onclick="pressPin('3')">3</div>
+        <div class="pkey" onclick="pressPin('4')">4</div><div class="pkey" onclick="pressPin('5')">5</div><div class="pkey" onclick="pressPin('6')">6</div>
+        <div class="pkey" onclick="pressPin('7')">7</div><div class="pkey" onclick="pressPin('8')">8</div><div class="pkey" onclick="pressPin('9')">9</div>
+        <div class="pkey" onclick="pressPin('del')">&#9003;</div><div class="pkey" onclick="pressPin('0')">0</div>
+        <div class="pkey" onclick="pressPin('ok')" style="color:var(--ok);border-color:var(--ok)">&#10003;</div>
+      </div>
+      <div class="pin-err" id="pin-err">&#10060; Wrong PIN.</div>
+    </div>
+  </div>
+</div>
+<div id="TOAST" class="toast-el"></div>
+
+<script src="../firebase-db.js"></script>
+<script>
+// ── THEME / FONT / CLOCK ──
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);document.querySelectorAll('.tdot').forEach(function(d){d.classList.toggle('ON',d.dataset.t===t);});localStorage.setItem('wms-theme',t);rebuildCharts();}
+function setFont(f){document.documentElement.setAttribute('data-font',f);document.querySelectorAll('.fbtn').forEach(function(b){b.classList.toggle('ON',b.dataset.f===f);});localStorage.setItem('wms-font',f);}
+function startClock(){var tick=function(){var n=new Date(),p=function(v){return String(v).padStart(2,'0');},el=document.getElementById('CLK');if(el)el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());};tick();setInterval(tick,1000);}
+function initApp(){setTheme(localStorage.getItem('wms-theme')||'slate');setFont(localStorage.getItem('wms-font')||'ubuntu');startClock();}
+
+// ── PIN ──
+var PIN='9625',pinBuf='',pinCb=null;
+var _pendDelNode=null,_pendDelKey=null;
+function openPin(cb){pinCb=cb;pinBuf='';updDots();document.getElementById('pin-err').style.display='none';showOv('OV-PIN');}
+function pressPin(v){if(v==='del'){pinBuf=pinBuf.slice(0,-1);}else if(v==='ok'){chkPin();return;}else{if(pinBuf.length>=4)return;pinBuf+=v;if(pinBuf.length===4)setTimeout(chkPin,150);}updDots();}
+function chkPin(){if(pinBuf===PIN){closeOv('OV-PIN');pinBuf='';if(pinCb)pinCb();}else{document.getElementById('pin-err').style.display='block';pinBuf='';updDots();}}
+function updDots(){[0,1,2,3].forEach(function(i){document.getElementById('pd'+i).classList.toggle('F',i<pinBuf.length);});}
+function showOv(id){document.getElementById(id).classList.add('show');}
+function closeOv(id){var e=document.getElementById(id);if(e)e.classList.remove('show');pinBuf='';updDots();var er=document.getElementById('pin-err');if(er)er.style.display='none';}
+document.addEventListener('click',function(e){document.querySelectorAll('.OV.show').forEach(function(o){if(e.target===o)closeOv(o.id);});});
+function toast(msg,type,ms){ms=ms||2500;var el=document.getElementById('TOAST');el.textContent=msg;el.className='toast-el show '+(type==='err'?'terr':'tok');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show');},ms);}
+
+// ── DATA STORES ──
+var DATA = {io:[],att:[],fk:[],inv:[],dmg:[]};
+var FB_NODES = {io:'kpi_inout',att:'kpi_attend',fk:'kpi_forklift',inv:'kpi_inventory',dmg:'kpi_damage'};
+
+// ── FIREBASE SYNC ──
+async function _initFbSync(){
+  if(!window.WmsDb){await new Promise(function(r){setTimeout(r,700);});}
+  var cloud=window.WmsDb&&WmsDb.isCloud();
+  var ind=document.getElementById('sync-ind'),pill=document.getElementById('sync-pill');
+  if(ind){ind.textContent=cloud?'\u2601 Cloud Sync ON':'\uD83D\uDCBE Local Only';ind.style.color=cloud?'var(--ok)':'var(--wrn)';}
+  if(pill){pill.textContent=cloud?'\u2601 Cloud Sync ON':'\uD83D\uDCBE Local Only';}
+  Object.keys(FB_NODES).forEach(function(k){
+    var node=FB_NODES[k];
+    if(window.WmsDb){
+      WmsDb.listen(node,function(d){DATA[k]=d;refreshAll();});
+    }else{
+      DATA[k]=JSON.parse(localStorage.getItem('wms_'+node)||'[]');
+    }
+  });
+  if(!window.WmsDb)refreshAll();
+}
+
+// ── MONTH FILTER INIT ──
+function initMonthFilter(){
+  var sel=document.getElementById('gMonth');
+  var now=new Date(),opts='';
+  for(var i=0;i<12;i++){
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var val=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var lbl=d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    opts+='<option value="'+val+'"'+(i===0?' selected':'')+'>'+lbl+'</option>';
+  }
+  sel.innerHTML=opts;
+  // Set all month inputs to current month
+  var cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var curD=now.toISOString().slice(0,10);
+  ['att-d','fk-d'].forEach(function(id){var e=document.getElementById(id);if(e)e.value=cur;});
+  ['io-date','att-date','fk-date','inv-date','dmg-date'].forEach(function(id){var e=document.getElementById(id);if(e)e.value=cur;});
+  ['io-d','inv-d','dmg-d'].forEach(function(id){var e=document.getElementById(id);if(e)e.value=curD;});
+}
+
+// ── KPI TAB SWITCH ──
+var activeKpi='inout';
+function switchKpi(k,el){
+  activeKpi=k;
+  document.querySelectorAll('.kpi-tab').forEach(function(b){b.classList.remove('ON');});
+  el.classList.add('ON');
+  document.querySelectorAll('.kpi-sec').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('sec-'+k).classList.add('active');
+  setTimeout(rebuildCharts,50);
+}
+
+// ── HELPERS ──
+function gv(id){return(document.getElementById(id)&&document.getElementById(id).value||'');}
+function gFac(){return gv('gFac');}
+function gMonth(){return gv('gMonth');}
+function filt(arr,facKey,monthKey){
+  var fac=gFac(),mon=gMonth();
+  return arr.filter(function(r){
+    if(fac!=='ALL'&&r[facKey]!==fac)return false;
+    if(mon&&r[monthKey]&&r[monthKey].slice(0,7)!==mon)return false;
+    return true;
+  });
+}
+function pct(a,b){if(!b)return 0;return Math.round(a/b*100);}
+function numFmt(n){return Number(n||0).toLocaleString();}
+function pctBadge(p){var c=p>=95?'b-ok':p>=80?'b-wrn':'b-err';return '<span class="badge '+c+'">'+p+'%</span>';}
+
+// ── CHART REGISTRY ──
+var charts={};
+function makeChart(id,type,labels,datasets,opts){
+  if(charts[id]){charts[id].destroy();}
+  var ctx=document.getElementById(id);
+  if(!ctx)return;
+  var style=getComputedStyle(document.documentElement);
+  var gridC=style.getPropertyValue('--bdr').trim()||'#2a3548';
+  var txtC=style.getPropertyValue('--tm').trim()||'#4a6070';
+  charts[id]=
+Chart.defaults.color = 'rgba(176,184,200,0.8)';
+Chart.defaults.borderColor = 'rgba(36,36,36,1)';
+
+new Chart(ctx,{
+    type:type,
+    data:{labels:labels,datasets:datasets},
+    options:Object.assign({
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:txtC,font:{size:11},boxWidth:12}}},
+      scales:type!=='pie'&&type!=='doughnut'?{
+        x:{ticks:{color:txtC,font:{size:10}},grid:{color:gridC+'44'}},
+        y:{ticks:{color:txtC,font:{size:10}},grid:{color:gridC+'44'}}
+      }:undefined
+    },opts||{})
+  });
+}
+function rebuildCharts(){
+  setTimeout(function(){
+    buildIoCharts();buildAttCharts();buildFkCharts();buildInvCharts();buildDmgCharts();
+  },30);
+}
+
+// ═══════════════════════════
+// SECTION 1: IN/OUT
+// ═══════════════════════════
+function refreshAll(){
+  renderIoTable();renderAttTable();renderFkTable();renderInvTable();renderDmgTable();
+  buildIoCharts();buildAttCharts();buildFkCharts();buildInvCharts();buildDmgCharts();
+}
+
+function getIoData(){
+  var fac=gFac(),mon=gMonth(),lf=gv('io-fac'),ld=gv('io-dept');
+  return DATA.io.filter(function(r){
+    if(fac!=='ALL'&&r.fty!==fac)return false;
+    if(mon&&r.date&&r.date.slice(0,7)!==mon)return false;
+    if(lf&&r.fty!==lf)return false;
+    if(ld&&r.dept!==ld)return false;
+    return true;
+  });
+}
+function renderIoTable(){
+  var data=getIoData();
+  document.getElementById('io-badge').textContent=data.length;
+  document.getElementById('io-tbody').innerHTML=data.map(function(r,i){
+    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'io\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'io\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+      '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
+      '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
+      '<td><span class="badge b-grey">'+r.dept+'</span></td>'+
+      '<td style="font-family:monospace;font-size:11px;color:var(--acc)">'+(r.wh||'&#8212;')+'</td>'+
+      '<td style="color:var(--ok);font-weight:600">'+numFmt(r.recv)+'</td>'+
+      '<td style="color:var(--err);font-weight:600">'+numFmt(r.issue)+'</td>'+
+      '<td><span class="badge b-grey">'+(r.unit||'KG')+'</span></td>'+
+      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
+  }).join('');
+  // Stats
+  var totIn=data.reduce(function(s,r){return s+(parseFloat(r.recv)||0);},0);
+  var totOut=data.reduce(function(s,r){return s+(parseFloat(r.issue)||0);},0);
+  document.getElementById('io-stats').innerHTML=
+    '<div class="stc green"><div class="stc-num">'+numFmt(totIn.toFixed(0))+'</div><div class="stc-lbl">Total Received (IN)</div><div class="stc-sub">'+data.length+' entries</div></div>'+
+    '<div class="stc red"><div class="stc-num">'+numFmt(totOut.toFixed(0))+'</div><div class="stc-lbl">Total Issued (OUT)</div><div class="stc-sub">Net: '+(totIn-totOut>=0?'+':'')+numFmt((totIn-totOut).toFixed(0))+'</div></div>'+
+    '<div class="stc"><div class="stc-num">'+data.filter(function(r){return r.fty==='EPF';}).length+'</div><div class="stc-lbl">EPF Entries</div></div>'+
+    '<div class="stc yellow"><div class="stc-num">'+data.filter(function(r){return r.fty==='TGL';}).length+'</div><div class="stc-lbl">TGL Entries</div></div>';
+}
+function buildIoCharts(){
+  var data=getIoData();
+  // Bar: daily in/out
+  var days={};
+  data.forEach(function(r){var d=(r.date||'').slice(8,10)||'?';days[d]=days[d]||{in:0,out:0};days[d].in+=parseFloat(r.recv)||0;days[d].out+=parseFloat(r.issue)||0;});
+  var dkeys=Object.keys(days).sort();
+  makeChart('io-bar','bar',dkeys,[
+    {label:'Receive IN',data:dkeys.map(function(k){return days[k].in;}),backgroundColor:'var(--ch1)',borderRadius:4},
+    {label:'Issue OUT',data:dkeys.map(function(k){return days[k].out;}),backgroundColor:'var(--ch3)',borderRadius:4}
+  ]);
+  // Pie
+  var ti=data.reduce(function(s,r){return s+(parseFloat(r.recv)||0);},0);
+  var to2=data.reduce(function(s,r){return s+(parseFloat(r.issue)||0);},0);
+  makeChart('io-pie','doughnut',['Receive IN','Issue OUT'],[
+    {data:[ti,to2],backgroundColor:['var(--ch1)','var(--ch3)'],borderWidth:0}
+  ]);
+}
+
+// ═══════════════════════════
+// SECTION 2: ATTENDANCE
+// ═══════════════════════════
+function getAttData(){
+  var fac=gFac(),mon=gMonth(),lf=gv('att-fac');
+  return DATA.att.filter(function(r){
+    if(fac!=='ALL'&&r.fty!==fac)return false;
+    if(mon&&r.month&&r.month.slice(0,7)!==mon)return false;
+    if(lf&&r.fty!==lf)return false;
+    return true;
+  });
+}
+function renderAttTable(){
+  var data=getAttData();
+  document.getElementById('att-badge').textContent=data.length;
+  document.getElementById('att-tbody').innerHTML=data.map(function(r,i){
+    var p=r.total?pct(parseFloat(r.pres)||0,parseFloat(r.total)||0):0;
+    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'att\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'att\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+      '<td style="font-size:11px">'+r.month+'</td>'+
+      '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
+      '<td><span class="badge b-grey">'+(r.dept||'All')+'</span></td>'+
+      '<td style="font-weight:600;color:var(--th)">'+(r.total||0)+'</td>'+
+      '<td style="color:var(--ok)">'+(r.pres||0)+'</td>'+
+      '<td style="color:var(--err)">'+(r.abs||0)+'</td>'+
+      '<td>'+pctBadge(p)+'</td>'+
+      '<td style="color:var(--wrn)">'+(r.ot||0)+' hrs</td>'+
+      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
+  }).join('');
+  var totStaff=data.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+  var totOt=data.reduce(function(s,r){return s+(parseFloat(r.ot)||0);},0);
+  var avgAtt=data.length?Math.round(data.reduce(function(s,r){return s+(r.total?pct(parseFloat(r.pres)||0,parseFloat(r.total)||0):0);},0)/data.length):0;
+  document.getElementById('att-stats').innerHTML=
+    '<div class="stc blue"><div class="stc-num">'+totStaff+'</div><div class="stc-lbl">Total Staff</div><div class="stc-sub">'+data.length+' dept records</div></div>'+
+    '<div class="stc green"><div class="stc-num">'+avgAtt+'%</div><div class="stc-lbl">Avg Attendance</div></div>'+
+    '<div class="stc yellow"><div class="stc-num">'+numFmt(totOt)+'</div><div class="stc-lbl">Total OT Hours</div></div>'+
+    '<div class="stc '+(avgAtt>=95?'green':avgAtt>=80?'yellow':'red')+'"><div class="stc-num">'+(avgAtt>=95?'Good':avgAtt>=80?'Fair':'Poor')+'</div><div class="stc-lbl">Att. Rating</div></div>';
+}
+function buildAttCharts(){
+  var data=DATA.att.slice().sort(function(a,b){return(a.month||'').localeCompare(b.month||'');});
+  var months=[],rates=[];
+  data.forEach(function(r){if(!months.includes(r.month))months.push(r.month);});
+  months=months.slice(-6);
+  months.forEach(function(m){var sub=data.filter(function(r){return r.month===m;});var avg=sub.length?Math.round(sub.reduce(function(s,r){return s+(r.total?pct(parseFloat(r.pres)||0,parseFloat(r.total)||0):0);},0)/sub.length):0;rates.push(avg);});
+  makeChart('att-line','line',months,[
+    {label:'Attendance %',data:rates,borderColor:'var(--acc)',backgroundColor:'var(--adim)',tension:.4,fill:true,pointBackgroundColor:'var(--acc)'}
+  ]);
+  var depts=['MM','PM','SM','HH','EQ','FG'];
+  var otByDept=depts.map(function(d){return DATA.att.filter(function(r){return r.dept===d;}).reduce(function(s,r){return s+(parseFloat(r.ot)||0);},0);});
+  makeChart('att-ot','bar',depts,[
+    {label:'OT Hours',data:otByDept,backgroundColor:'var(--ch2)',borderRadius:4}
+  ]);
+}
+
+// ═══════════════════════════
+// SECTION 3: FORKLIFT
+// ═══════════════════════════
+function getFkData(){
+  var fac=gFac(),mon=gMonth(),lfl=gv('fk-fl');
+  return DATA.fk.filter(function(r){
+    if(fac!=='ALL'&&r.fty!==fac)return false;
+    if(mon&&r.month&&r.month.slice(0,7)!==mon)return false;
+    if(lfl&&r.forklift!==lfl)return false;
+    return true;
+  });
+}
+function renderFkTable(){
+  var data=getFkData();
+  document.getElementById('fk-badge').textContent=data.length;
+  document.getElementById('fk-tbody').innerHTML=data.map(function(r,i){
+    var u=r.wd?pct(parseFloat(r.ud)||0,parseFloat(r.wd)||0):0;
+    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'fk\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'fk\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+      '<td style="font-size:11px">'+r.month+'</td>'+
+      '<td style="font-family:monospace;color:var(--acc);font-weight:600">'+(r.forklift||'&#8212;')+'</td>'+
+      '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+(r.fty||'&#8212;')+'</span></td>'+
+      '<td style="text-align:center">'+(r.wd||0)+'</td>'+
+      '<td style="text-align:center;color:var(--ok)">'+(r.ud||0)+'</td>'+
+      '<td>'+pctBadge(u)+'</td>'+
+      '<td style="color:var(--wrn)">'+(r.hrs||0)+' hrs</td>'+
+      '<td style="text-align:center;color:var(--err)">'+(r.dn||0)+'</td>'+
+      '<td style="font-size:11px;color:var(--tm)">'+(r.dr||'&#8212;')+'</td>'+
+      '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
+  }).join('');
+  var avgUtil=data.length?Math.round(data.reduce(function(s,r){return s+(r.wd?pct(parseFloat(r.ud)||0,parseFloat(r.wd)||0):0);},0)/data.length):0;
+  var totDn=data.reduce(function(s,r){return s+(parseFloat(r.dn)||0);},0);
+  var totHrs=data.reduce(function(s,r){return s+(parseFloat(r.hrs)||0);},0);
+  document.getElementById('fk-stats').innerHTML=
+    '<div class="stc"><div class="stc-num">'+data.length+'</div><div class="stc-lbl">Records</div></div>'+
+    '<div class="stc '+(avgUtil>=80?'green':avgUtil>=60?'yellow':'red')+'"><div class="stc-num">'+avgUtil+'%</div><div class="stc-lbl">Avg Utilization</div></div>'+
+    '<div class="stc blue"><div class="stc-num">'+numFmt(totHrs)+'</div><div class="stc-lbl">Total Hours</div></div>'+
+    '<div class="stc red"><div class="stc-num">'+totDn+'</div><div class="stc-lbl">Downtime Days</div></div>';
+}
+function buildFkCharts(){
+  var forklifts=['02 (FD-30)','03 (FD-30)','04 (FD-30)','05 (FD-30)','06 (CPC-30)','07 (CQD-20)','08 (CQD-20)'];
+  var hrs=forklifts.map(function(f){return DATA.fk.filter(function(r){return r.forklift===f;}).reduce(function(s,r){return s+(parseFloat(r.hrs)||0);},0);});
+  makeChart('fk-bar','bar',forklifts,[
+    {label:'Total Hours',data:hrs,backgroundColor:'var(--ch1)',borderRadius:4}
+  ]);
+  var utils=forklifts.map(function(f){var sub=DATA.fk.filter(function(r){return r.forklift===f;});return sub.length?Math.round(sub.reduce(function(s,r){return s+(r.wd?pct(parseFloat(r.ud)||0,parseFloat(r.wd)||0):0);},0)/sub.length):0;});
+  makeChart('fk-util','bar',forklifts,[
+    {label:'Utilization %',data:utils,backgroundColor:utils.map(function(u){return u>=80?'var(--ch2)':u>=60?'var(--ch2)':'var(--ch3)';}),borderRadius:4}
+  ]);
+}
+
+// ═══════════════════════════
+// SECTION 4: INVENTORY
+// ═══════════════════════════
+function getInvData(){
+  var fac=gFac(),mon=gMonth(),lf=gv('inv-fac');
+  return DATA.inv.filter(function(r){
+    if(fac!=='ALL'&&r.fty!==fac)return false;
+    if(mon&&r.date&&r.date.slice(0,7)!==mon)return false;
+    if(lf&&r.fty!==lf)return false;
+    return true;
+  });
+}
+function renderInvTable(){
+  var data=getInvData();
+  document.getElementById('inv-badge').textContent=data.length;
+  document.getElementById('inv-tbody').innerHTML=data.map(function(r,i){
+    var sys=parseFloat(r.sys)||0,phy=parseFloat(r.phy)||0;
+    var variance=phy-sys,acc=sys?Math.round(Math.min(phy,sys)/Math.max(phy,sys)*100):100;
+    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'inv\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'inv\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+      '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
+      '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
+      '<td><span class="badge b-grey">'+r.dept+'</span></td>'+
+      '<td style="font-weight:600">'+numFmt(sys)+'</td>'+
+      '<td style="font-weight:600;color:var(--ok)">'+numFmt(phy)+'</td>'+
+      '<td style="color:'+(variance>=0?'var(--ok)':'var(--err)')+';font-weight:600">'+(variance>=0?'+':'')+numFmt(variance.toFixed(1))+'</td>'+
+      '<td>'+pctBadge(acc)+'</td>'+
+      '<td style="font-size:11px">'+(r.by||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
+  }).join('');
+  var avgAcc=data.length?Math.round(data.reduce(function(s,r){var sy=parseFloat(r.sys)||0,ph=parseFloat(r.phy)||0;return s+(sy?Math.round(Math.min(ph,sy)/Math.max(ph,sy)*100):100);},0)/data.length):0;
+  document.getElementById('inv-stats').innerHTML=
+    '<div class="stc"><div class="stc-num">'+data.length+'</div><div class="stc-lbl">Count Records</div></div>'+
+    '<div class="stc '+(avgAcc>=98?'green':avgAcc>=90?'yellow':'red')+'"><div class="stc-num">'+avgAcc+'%</div><div class="stc-lbl">Avg Accuracy</div></div>'+
+    '<div class="stc green"><div class="stc-num">'+data.filter(function(r){var s=parseFloat(r.sys)||0,p=parseFloat(r.phy)||0;return s&&Math.round(Math.min(p,s)/Math.max(p,s)*100)>=98;}).length+'</div><div class="stc-lbl">&#10003; Accurate (&ge;98%)</div></div>'+
+    '<div class="stc red"><div class="stc-num">'+data.filter(function(r){var s=parseFloat(r.sys)||0,p=parseFloat(r.phy)||0;return s&&Math.round(Math.min(p,s)/Math.max(p,s)*100)<90;}).length+'</div><div class="stc-lbl">&#9888; Variance (&lt;90%)</div></div>';
+}
+function buildInvCharts(){
+  var months=[],accs=[];
+  var sorted=DATA.inv.slice().sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+  sorted.forEach(function(r){var m=(r.date||'').slice(0,7);if(!months.includes(m))months.push(m);});
+  months.slice(-6).forEach(function(m){var sub=DATA.inv.filter(function(r){return(r.date||'').slice(0,7)===m;});var avg=sub.length?Math.round(sub.reduce(function(s,r){var sy=parseFloat(r.sys)||0,ph=parseFloat(r.phy)||0;return s+(sy?Math.round(Math.min(ph,sy)/Math.max(ph,sy)*100):100);},0)/sub.length):0;accs.push(avg);});
+  makeChart('inv-line','line',months.slice(-6),[
+    {label:'Accuracy %',data:accs,borderColor:'var(--acc)',backgroundColor:'var(--adim)',tension:.4,fill:true}
+  ]);
+  var depts=['MM','PM','SM','HH','EQ','FG'];
+  var vars=depts.map(function(d){var sub=DATA.inv.filter(function(r){return r.dept===d;});return sub.length?Math.round(sub.reduce(function(s,r){return s+(parseFloat(r.phy)||0)-(parseFloat(r.sys)||0);},0)):0;});
+  makeChart('inv-bar','bar',depts,[
+    {label:'Variance',data:vars,backgroundColor:vars.map(function(v){return v>=0?'var(--ch1)':'var(--ch3)';}),borderRadius:4}
+  ]);
+}
+
+// ═══════════════════════════
+// SECTION 5: DAMAGE/LOSS
+// ═══════════════════════════
+function getDmgData(){
+  var fac=gFac(),mon=gMonth(),lf=gv('dmg-fac'),lt=gv('dmg-type');
+  return DATA.dmg.filter(function(r){
+    if(fac!=='ALL'&&r.fty!==fac)return false;
+    if(mon&&r.date&&r.date.slice(0,7)!==mon)return false;
+    if(lf&&r.fty!==lf)return false;
+    if(lt&&r.type!==lt)return false;
+    return true;
+  });
+}
+function renderDmgTable(){
+  var data=getDmgData();
+  document.getElementById('dmg-badge').textContent=data.length;
+  document.getElementById('dmg-tbody').innerHTML=data.map(function(r,i){
+    var stC=r.status==='Resolved'||r.status==='Written Off'?'b-ok':r.status==='Investigated'?'b-wrn':'b-err';
+    var tC=r.type==='Damage'?'b-wrn':r.type==='Loss'?'b-err':r.type==='Theft'?'b-err':'b-grey';
+    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'dmg\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'dmg\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+      '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
+      '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
+      '<td><span class="badge b-grey">'+(r.dept||'&#8212;')+'</span></td>'+
+      '<td><span class="badge '+tC+'">'+r.type+'</span></td>'+
+      '<td style="font-weight:500;color:var(--th)">'+(r.item||'&#8212;')+'</td>'+
+      '<td style="font-weight:600">'+(r.qty||0)+'</td>'+
+      '<td style="color:var(--wrn)">&#2547;'+(r.val?numFmt(r.val):'&#8212;')+'</td>'+
+      '<td style="font-size:11px;max-width:130px">'+(r.cause||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--tm)">'+(r.action||'&#8212;')+'</td>'+
+      '<td><span class="badge '+stC+'">'+(r.status||'Open')+'</span></td>'+
+      '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
+  }).join('');
+  var totVal=data.reduce(function(s,r){return s+(parseFloat(r.val)||0);},0);
+  var open=data.filter(function(r){return r.status==='Open'||r.status==='Investigated';}).length;
+  document.getElementById('dmg-stats').innerHTML=
+    '<div class="stc red"><div class="stc-num">'+data.length+'</div><div class="stc-lbl">Total Incidents</div></div>'+
+    '<div class="stc yellow"><div class="stc-num">&#2547;'+numFmt(totVal.toFixed(0))+'</div><div class="stc-lbl">Est. Total Value</div></div>'+
+    '<div class="stc red"><div class="stc-num">'+open+'</div><div class="stc-lbl">Open Cases</div></div>'+
+    '<div class="stc green"><div class="stc-num">'+(data.length-open)+'</div><div class="stc-lbl">Resolved</div></div>';
+}
+function buildDmgCharts(){
+  var months=[];
+  DATA.dmg.forEach(function(r){var m=(r.date||'').slice(0,7);if(!months.includes(m))months.push(m);});
+  months.sort();
+  var counts=months.map(function(m){return DATA.dmg.filter(function(r){return(r.date||'').slice(0,7)===m;}).length;});
+  makeChart('dmg-bar','bar',months,[
+    {label:'Incidents',data:counts,backgroundColor:'var(--ch3)',borderRadius:4}
+  ]);
+  var types=['Damage','Loss','Theft','Expired'];
+  var typeCounts=types.map(function(t){return DATA.dmg.filter(function(r){return r.type===t;}).length;});
+  makeChart('dmg-pie','doughnut',types,[
+    {data:typeCounts,backgroundColor:['var(--ch2)','var(--ch3)','rgba(163,113,247,.7)','var(--ch4)'],borderWidth:0}
+  ]);
+}
+
+// ═══════════════════════════
+// OPEN MODAL (ADD)
+// ═══════════════════════════
+var _editType=null,_editKey=null;
+function openModal(type){
+  _editType=type;_editKey=null;
+  var today=new Date().toISOString().slice(0,10);
+  var curMon=today.slice(0,7);
+  if(type==='io'){
+    document.getElementById('io-mtitle').textContent='Add In/Out Record';
+    document.getElementById('io-ei').value='';document.getElementById('io-ek').value='';
+    document.getElementById('io-d').value=today;
+    ['io-f','io-dept2','io-wh','io-in','io-out','io-rk'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    document.getElementById('io-unit').value='KG';
+    showOv('OV-io');
+  }else if(type==='att'){
+    document.getElementById('att-mtitle').textContent='Add Attendance Record';
+    document.getElementById('att-d').value=curMon;
+    ['att-f','att-total','att-pres','att-abs','att-ot2','att-rk'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    document.getElementById('att-dept').value='All';
+    showOv('OV-att');
+  }else if(type==='fk'){
+    document.getElementById('fk-mtitle').textContent='Add Forklift Utilization';
+    document.getElementById('fk-d').value=curMon;
+    ['fk-fl2','fk-wd','fk-ud','fk-hrs','fk-dn','fk-dr'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    document.getElementById('fk-fac').value='EPF';
+    showOv('OV-fk');
+  }else if(type==='inv'){
+    document.getElementById('inv-mtitle').textContent='Add Inventory Count';
+    document.getElementById('inv-d').value=today;
+    ['inv-f','inv-dept','inv-sys','inv-phy','inv-by','inv-rk'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    showOv('OV-inv');
+  }else{
+    document.getElementById('dmg-mtitle').textContent='Add Damage/Loss Report';
+    document.getElementById('dmg-d').value=today;
+    ['dmg-f','dmg-dept','dmg-item','dmg-qty','dmg-val','dmg-cause','dmg-action'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+    document.getElementById('dmg-type2').value='Damage';
+    document.getElementById('dmg-st').value='Open';
+    showOv('OV-dmg');
+  }
+}
+
+// ═══════════════════════════
+// OPEN EDIT
+// ═══════════════════════════
+function openEdit(type,fbKey){
+  _editType=type;_editKey=fbKey;
+  var r=DATA[type].find(function(x){return x._fbKey===fbKey;});
+  if(!r)return;
+  if(type==='io'){
+    document.getElementById('io-mtitle').textContent='Edit In/Out Record';
+    document.getElementById('io-d').value=r.date||'';
+    document.getElementById('io-f').value=r.fty||'';
+    document.getElementById('io-dept2').value=r.dept||'';
+    document.getElementById('io-wh').value=r.wh||'';
+    document.getElementById('io-in').value=r.recv||'';
+    document.getElementById('io-out').value=r.issue||'';
+    document.getElementById('io-unit').value=r.unit||'KG';
+    document.getElementById('io-rk').value=r.remark||'';
+    showOv('OV-io');
+  }else if(type==='att'){
+    document.getElementById('att-mtitle').textContent='Edit Attendance Record';
+    document.getElementById('att-d').value=r.month||'';
+    document.getElementById('att-f').value=r.fty||'';
+    document.getElementById('att-dept').value=r.dept||'All';
+    document.getElementById('att-total').value=r.total||'';
+    document.getElementById('att-pres').value=r.pres||'';
+    document.getElementById('att-abs').value=r.abs||'';
+    document.getElementById('att-ot2').value=r.ot||'';
+    document.getElementById('att-rk').value=r.remark||'';
+    showOv('OV-att');
+  }else if(type==='fk'){
+    document.getElementById('fk-mtitle').textContent='Edit Forklift Utilization';
+    document.getElementById('fk-d').value=r.month||'';
+    document.getElementById('fk-fl2').value=r.forklift||'';
+    document.getElementById('fk-fac').value=r.fty||'EPF';
+    document.getElementById('fk-wd').value=r.wd||'';
+    document.getElementById('fk-ud').value=r.ud||'';
+    document.getElementById('fk-hrs').value=r.hrs||'';
+    document.getElementById('fk-dn').value=r.dn||'';
+    document.getElementById('fk-dr').value=r.dr||'';
+    showOv('OV-fk');
+  }else if(type==='inv'){
+    document.getElementById('inv-mtitle').textContent='Edit Inventory Count';
+    document.getElementById('inv-d').value=r.date||'';
+    document.getElementById('inv-f').value=r.fty||'';
+    document.getElementById('inv-dept').value=r.dept||'';
+    document.getElementById('inv-sys').value=r.sys||'';
+    document.getElementById('inv-phy').value=r.phy||'';
+    document.getElementById('inv-by').value=r.by||'';
+    document.getElementById('inv-rk').value=r.remark||'';
+    showOv('OV-inv');
+  }else{
+    document.getElementById('dmg-mtitle').textContent='Edit Damage/Loss Report';
+    document.getElementById('dmg-d').value=r.date||'';
+    document.getElementById('dmg-f').value=r.fty||'';
+    document.getElementById('dmg-dept').value=r.dept||'';
+    document.getElementById('dmg-type2').value=r.type||'Damage';
+    document.getElementById('dmg-item').value=r.item||'';
+    document.getElementById('dmg-qty').value=r.qty||'';
+    document.getElementById('dmg-val').value=r.val||'';
+    document.getElementById('dmg-cause').value=r.cause||'';
+    document.getElementById('dmg-action').value=r.action||'';
+    document.getElementById('dmg-st').value=r.status||'Open';
+    showOv('OV-dmg');
+  }
+}
+
+// ═══════════════════════════
+// SAVE KPI
+// ═══════════════════════════
+function g(id){return(document.getElementById(id)&&document.getElementById(id).value||'').trim();}
+function saveKpi(type){
+  var rec={},node=FB_NODES[type],modal='OV-'+type;
+  if(type==='io'){
+    if(!g('io-f')||!g('io-dept2')){toast('Factory & Dept required','err');return;}
+    rec={date:g('io-d'),fty:g('io-f'),dept:g('io-dept2'),wh:g('io-wh'),recv:parseFloat(g('io-in'))||0,issue:parseFloat(g('io-out'))||0,unit:g('io-unit')||'KG',remark:g('io-rk'),_upd:new Date().toISOString()};
+  }else if(type==='att'){
+    if(!g('att-f')){toast('Factory required','err');return;}
+    rec={month:g('att-d'),fty:g('att-f'),dept:g('att-dept')||'All',total:parseFloat(g('att-total'))||0,pres:parseFloat(g('att-pres'))||0,abs:parseFloat(g('att-abs'))||0,ot:parseFloat(g('att-ot2'))||0,remark:g('att-rk'),_upd:new Date().toISOString()};
+  }else if(type==='fk'){
+    if(!g('fk-fl2')){toast('Forklift required','err');return;}
+    rec={month:g('fk-d'),forklift:g('fk-fl2'),fty:g('fk-fac')||'EPF',wd:parseFloat(g('fk-wd'))||0,ud:parseFloat(g('fk-ud'))||0,hrs:parseFloat(g('fk-hrs'))||0,dn:parseFloat(g('fk-dn'))||0,dr:g('fk-dr'),_upd:new Date().toISOString()};
+  }else if(type==='inv'){
+    if(!g('inv-f')||!g('inv-dept')){toast('Factory & Dept required','err');return;}
+    rec={date:g('inv-d'),fty:g('inv-f'),dept:g('inv-dept'),sys:parseFloat(g('inv-sys'))||0,phy:parseFloat(g('inv-phy'))||0,by:g('inv-by'),remark:g('inv-rk'),_upd:new Date().toISOString()};
+  }else{
+    if(!g('dmg-f')||!g('dmg-item')){toast('Factory & Item required','err');return;}
+    rec={date:g('dmg-d'),fty:g('dmg-f'),dept:g('dmg-dept'),type:g('dmg-type2'),item:g('dmg-item'),qty:parseFloat(g('dmg-qty'))||0,val:parseFloat(g('dmg-val'))||0,cause:g('dmg-cause'),action:g('dmg-action'),status:g('dmg-st'),_upd:new Date().toISOString()};
+  }
+  if(_editKey){
+    if(window.WmsDb){WmsDb.update(node,_editKey,rec).then(function(){toast('Updated \u2713','tok');});}
+    else{var idx=DATA[type].findIndex(function(r){return r._fbKey===_editKey;});if(idx>=0)DATA[type][idx]=Object.assign({},rec,{_fbKey:_editKey});localStorage.setItem('wms_'+node,JSON.stringify(DATA[type]));refreshAll();toast('Updated \u2713','tok');}
+  }else{
+    if(window.WmsDb){WmsDb.push(node,rec).then(function(){toast('Added \u2713','tok');});}
+    else{var ex=DATA[type].concat([rec]);DATA[type]=ex;localStorage.setItem('wms_'+node,JSON.stringify(ex));refreshAll();toast('Added \u2713','tok');}
+  }
+  closeOv(modal);
+}
+
+// ═══════════════════════════
+// DELETE
+// ═══════════════════════════
+function askDel(type,fbKey){_pendDelNode=type;_pendDelKey=fbKey;showOv('OV-del');}
+function confirmDel(){
+  if(!_pendDelKey)return;
+  var node=FB_NODES[_pendDelNode],type=_pendDelNode;
+  if(window.WmsDb){WmsDb.remove(node,_pendDelKey).then(function(){toast('Deleted','err');closeOv('OV-del');});}
+  else{DATA[type]=DATA[type].filter(function(r){return r._fbKey!==_pendDelKey;});localStorage.setItem('wms_'+node,JSON.stringify(DATA[type]));refreshAll();toast('Deleted','err');closeOv('OV-del');}
+  _pendDelKey=null;
+}
+
+// ── INIT ──
+initApp();
+initMonthFilter();
+_initFbSync().then(function(){if(!window.WmsDb){refreshAll();rebuildCharts();}});
+</script>
+</body>
+</html>

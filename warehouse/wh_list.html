@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="slate" data-font="ubuntu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warehouse List — EPFBD WMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
+[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
+[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--bdr:#2a3548;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--ok:#3fb950;--err:#f85149;--wrn:#e3b341;--nav:#0d1117;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shs:0 2px 10px rgba(0,0,0,.4);--shd:0 4px 24px rgba(0,0,0,.6);--ra:rgba(0,201,167,.025)}
+[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--bdr:#d0dae8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--ok:#2e7d32;--err:#c62828;--wrn:#e65100;--nav:#fff;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shs:0 2px 8px rgba(21,101,192,.08);--shd:0 4px 20px rgba(21,101,192,.10);--ra:rgba(21,101,192,.025)}
+[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--bdr:#3f3f46;--acc:#D4A017;--adim:rgba(212,160,23,.10);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--ok:#22c55e;--err:#ef4444;--wrn:#f59e0b;--nav:#111113;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shs:0 2px 10px rgba(0,0,0,.5);--shd:0 4px 24px rgba(0,0,0,.7);--ra:rgba(212,160,23,.025)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--fb);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
+.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;padding:0 16px;height:52px;box-shadow:var(--shs)}
+.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);white-space:nowrap}
+.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400}
+.sep{flex:1}
+.tnav{display:flex;gap:2px}
+.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
+.tnav a:hover{background:var(--adim);color:var(--acc)}
+.tnav a.ON{background:var(--tbg);color:var(--acc)}
+.ctrl{display:flex;align-items:center;gap:8px}
+.clbl{font-size:10px;color:var(--tm)}
+.tdots{display:flex;gap:5px}
+.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
+.tdot[data-t="slate"]{background:#00C9A7}.tdot[data-t="arctic"]{background:#1565C0}.tdot[data-t="ember"]{background:#D4A017}
+.tdot.ON{border-color:var(--th);transform:scale(1.2)}
+.fsw{display:flex;gap:4px}
+.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
+.fbtn:hover,.fbtn.ON{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
+.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
+.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
+.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
+.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
+.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
+.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
+.MN{margin-left:200px;padding:20px;position:relative;z-index:1}
+.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
+.ph-ico{width:40px;height:40px;background:var(--adim);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ph-title{font-family:var(--fh);font-size:19px;font-weight:700;color:var(--th)}
+.ph-sub{font-size:11px;color:var(--tm)}
+.ph-right{margin-left:auto}
+.stg{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px}
+.stc{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:13px 15px}
+.stc-num{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--acc)}
+.stc-lbl{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.stc-sub{font-size:11px;color:var(--tb);margin-top:3px}
+.brow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.brow.fu{justify-content:space-between}
+.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;transition:border .2s;font-family:var(--fb)}
+.si:focus{border-color:var(--acc)}
+.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer;font-family:var(--fb)}
+.a-add{background:var(--acc);color:#000;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--fb);border:none;cursor:pointer}
+.a-add:hover{opacity:.85}
+.abtn{border:none;border-radius:5px;cursor:pointer;padding:4px 8px;font-size:12px;transition:all .2s;background:var(--adim)}
+.a-edit{color:var(--wrn)}.a-edit:hover{background:rgba(227,179,65,.2)}
+.a-del{color:var(--err)}.a-del:hover{background:rgba(248,81,73,.2)}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
+.card-hd{padding:11px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
+.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
+.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 11px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.tbl td{padding:9px 11px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--adim)}
+.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700}
+.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
+.b-acc{background:var(--tbg);color:var(--acc)}
+.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
+.b-err{background:rgba(248,81,73,.15);color:var(--err)}
+.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
+.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
+.b-purple{background:rgba(163,113,247,.15);color:#a371f7}
+.chip{display:inline-block;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.OV{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.OV.show{display:flex}
+.OV-box{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shd)}
+.OV-box h3{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--th);margin-bottom:18px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fr{display:flex;flex-direction:column;gap:5px}
+.fr label{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.4px}
+.fr input,.fr select,.fr textarea{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--th);font-size:12px;font-family:var(--fb);outline:none;transition:border .2s;width:100%}
+.fr input:focus,.fr select:focus{border-color:var(--acc)}
+.fr select option{background:var(--card)}
+.ff{grid-column:1/-1}
+.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.btn{border:none;border-radius:7px;padding:9px 20px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--fb);transition:all .2s}
+.btn-acc{background:var(--acc);color:#000}.btn-acc:hover{opacity:.85}
+.btn-sec{background:var(--adim);color:var(--acc);border:1px solid var(--bdr)}.btn-sec:hover{background:var(--tbg)}
+.btn-err{background:rgba(248,81,73,.15);color:var(--err);border:1px solid rgba(248,81,73,.3)}.btn-err:hover{background:rgba(248,81,73,.25)}
+.pin-pad{display:flex;flex-direction:column;align-items:center;gap:14px}
+.pin-dots{display:flex;gap:10px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
+.pin-dot.F{background:var(--acc);border-color:var(--acc)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:200px}
+.pkey{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--th);transition:all .2s;user-select:none}
+.pkey:hover{background:var(--adim);border-color:var(--acc);color:var(--acc)}
+.pin-err{color:var(--err);font-size:12px;display:none}
+.toast-el{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:10px 22px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast-el.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.tok{border-color:var(--ok);color:var(--ok)}.terr{border-color:var(--err);color:var(--err)}
+#sync-ind{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--adim);color:var(--tm)}
+@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
+</style>
+
+<style id="dark-override">
+/* ── DARK MODE OVERRIDE ── */
+body{background:#0a0a0a!important;color:#f0f0f0!important}
+.kpi-c,.fi2,.sys-row,.mc,.ch-card,.act-i{background:#141414!important;border-color:#242424!important;color:#f0f0f0!important}
+.kpi-num{color:#f0f0f0!important}
+.kpi-lbl{color:#b0b8c8!important}
+.kpi-ch.nc{background:rgba(255,255,255,.06)!important;color:#b0b8c8!important}
+.mc-title{color:#f0f0f0!important}
+.mc-desc{color:#5a6478!important}
+.mc-arr{color:#5a6478!important}
+.sh-title{color:#f0f0f0!important}
+.sh-sub{color:#5a6478!important}
+.ann{background:linear-gradient(135deg,rgba(129,140,248,.1),rgba(167,139,250,.1))!important;border-color:rgba(129,140,248,.2)!important}
+.ann-t{color:#a78bfa!important}
+.ann-cl{color:#5a6478!important}
+.ann-cl:hover{color:#f0f0f0!important}
+.fn{color:#f0f0f0!important}
+.fk{color:#5a6478!important}
+.fv{color:#b0b8c8!important}
+.wsn{color:#f0f0f0!important}
+.act-text{color:#f0f0f0!important}
+.act-sub{color:#5a6478!important}
+.sys-lbl{color:#f0f0f0!important}
+.hdr{background:rgba(10,10,10,.92)!important}
+select option{background:#141414!important;color:#f0f0f0!important}
+input,select,textarea{background:#111111!important;color:#f0f0f0!important;border-color:#242424!important}
+input::placeholder,textarea::placeholder{color:#5a6478!important}
+.OV-box{background:#141414!important;border-color:#242424!important}
+.welcome{background:linear-gradient(135deg,#0a1a0d 0%,#0d1a14 50%,#0a0d14 100%)!important}
+.bg-grid .ch-card{background:#141414!important;border-color:#242424!important}
+.kpi-pb-bg{background:#242424!important}
+.fp{background:#242424!important}
+.fi2{background:#141414!important;border-color:#242424!important}
+.fi2:hover{background:#1a1a1a!important}
+</style>
+</head>
+<body>
+<nav class="TB">
+  <div class="brand">EPFBD<small>WMS</small></div>
+  <span id="sync-ind">&#9203; Connecting&hellip;</span>
+  <div class="sep"></div>
+  <div class="tnav">
+    <a href="../index.html">Dashboard</a>
+    <a href="../manpower/all_manpower.html">Manpower</a>
+    <a href="wh_list.html" class="ON">Warehouse</a>
+    <a href="../equipment/pda_devices.html">Equipment</a>
+  </div>
+  <div class="ctrl">
+    <span class="clbl">Theme</span>
+    <div class="tdots">
+      <div class="tdot" data-t="slate" onclick="setTheme('slate')"></div>
+      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')"></div>
+      <div class="tdot" data-t="ember" onclick="setTheme('ember')"></div>
+    </div>
+    <span class="clbl">Font</span>
+    <div class="fsw">
+      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
+      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    </div>
+    <div id="CLK" class="clk">--:--:--</div>
+  </div>
+</nav>
+<aside class="SB">
+  <div><div class="sb-hd">Main</div>
+    <a class="sb-a" href="../index.html">&#127968; Dashboard</a>
+  </div>
+  <div><div class="sb-hd">Manpower</div>
+    <a class="sb-a" href="../manpower/all_manpower.html">&#128101; All Manpower</a>
+    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span> EPF</a>
+    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span> TGL</a>
+    <a class="sb-a" href="../manpower/BGL_manpower.html"><span class="sb-badge">BGL</span> BGL</a>
+    <a class="sb-a" href="../manpower/GTM_manpower.html"><span class="sb-badge">GTM</span> GTM</a>
+    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span> RFL</a>
+    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span> EC</a>
+  </div>
+  <div><div class="sb-hd">Warehouse</div>
+    <a class="sb-a ON" href="wh_list.html">&#127981; WH List</a>
+    <a class="sb-a" href="mis_login.html">&#128272; MIS Login</a>
+    <a class="sb-a" href="mail_list.html">&#128140; Mail List</a>
+  </div>
+  <div><div class="sb-hd">Equipment</div>
+    <a class="sb-a" href="../equipment/pda_devices.html">&#128241; PDA / Scanner</a>
+    <a class="sb-a" href="../equipment/forklift.html">&#128663; Forklift</a>
+    <a class="sb-a" href="../equipment/maintenance_log.html">&#128295; Maintenance</a>
+  </div>
+  <div><div class="sb-hd">Setup</div>
+    <a class="sb-a" href="../firebase-setup.html">&#128293; Firebase Setup</a>
+  </div>
+</aside>
+
+<main class="MN">
+<div class="ph">
+  <div class="ph-ico">&#127981;</div>
+  <div>
+    <div class="ph-title">Warehouse List</div>
+    <div class="ph-sub">All warehouse locations — EPF, TGL, BGL, GTM, RFL, DJ</div>
+  </div>
+  <div class="ph-right">
+    <span id="sync-pill" style="font-size:11px;padding:4px 12px;border-radius:20px;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)">Loading&hellip;</span>
+  </div>
+</div>
+
+<div class="stg" id="STATS"></div>
+
+<div class="brow fu">
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <input class="si" id="fq" placeholder="&#128269; Search place, items, code&hellip;" style="width:220px" oninput="render()">
+    <select class="fsel" id="ffac" onchange="render()">
+      <option value="">All Factory</option>
+      <option>EPF</option><option>TGL</option><option>BGL</option>
+      <option>GTM</option><option>RFL</option><option>DJ</option><option>GT-06</option><option>GT-08</option>
+    </select>
+    <select class="fsel" id="fitm" onchange="render()">
+      <option value="">All Items</option>
+      <option>MM</option><option>PM</option><option>SM</option>
+      <option>HH</option><option>EQ</option><option>FG</option>
+    </select>
+  </div>
+  <button class="a-add" onclick="openPin(function(){openAdd()})">&#65291; Add Warehouse</button>
+</div>
+
+<div class="card">
+  <div class="card-hd">
+    <div class="card-hd-title">&#127981; Warehouse Locations</div>
+    <span class="card-hd-badge" id="BADGE">0</span>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead><tr>
+      <th>#</th><th>Factory</th><th>Warehouse Place</th><th>Items</th>
+      <th>MIS WH Code</th><th>Actions</th>
+    </tr></thead>
+    <tbody id="TBODY"></tbody>
+  </table>
+  </div>
+</div>
+</main>
+
+<!-- MODAL: ADD/EDIT -->
+<div class="OV" id="OV-FORM">
+  <div class="OV-box">
+    <h3 id="FT">Add Warehouse</h3>
+    <input type="hidden" id="EI"><input type="hidden" id="EK">
+    <div class="fg">
+      <div class="fr"><label>Factory *</label>
+        <select id="FF">
+          <option value="">&#8212; Select &#8212;</option>
+          <option>EPF</option><option>TGL</option><option>BGL</option>
+          <option>GTM</option><option>RFL</option><option>DJ</option>
+          <option>GT-06</option><option>GT-08</option><option>EC</option>
+        </select>
+      </div>
+      <div class="fr"><label>Warehouse Place</label>
+        <input id="FP" placeholder="e.g. 3A 1st" list="place-list">
+        <datalist id="place-list">
+          <option value="3A 1st"><option value="3A 2nd"><option value="3B 1st">
+          <option value="3C 3rd"><option value="3E 1st(west)"><option value="3E 1st(east)">
+          <option value="3E 3rd"><option value="3E 6th"><option value="3G 1st">
+          <option value="3G 1st(New)"><option value="3G 3nd"><option value="3G 5th">
+          <option value="3G 7th"><option value="Admin building">
+          <option value="C- building 1st Floor"><option value="F- building 3rt Floor">
+          <option value="GRL- building 3rt Floor"><option value="C- building">
+        </datalist>
+      </div>
+      <div class="fr ff"><label>Items *</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--tb);cursor:pointer"><input type="checkbox" id="itMM" style="width:auto"> MM</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--tb);cursor:pointer"><input type="checkbox" id="itPM" style="width:auto"> PM</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--tb);cursor:pointer"><input type="checkbox" id="itSM" style="width:auto"> SM</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--tb);cursor:pointer"><input type="checkbox" id="itHH" style="width:auto"> HH</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--tb);cursor:pointer"><input type="checkbox" id="itEQ" style="width:auto"> EQ</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--tb);cursor:pointer"><input type="checkbox" id="itFG" style="width:auto"> FG</label>
+        </div>
+      </div>
+      <div class="fr ff"><label>MIS WH Code(s)</label>
+        <input id="FC" placeholder="e.g. BDC110/BDC210" list="code-list">
+        <datalist id="code-list">
+          <option value="BDC110"><option value="BDC150"><option value="BDC170">
+          <option value="BDC210"><option value="BDC310"><option value="BDC410">
+          <option value="BDC515"><option value="BDC610"><option value="BDC620">
+          <option value="BDC650"><option value="BDW110"><option value="BDW150">
+          <option value="BDW170"><option value="BDW210"><option value="BDW310">
+          <option value="BDW410"><option value="BDW515"><option value="BDW610">
+        </datalist>
+      </div>
+      <div class="fr ff"><label>Notes</label>
+        <input id="FN" placeholder="Optional notes&hellip;">
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-sec" onclick="closeOv('OV-FORM')">Cancel</button>
+      <button class="btn btn-acc" onclick="saveRecord()">&#128190; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE -->
+<div class="OV" id="OV-DEL">
+  <div class="OV-box" style="max-width:360px;text-align:center">
+    <h3>&#9888; Delete Confirm</h3>
+    <p style="font-size:13px;margin:14px 0 20px">এই warehouse মুছে ফেলবেন?<br><strong id="DNAME" style="color:var(--th)"></strong></p>
+    <div class="mbtns" style="justify-content:center">
+      <button class="btn btn-sec" onclick="closeOv('OV-DEL')">Cancel</button>
+      <button class="btn btn-err" onclick="confirmDel()">&#128465; Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN -->
+<div class="OV" id="OV-PIN">
+  <div class="OV-box" style="max-width:300px">
+    <h3 style="text-align:center">&#128272; Enter PIN</h3>
+    <div class="pin-pad">
+      <div class="pin-dots">
+        <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+        <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+      </div>
+      <div class="pin-grid">
+        <div class="pkey" onclick="pressPin('1')">1</div><div class="pkey" onclick="pressPin('2')">2</div><div class="pkey" onclick="pressPin('3')">3</div>
+        <div class="pkey" onclick="pressPin('4')">4</div><div class="pkey" onclick="pressPin('5')">5</div><div class="pkey" onclick="pressPin('6')">6</div>
+        <div class="pkey" onclick="pressPin('7')">7</div><div class="pkey" onclick="pressPin('8')">8</div><div class="pkey" onclick="pressPin('9')">9</div>
+        <div class="pkey" onclick="pressPin('del')">&#9003;</div><div class="pkey" onclick="pressPin('0')">0</div>
+        <div class="pkey" onclick="pressPin('ok')" style="color:var(--ok);border-color:var(--ok)">&#10003;</div>
+      </div>
+      <div class="pin-err" id="pin-err">&#10060; Wrong PIN. Try again.</div>
+    </div>
+  </div>
+</div>
+<div id="TOAST" class="toast-el"></div>
+
+<script src="../firebase-db.js"></script>
+<script>
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);document.querySelectorAll('.tdot').forEach(function(d){d.classList.toggle('ON',d.dataset.t===t);});localStorage.setItem('wms-theme',t);}
+function setFont(f){document.documentElement.setAttribute('data-font',f);document.querySelectorAll('.fbtn').forEach(function(b){b.classList.toggle('ON',b.dataset.f===f);});localStorage.setItem('wms-font',f);}
+function startClock(){var tick=function(){var n=new Date(),p=function(v){return String(v).padStart(2,'0');},el=document.getElementById('CLK');if(el)el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());};tick();setInterval(tick,1000);}
+function initApp(){setTheme(localStorage.getItem('wms-theme')||'slate');setFont(localStorage.getItem('wms-font')||'ubuntu');startClock();}
+
+var PIN='9625',pinBuf='',pinCb=null,pendDel=null,pendDelKey=null;
+function openPin(cb){pinCb=cb;pinBuf='';updDots();document.getElementById('pin-err').style.display='none';showOv('OV-PIN');}
+function pressPin(v){if(v==='del'){pinBuf=pinBuf.slice(0,-1);}else if(v==='ok'){chkPin();return;}else{if(pinBuf.length>=4)return;pinBuf+=v;if(pinBuf.length===4)setTimeout(chkPin,150);}updDots();}
+function chkPin(){if(pinBuf===PIN){closeOv('OV-PIN');pinBuf='';if(pinCb)pinCb();}else{document.getElementById('pin-err').style.display='block';pinBuf='';updDots();}}
+function updDots(){[0,1,2,3].forEach(function(i){document.getElementById('pd'+i).classList.toggle('F',i<pinBuf.length);});}
+function showOv(id){document.getElementById(id).classList.add('show');}
+function closeOv(id){var e=document.getElementById(id);if(e)e.classList.remove('show');pinBuf='';updDots();var er=document.getElementById('pin-err');if(er)er.style.display='none';}
+document.addEventListener('click',function(e){document.querySelectorAll('.OV.show').forEach(function(o){if(e.target===o)closeOv(o.id);});});
+function toast(msg,type,ms){ms=ms||2500;var el=document.getElementById('TOAST');el.textContent=msg;el.className='toast-el show '+(type==='err'?'terr':'tok');clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show');},ms);}
+
+// BASE DATA — from Warehouse_List__all_.xlsx
+var BASE = [
+  {sl:1, fty:'EPF', place:'3A 1st',          items:'MM/HH',           code:'BDC150/BDC170/BDC610', notes:''},
+  {sl:2, fty:'EPF', place:'3A 2nd',          items:'SM',              code:'BDC310',               notes:''},
+  {sl:3, fty:'EPF', place:'3B 1st',          items:'SM/MM/HH',        code:'BDC310/BDC110/BDC610', notes:''},
+  {sl:4, fty:'EPF', place:'3C 3rd',          items:'HH',              code:'BDC620/BDC650',        notes:''},
+  {sl:5, fty:'EPF', place:'3E 1st(west)',     items:'EQ',              code:'BDC515',               notes:''},
+  {sl:6, fty:'EPF', place:'3E 1st(east)',     items:'FG',              code:'BDC410',               notes:''},
+  {sl:7, fty:'EPF', place:'3E 3rd',           items:'SM',              code:'BDC310',               notes:''},
+  {sl:8, fty:'EPF', place:'3E 6th',           items:'EQ',              code:'BDC515',               notes:''},
+  {sl:9, fty:'EPF', place:'3G 1st',           items:'PM',              code:'BDC210',               notes:''},
+  {sl:10,fty:'EPF', place:'3G 1st(New)',       items:'MM/PM',           code:'BDC110/BDC210',        notes:''},
+  {sl:11,fty:'EPF', place:'3G 3nd',           items:'SM Hall Cos.',    code:'BDC210/BDC310',        notes:''},
+  {sl:12,fty:'EPF', place:'3G 5th',           items:'PM',              code:'BDC210',               notes:''},
+  {sl:13,fty:'EPF', place:'3G 7th',           items:'PM',              code:'BDC210',               notes:''},
+  {sl:14,fty:'EPF', place:'Canteen building(east)', items:'SM',         code:'BDC310',               notes:''},
+  {sl:15,fty:'EPF', place:'Canteen building(west)', items:'EQ Cons',    code:'BDC515',               notes:''},
+  {sl:16,fty:'EPF', place:'Admin building',   items:'SM (Stationery)', code:'BDC310',               notes:''},
+  {sl:17,fty:'DJ',  place:'&#8212;',          items:'SM',              code:'BDC310',               notes:''},
+  {sl:18,fty:'RFL', place:'&#8212;',          items:'MM/PM/SM/EQ',     code:'BDC110/BDC210/BDC310/BDC515', notes:''},
+  {sl:19,fty:'TGL', place:'C- building 1st Floor', items:'MM/PM/SM',   code:'BDW110/BDW210/BDW310', notes:''},
+  {sl:20,fty:'TGL', place:'C- building 1st Floor', items:'FG/MM',      code:'BDW410/BDW110',        notes:''},
+  {sl:21,fty:'TGL', place:'C- building 1st Floor', items:'MM',         code:'BDW150/170',           notes:''},
+  {sl:22,fty:'TGL', place:'Admin-building 1st Floor', items:'SM',      code:'BDW310',               notes:''},
+  {sl:23,fty:'TGL', place:'C- building 1st Floor', items:'EQ',         code:'BDW515',               notes:''},
+  {sl:24,fty:'TGL', place:'F- building 3rt Floor', items:'HH',         code:'BDW610',               notes:''},
+  {sl:25,fty:'TGL', place:'GRL- building 3rt Floor', items:'Constraction', code:'BDW515',           notes:''},
+  {sl:26,fty:'GT-06',place:'&#8212;',         items:'MM/PM/SM/EQ',     code:'BDC110/BDC210/BDC310/BDC515', notes:''},
+  {sl:27,fty:'GT-08',place:'C- building',     items:'MM/PM/SM/EQ',     code:'BDC110/BDC210/BDC310/BDC515', notes:''},
+];
+
+var _extra=[], _ov={};
+var FB_NODE='wh_list';
+
+async function _initFbSync(){
+  if(!window.WmsDb){await new Promise(function(r){setTimeout(r,700);});}
+  var cloud=window.WmsDb&&WmsDb.isCloud();
+  var ind=document.getElementById('sync-ind'),pill=document.getElementById('sync-pill');
+  if(ind){ind.textContent=cloud?'\u2601 Cloud Sync ON':'\uD83D\uDCBE Local Only';ind.style.color=cloud?'var(--ok)':'var(--wrn)';}
+  if(pill){pill.textContent=cloud?'\u2601 Cloud Sync ON':'\uD83D\uDCBE Local Only';}
+  if(window.WmsDb){
+    WmsDb.listen(FB_NODE,function(d){_extra=d;render();buildStats();});
+    WmsDb.listenOverrides(FB_NODE,function(ov){_ov=ov;render();buildStats();});
+  }else{
+    _extra=JSON.parse(localStorage.getItem('wms_'+FB_NODE)||'[]');
+    _ov=JSON.parse(localStorage.getItem(FB_NODE+'_ov')||'{}');
+    render();buildStats();
+  }
+}
+function getAll(){
+  var base=BASE.map(function(r,i){return Object.assign({},r,_ov[i]||{});});
+  return base.concat(_extra);
+}
+
+// FACTORY BADGE COLOR
+var FAC_CLR={EPF:'b-acc',TGL:'b-wrn',BGL:'b-blue',GTM:'b-purple',RFL:'b-ok',DJ:'b-grey','GT-06':'b-err','GT-08':'b-err',EC:'b-blue'};
+// ITEM BADGE
+var ITM_CLR={MM:'b-acc',PM:'b-wrn',SM:'b-blue',HH:'b-purple',EQ:'b-ok',FG:'b-grey'};
+function itemBadges(items){
+  if(!items)return'&#8212;';
+  return items.split('/').map(function(it){
+    it=it.trim().split(' ')[0];
+    var c=ITM_CLR[it]||'b-grey';
+    return '<span class="badge '+c+'" style="margin-right:3px">'+it+'</span>';
+  }).join('');
+}
+
+// STATS
+function buildStats(){
+  var all=getAll();
+  var facs={};
+  all.forEach(function(r){facs[r.fty]=(facs[r.fty]||0)+1;});
+  var epf=facs['EPF']||0,tgl=facs['TGL']||0;
+  document.getElementById('STATS').innerHTML=
+    '<div class="stc"><div class="stc-num">'+all.length+'</div><div class="stc-lbl">Total WH</div><div class="stc-sub">All locations</div></div>'+
+    '<div class="stc"><div class="stc-num" style="color:var(--acc)">'+epf+'</div><div class="stc-lbl">EPF</div><div class="stc-sub">Locations</div></div>'+
+    '<div class="stc"><div class="stc-num" style="color:var(--wrn)">'+tgl+'</div><div class="stc-lbl">TGL</div><div class="stc-sub">GT-07</div></div>'+
+    '<div class="stc"><div class="stc-num" style="color:var(--ok)">'+(all.length-epf-tgl)+'</div><div class="stc-lbl">Others</div><div class="stc-sub">BGL/GTM/RFL</div></div>';
+}
+
+// RENDER
+function render(){
+  var q=(document.getElementById('fq')&&document.getElementById('fq').value||'').toLowerCase();
+  var ff=document.getElementById('ffac')&&document.getElementById('ffac').value||'';
+  var fi=document.getElementById('fitm')&&document.getElementById('fitm').value||'';
+  var bLen=BASE.length;
+  var data=getAll().map(function(r,i){return Object.assign({},r,{_gi:i});}).filter(function(r){
+    if(ff&&r.fty!==ff)return false;
+    if(fi&&(r.items||'').indexOf(fi)<0)return false;
+    if(q&&((r.place||'').toLowerCase()+(r.items||'').toLowerCase()+(r.code||'').toLowerCase()+(r.fty||'').toLowerCase()).indexOf(q)<0)return false;
+    return true;
+  });
+  document.getElementById('BADGE').textContent=data.length;
+  document.getElementById('TBODY').innerHTML=data.map(function(r,i){
+    var isBase=r._gi<bLen;
+    var fc=FAC_CLR[r.fty]||'b-grey';
+    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit('+r._gi+')})" title="Edit">&#9998;</button>';
+    var dB=isBase?'':'<button class="abtn a-del" onclick="openPin(function(){askDel('+( r._gi-bLen)+',\''+((r.fty||'')+(r.place||'Place')).replace(/'/g,"\\'")+ '\',\''+(r._fbKey||'')+'\' )})" title="Delete">&#128465;</button>';
+    return '<tr>'+
+      '<td style="color:var(--tm);font-family:monospace;font-size:11px">'+(i+1)+'</td>'+
+      '<td><span class="badge '+fc+'">'+r.fty+'</span></td>'+
+      '<td style="font-weight:500;color:var(--th)">'+(r.place||'&#8212;')+'</td>'+
+      '<td>'+itemBadges(r.items)+'</td>'+
+      '<td style="font-family:monospace;font-size:11px;color:var(--acc)">'+(r.code||'&#8212;')+'</td>'+
+      '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
+  }).join('');
+}
+
+// ITEMS HELPERS
+var ITM_IDS=['MM','PM','SM','HH','EQ','FG'];
+function getCheckedItems(){
+  return ITM_IDS.filter(function(it){
+    var el=document.getElementById('it'+it);
+    return el&&el.checked;
+  }).join('/');
+}
+function setCheckedItems(str){
+  ITM_IDS.forEach(function(it){
+    var el=document.getElementById('it'+it);
+    if(el)el.checked=(str||'').indexOf(it)>=0;
+  });
+}
+
+// OPEN ADD
+function openAdd(){
+  document.getElementById('FT').textContent='Add Warehouse';
+  document.getElementById('EI').value='';document.getElementById('EK').value='';
+  document.getElementById('FF').value='';document.getElementById('FP').value='';
+  document.getElementById('FC').value='';document.getElementById('FN').value='';
+  setCheckedItems('');
+  showOv('OV-FORM');
+}
+
+// OPEN EDIT
+function openEdit(gi){
+  var r=getAll()[gi];if(!r)return;
+  document.getElementById('FT').textContent='Edit Warehouse';
+  document.getElementById('EI').value=gi;document.getElementById('EK').value=r._fbKey||'';
+  document.getElementById('FF').value=r.fty||'';
+  document.getElementById('FP').value=r.place&&r.place!=='&#8212;'?r.place:'';
+  document.getElementById('FC').value=r.code||'';
+  document.getElementById('FN').value=r.notes||'';
+  setCheckedItems(r.items||'');
+  showOv('OV-FORM');
+}
+
+// SAVE
+function g(id){return(document.getElementById(id)&&document.getElementById(id).value||'').trim();}
+function saveRecord(){
+  var fty=g('FF');
+  if(!fty){toast('Factory required','err');return;}
+  var items=getCheckedItems();
+  var rec={fty:fty,place:g('FP')||'&#8212;',items:items||'&#8212;',code:g('FC')||'&#8212;',notes:g('FN'),_upd:new Date().toISOString()};
+  var giStr=g('EI'),fbKey=g('EK'),bLen=BASE.length;
+  if(giStr!==''){
+    var gi=parseInt(giStr);
+    if(gi<bLen){
+      if(window.WmsDb)WmsDb.setOverride(FB_NODE,gi,Object.assign({},BASE[gi],rec)).then(function(){toast('Updated \u2713','tok');});
+      else{var ov=JSON.parse(localStorage.getItem(FB_NODE+'_ov')||'{}');ov[gi]=Object.assign({},BASE[gi],rec);localStorage.setItem(FB_NODE+'_ov',JSON.stringify(ov));_ov=ov;render();toast('Updated \u2713','tok');}
+    }else if(fbKey){
+      if(window.WmsDb)WmsDb.update(FB_NODE,fbKey,rec).then(function(){toast('Updated \u2713','tok');});
+      else{var ex=JSON.parse(localStorage.getItem('wms_'+FB_NODE)||'[]');var idx=ex.findIndex(function(r2){return r2._fbKey===fbKey;});if(idx>=0)ex[idx]=rec;localStorage.setItem('wms_'+FB_NODE,JSON.stringify(ex));_extra=ex;render();toast('Updated \u2713','tok');}
+    }
+  }else{
+    rec.sl=getAll().length+1;
+    if(window.WmsDb)WmsDb.push(FB_NODE,rec).then(function(){toast('Added \u2713','tok');});
+    else{var ex2=JSON.parse(localStorage.getItem('wms_'+FB_NODE)||'[]');ex2.push(rec);localStorage.setItem('wms_'+FB_NODE,JSON.stringify(ex2));_extra=ex2;render();buildStats();toast('Added \u2713','tok');}
+  }
+  closeOv('OV-FORM');
+}
+
+// DELETE
+function askDel(idx,name,fbKey){pendDel=idx;pendDelKey=fbKey||null;document.getElementById('DNAME').textContent=name;showOv('OV-DEL');}
+function confirmDel(){
+  if(pendDel===null)return;
+  if(pendDelKey&&window.WmsDb){
+    WmsDb.remove(FB_NODE,pendDelKey).then(function(){toast('Deleted','err');closeOv('OV-DEL');pendDel=null;});
+  }else{
+    var ex=JSON.parse(localStorage.getItem('wms_'+FB_NODE)||'[]');
+    ex.splice(pendDel,1);localStorage.setItem('wms_'+FB_NODE,JSON.stringify(ex));
+    _extra=ex;render();buildStats();toast('Deleted','err');closeOv('OV-DEL');pendDel=null;
+  }
+}
+
+initApp();
+_initFbSync().then(function(){if(!window.WmsDb){render();buildStats();}});
+</script>
+</body>
+</html>
