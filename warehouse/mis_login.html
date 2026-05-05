@@ -1,181 +1,66 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="slate" data-font="ubuntu">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MIS Login — EPFBD WMS</title>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
-[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
-[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--cardh:#212b3d;--bdr:#2a3548;--bdrh:#3d5070;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--aglow:rgba(0,201,167,.20);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--tag:#00C9A7;--err:#f85149;--wrn:#e3b341;--ok:#3fb950;--nav:#0d1117;--tln:#00C9A7;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shd:0 4px 24px rgba(0,0,0,.6);--shs:0 2px 10px rgba(0,0,0,.4);--ra:rgba(0,201,167,.025)}
-[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--cardh:#f5f9ff;--bdr:#d0dae8;--bdrh:#a0b8d8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--aglow:rgba(21,101,192,.14);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--tag:#1565C0;--err:#c62828;--wrn:#e65100;--ok:#2e7d32;--nav:#fff;--tln:#1565C0;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shd:0 4px 20px rgba(21,101,192,.10);--shs:0 2px 8px rgba(21,101,192,.08);--ra:rgba(21,101,192,.025)}
-[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--cardh:#2f2f33;--bdr:#3f3f46;--bdrh:#58585f;--acc:#D4A017;--adim:rgba(212,160,23,.10);--aglow:rgba(212,160,23,.20);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--tag:#D4A017;--err:#ef4444;--wrn:#f59e0b;--ok:#22c55e;--nav:#111113;--tln:#D4A017;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shd:0 4px 24px rgba(0,0,0,.7);--shs:0 2px 10px rgba(0,0,0,.5);--ra:rgba(212,160,23,.025)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--fb);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
-.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;box-shadow:var(--shs)}
-.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);letter-spacing:.5px;white-space:nowrap}
-.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400}
-.sep{flex:1}
-.tnav{display:flex;gap:2px}
-.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
-.tnav a:hover{background:var(--adim);color:var(--acc)}
-.tnav a.ON{background:var(--tbg);color:var(--acc)}
-.ctrl{display:flex;align-items:center;gap:10px}
-.clbl{font-size:10px;color:var(--tm)}
-.tdots{display:flex;gap:5px}
-.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
-.tdot[data-t="slate"]{background:#00C9A7}
-.tdot[data-t="arctic"]{background:#1565C0}
-.tdot[data-t="ember"]{background:#D4A017}
-.tdot.active{border-color:var(--th);transform:scale(1.2)}
-.fsw{display:flex;gap:4px}
-.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
-.fbtn:hover,.fbtn.active{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
-.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
-.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
-.sb-sec{margin-bottom:4px}
-.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
-.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
-.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
-.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
-.MN{margin-left:200px;padding:20px;position:relative;z-index:1;min-height:calc(100vh - 52px)}
-.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
-.ph-ico{width:38px;height:38px;background:var(--adim);border:1px solid var(--bdr);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.ph-title{font-family:var(--fh);font-size:18px;font-weight:700;color:var(--th)}
-.ph-sub{font-size:11px;color:var(--tm)}
-.ph-right{margin-left:auto}
-.pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)}
-.alert{background:rgba(248,81,73,.10);border:1px solid rgba(248,81,73,.30);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--err);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
-.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
-.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
-.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
-.tbl td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb)}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--adim)}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
-.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
-.b-acc{background:var(--tbg);color:var(--acc)}
-.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
-.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
-.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
-.fctl{display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
-.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;width:240px;outline:none;transition:border .2s}
-.si:focus{border-color:var(--acc)}
-/* PIN gate */
-.pin-gate{display:flex;align-items:center;justify-content:center;min-height:300px}
-.pin-box{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:28px 32px;text-align:center;max-width:320px;width:100%}
-.pin-box h3{font-family:var(--fh);color:var(--th);margin-bottom:6px}
-.pin-box p{font-size:12px;color:var(--tm);margin-bottom:18px}
-.pin-in{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:10px;color:var(--th);font-size:18px;letter-spacing:6px;text-align:center;width:100%;outline:none;transition:border .2s;margin-bottom:12px}
-.pin-in:focus{border-color:var(--acc)}
-.btn{background:var(--acc);color:#000;border:none;padding:9px 24px;border-radius:6px;cursor:pointer;font-weight:700;font-size:12px;transition:opacity .2s}
-.btn:hover{opacity:.85}
-.p-err{color:var(--err);font-size:11px;margin-top:8px}
-.pwd-cell{font-family:monospace;font-size:11px;cursor:pointer;user-select:none;color:var(--acc)}
-.pwd-cell.hidden{color:var(--tm);letter-spacing:2px}
-@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
-</style>
 
-<style id="dark-override">
-/* ── DARK MODE OVERRIDE ── */
-body{background:#0a0a0a!important;color:#f0f0f0!important}
-.kpi-c,.fi2,.sys-row,.mc,.ch-card,.act-i{background:#141414!important;border-color:#242424!important;color:#f0f0f0!important}
-.kpi-num{color:#f0f0f0!important}
-.kpi-lbl{color:#b0b8c8!important}
-.kpi-ch.nc{background:rgba(255,255,255,.06)!important;color:#b0b8c8!important}
-.mc-title{color:#f0f0f0!important}
-.mc-desc{color:#5a6478!important}
-.mc-arr{color:#5a6478!important}
-.sh-title{color:#f0f0f0!important}
-.sh-sub{color:#5a6478!important}
-.ann{background:linear-gradient(135deg,rgba(129,140,248,.1),rgba(167,139,250,.1))!important;border-color:rgba(129,140,248,.2)!important}
-.ann-t{color:#a78bfa!important}
-.ann-cl{color:#5a6478!important}
-.ann-cl:hover{color:#f0f0f0!important}
-.fn{color:#f0f0f0!important}
-.fk{color:#5a6478!important}
-.fv{color:#b0b8c8!important}
-.wsn{color:#f0f0f0!important}
-.act-text{color:#f0f0f0!important}
-.act-sub{color:#5a6478!important}
-.sys-lbl{color:#f0f0f0!important}
-.hdr{background:rgba(10,10,10,.92)!important}
-select option{background:#141414!important;color:#f0f0f0!important}
-input,select,textarea{background:#111111!important;color:#f0f0f0!important;border-color:#242424!important}
-input::placeholder,textarea::placeholder{color:#5a6478!important}
-.OV-box{background:#141414!important;border-color:#242424!important}
-.welcome{background:linear-gradient(135deg,#0a1a0d 0%,#0d1a14 50%,#0a0d14 100%)!important}
-.bg-grid .ch-card{background:#141414!important;border-color:#242424!important}
-.kpi-pb-bg{background:#242424!important}
-.fp{background:#242424!important}
-.fi2{background:#141414!important;border-color:#242424!important}
-.fi2:hover{background:#1a1a1a!important}
-</style>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../wms-theme.css">
 </head>
 <body>
-<nav class="TB">
-  <div class="brand">EPFBD<small>Warehouse Management System</small></div>
-  <div class="sep"></div>
-  <div class="tnav">
-    <a href="../index.html">Dashboard</a>
-    <a href="../manpower/all_manpower.html">Manpower</a>
-    <a href="wh_list.html" class="ON">Warehouse</a>
-    <a href="../equipment/pda_devices.html">Equipment</a>
-    <a href="../kpi/staff_kpi.html">KPI</a>
-  </div>
-  <div class="ctrl">
-    <span class="clbl">Theme</span>
-    <div class="tdots">
-      <div class="tdot" data-t="slate" onclick="setTheme('slate')" title="Slate Night"></div>
-      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')" title="Arctic Light"></div>
-      <div class="tdot" data-t="ember" onclick="setTheme('ember')" title="Ember Gold"></div>
+<header class="hdr">
+  <div><div class="hdr-title">MIS Login</div><div class="hdr-bc">EPFBD WMS · Warehouse</div></div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" placeholder="Search…"></div>
+  <a class="hdr-btn" href="../firebase-setup.html">🔥</a>
+  <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
+  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <div class="hdr-clk" id="CLK">--:--:--</div>
+</header>
+<aside class="sb">
+  <a class="sb-logo" href="../index.html"><div class="sb-mark">🏭</div>
+    <div><div class="sb-name">EPFBD WMS</div><div class="sb-sub">Warehouse System</div></div></a>
+  <nav class="sb-nav">
+    <div class="sb-grp"><span class="sb-grp-lbl">Main</span>
+      <a class="sb-a" href="../index.html"><div class="sb-ico">🏠</div>Dashboard</a>
+      <a class="sb-a" href="../kpi/staff_kpi.html"><div class="sb-ico">⭐</div>KPI</a>
     </div>
-    <span class="clbl">Font</span>
-    <div class="fsw">
-      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
-      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    <div class="sb-grp"><span class="sb-grp-lbl">Manpower</span>
+      <a class="sb-a" href="../manpower/all_manpower.html"><div class="sb-ico">👥</div>All Manpower<span class="sb-badge">264</span></a>
+      <div class="sb-chips"><a class="sb-chip" href="../manpower/EPF_manpower.html">EPF</a><a class="sb-chip" href="../manpower/TGL_manpower.html">TGL</a><a class="sb-chip" href="../manpower/BGL_manpower.html">BGL</a><a class="sb-chip" href="../manpower/GTM_manpower.html">GTM</a><a class="sb-chip" href="../manpower/RFL_manpower.html">RFL</a><a class="sb-chip" href="../manpower/EC_manpower.html">EC</a></div>
     </div>
-    <div id="CLK" class="clk">--:--:--</div>
-  </div>
-</nav>
-<aside class="SB">
-  <div class="sb-sec"><div class="sb-hd">Main</div>
-    <a class="sb-a" href="../index.html">&#127968; Dashboard</a>
-  </div>
-  <div class="sb-sec"><div class="sb-hd">Manpower</div>
-    <a class="sb-a" href="../manpower/all_manpower.html">&#128101; All Manpower</a>
-    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span>EPF</a>
-    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span>TGL</a>
-    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span>RFL</a>
-    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span>EC</a>
-  </div>
-  <div class="sb-sec"><div class="sb-hd">Warehouse</div>
-    <a class="sb-a" href="wh_list.html">&#127981; WH List</a>
-    <a class="sb-a ON" href="mis_login.html">&#128272; MIS Login</a>
-    <a class="sb-a" href="mail_list.html">&#128140; Mail List</a>
-  </div>
-  <div class="sb-sec"><div class="sb-hd">Equipment</div>
-    <a class="sb-a" href="../equipment/pda_devices.html">&#128241; PDA / Scanner</a>
-    <a class="sb-a" href="../equipment/forklift.html">&#127959; Forklift</a>
-  </div>
-  <div class="sb-sec"><div class="sb-hd">Performance</div>
-    <a class="sb-a" href="../kpi/staff_kpi.html">&#11088; Staff KPI</a>
-  </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Warehouse</span>
+      <a class="sb-a" href="../warehouse/wh_list.html"><div class="sb-ico">🏭</div>WH List</a>
+      <a class="sb-a ON" href="../warehouse/mis_login.html"><div class="sb-ico">🔑</div>MIS Login</a>
+      <a class="sb-a" href="../warehouse/mail_list.html"><div class="sb-ico">📧</div>Mail List</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Equipment</span>
+      <a class="sb-a" href="../equipment/pda_devices.html"><div class="sb-ico">📱</div>PDA &amp; Scanner</a>
+      <a class="sb-a" href="../equipment/barcode_printer.html"><div class="sb-ico">🖨</div>Barcode Printer</a>
+      <a class="sb-a" href="../equipment/forklift.html"><div class="sb-ico">🚜</div>Forklift</a>
+      <a class="sb-a" href="../equipment/maintenance_log.html"><div class="sb-ico">🔧</div>Maintenance</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">HR</span>
+      <a class="sb-a" href="../hr/attendance.html"><div class="sb-ico">📋</div>Attendance &amp; Leave</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Setup</span>
+      <a class="sb-a" href="../firebase-setup.html"><div class="sb-ico">🔥</div>Firebase</a>
+    </div>
+  </nav>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
+    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
 </aside>
-<main class="MN">
+<main class="mn">
 <div class="ph">
   <div class="ph-ico">&#128272;</div>
   <div>
     <div class="ph-title">MIS ID & Password</div>
     <div class="ph-sub">Warehouse MIS login credentials — All units</div>
   </div>
-  <div class="ph-right">
+  <div class="ph-r">
     <span class="pill">19 Accounts</span>
   </div>
 </div>
@@ -197,14 +82,23 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
 <!-- Content (hidden until PIN ok) -->
 <div id="content" style="display:none">
 
-<div class="fctl">
-  <input class="si" id="srch" placeholder="&#128269; Search name, ID, WH code…" oninput="render()">
+<div class="frow">
+  <input class="fi" id="srch" placeholder="&#128269; Search name, ID, WH code…" oninput="render()">
 </div>
 
+<div class="imp-bar an d1">
+  <div><div class="imp-bar-title">📥 Import / Export</div><div class="imp-bar-sub">Excel import · Template · Backup</div></div>
+  <div class="imp-btns">
+    <button class="btn btn-b" onclick="dlTemplate()">⬇ Template (.csv)</button>
+    <label class="btn btn-g" style="cursor:pointer">📂 Import Excel<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importFile(this)"></label>
+    <button class="btn btn-y" onclick="exportExcel()">📤 Export</button>
+    <button class="btn btn-s" onclick="openBackup()">💾 Backup</button>
+  </div>
+</div>
 <div class="card">
   <div class="card-hd">
-    <div class="card-hd-title">&#128272; MIS Login Credentials</div>
-    <span class="card-hd-badge" id="cnt">0</span>
+    <div class="card-title">&#128272; MIS Login Credentials</div>
+    <span class="card-cnt" id="cnt">0</span>
   </div>
   <div style="overflow-x:auto">
   <table class="tbl">
@@ -269,7 +163,7 @@ function render(){
       <td><span class="badge b-grey">${d.desg}</span></td>
       <td><span class="badge b-acc">${d.wh}</span></td>
       <td>${d.dept}</td>
-      <td style="font-size:11px;color:var(--tm)">${d.loc}</td>
+      <td style="font-size:11px;color:var(--t3)">${d.loc}</td>
     </tr>`;
   }).join('');
 }
@@ -294,5 +188,30 @@ function startClock(){const c=document.getElementById('CLK');setInterval(()=>{c.
 function init(){const t=localStorage.getItem('wms-theme')||'slate';const f=localStorage.getItem('wms-font')||'ubuntu';setTheme(t);setFont(f);startClock()}
 init();
 </script>
+<div class="OV" id="bkpModal">
+  <div class="OV-box" style="max-width:500px">
+    <h3>💾 Backup &amp; Restore</h3>
+    <div class="OV-sub">ডেটা backup নিন অথবা restore করুন</div>
+    <div class="bkp-panel">
+      <div class="bkp-title">📤 Backup নিন</div>
+      <div class="bkp-sub">সম্পূর্ণ ডেটা download করুন</div>
+      <div class="bkp-btns">
+        <button class="btn btn-g" onclick="backupExcel()">📊 Excel (.csv)</button>
+        <button class="btn btn-b" onclick="backupJSON()">📄 JSON</button>
+        <button class="btn btn-p" onclick="backupEmail()">✉️ Email</button>
+      </div>
+    </div>
+    <div class="bkp-panel" style="background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.05));border-color:rgba(249,115,22,.2)">
+      <div class="bkp-title" style="color:var(--ora)">📥 Restore করুন</div>
+      <div class="bkp-sub">Backup file থেকে ডেটা ফিরিয়ে আনুন</div>
+      <div class="bkp-btns">
+        <label class="btn btn-y" style="cursor:pointer">📂 File নির্বাচন<input type="file" accept=".json,.csv" style="display:none" onchange="restoreBackup(this)"></label>
+      </div>
+    </div>
+    <div id="bkpStatus" style="font-size:13px;color:var(--t3);margin-bottom:8px;min-height:20px"></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeBkp()">বন্ধ করুন</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
 </body>
 </html>

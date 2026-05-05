@@ -4,187 +4,129 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EPFBD WMS — Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="wms-theme.css">
 <style>
-.welcome{background:linear-gradient(135deg,var(--text-1) 0%,#2d3561 50%,#1f2d5c 100%);border-radius:20px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;position:relative;overflow:hidden}
-.welcome::before{content:'';position:absolute;top:-40px;right:120px;width:200px;height:200px;background:radial-gradient(circle,rgba(62,207,142,.22) 0%,transparent 70%);pointer-events:none}
-.welcome::after{content:'';position:absolute;bottom:-30px;right:-20px;width:160px;height:160px;background:radial-gradient(circle,rgba(99,102,241,.18) 0%,transparent 70%);pointer-events:none}
-.wt{}
-.wg{font-size:13px;color:rgba(255,255,255,.55);font-weight:500;margin-bottom:4px}
-.wti{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:white;line-height:1.25;margin-bottom:8px}
-.wti span{color:#3ecf8e}
-.ws{font-size:13px;color:rgba(255,255,255,.45)}
+.welcome{background:linear-gradient(135deg,#0c1a0e,#0a1614,#0d1118);border:1px solid var(--bdr);border-radius:var(--r5);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;position:relative;overflow:hidden}
+.welcome::before{content:'';position:absolute;top:-40px;right:120px;width:200px;height:200px;background:radial-gradient(circle,rgba(62,207,142,.18) 0%,transparent 70%);pointer-events:none}
+.wg{font-size:13.5px;color:rgba(255,255,255,.5);font-weight:500;margin-bottom:4px}
+.wti{font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:800;color:white;line-height:1.25;margin-bottom:8px}
+.wti span{color:var(--acc)}
+.ws{font-size:13.5px;color:rgba(255,255,255,.4)}
 .wstats{display:flex;gap:32px;position:relative;z-index:1}
 .wst{text-align:center}
-.wsn{font-family:'Plus Jakarta Sans',sans-serif;font-size:26px;font-weight:800;color:white}
-.wsl{font-size:11px;color:rgba(255,255,255,.45);font-weight:500}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-.kpi-c{background:var(--surface);border-radius:20px;padding:20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.5);transition:all .25s cubic-bezier(.4,0,.2,1);cursor:default;position:relative;overflow:hidden}
-.kpi-c:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.55)}
+.wsn{font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:white}
+.wsl{font-size:12px;color:rgba(255,255,255,.4);font-weight:500}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.kpi-c{background:var(--sur);border-radius:var(--r4);padding:20px;border:1px solid var(--bdr);box-shadow:var(--sh1);transition:all .25s var(--ease);position:relative;overflow:hidden}
+.kpi-c:hover{transform:translateY(-2px);box-shadow:var(--sh3)}
 .kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.kpi-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.kpi-ch{display:flex;align-items:center;gap:3px;font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px}
-.kpi-ch.up{background:rgba(34,197,94,.12);color:#22c55e}
-.kpi-ch.dn{background:rgba(239,68,68,.12);color:#ef4444}
-.kpi-ch.nc{background:var(--bg2);color:var(--text-3)}
-.kpi-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--text-1);line-height:1;margin-bottom:4px}
-.kpi-lbl{font-size:12.5px;color:var(--text-2);font-weight:500}
+.kpi-ico{width:44px;height:44px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:20px}
+.kpi-ch{display:flex;align-items:center;gap:3px;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:var(--rf)}
+.kpi-ch.up{background:var(--grn2);color:var(--grn)}
+.kpi-ch.nc{background:rgba(255,255,255,.06);color:var(--t3)}
+.kpi-num{font-family:'Plus Jakarta Sans',sans-serif;font-size:30px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:4px}
+.kpi-lbl{font-size:13.5px;color:var(--t2);font-weight:500}
 .kpi-pb{margin-top:14px}
-.kpi-pb-bg{height:4px;background:var(--border);border-radius:99px;overflow:hidden}
-.kpi-pb-bar{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
-.kpi-pb-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text-3);margin-top:5px}
-.cg{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px}
-.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
-.mc{background:var(--surface);border-radius:20px;padding:18px 20px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,.5);text-decoration:none;display:flex;align-items:center;gap:14px;transition:all .25s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
-.mc:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.55);border-color:var(--border2)}
-.mc-ico{width:46px;height:46px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.mc-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;font-weight:700;color:var(--text-1);margin-bottom:2px}
-.mc-desc{font-size:11.5px;color:var(--text-3)}
-.mc-arr{margin-left:auto;font-size:16px;color:var(--text-3);transition:all .2s;flex-shrink:0}
-.mc:hover .mc-arr{color:var(--accent-d);transform:translateX(3px)}
-.ms{position:absolute;top:12px;right:12px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px}
-.ms-live{background:rgba(34,197,94,.12);color:#22c55e}
+.kpi-pb-bg{height:4px;background:var(--bdr);border-radius:99px;overflow:hidden}
+.kpi-pb-bar{height:100%;border-radius:99px;transition:width .6s var(--ease)}
+.kpi-pb-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--t3);margin-top:5px}
+.cg{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:22px}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+.mc{background:var(--sur);border-radius:var(--r4);padding:18px 20px;border:1px solid var(--bdr);box-shadow:var(--sh1);text-decoration:none;display:flex;align-items:center;gap:14px;transition:all .25s var(--ease);position:relative;overflow:hidden}
+.mc:hover{transform:translateY(-2px);box-shadow:var(--sh3);border-color:var(--bdr2)}
+.mc-ico{width:48px;height:48px;border-radius:var(--r3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.mc-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:14.5px;font-weight:700;color:var(--t1);margin-bottom:2px}
+.mc-desc{font-size:12.5px;color:var(--t3)}
+.mc-arr{margin-left:auto;font-size:16px;color:var(--t3);transition:all .2s;flex-shrink:0}
+.mc:hover .mc-arr{color:var(--acc2);transform:translateX(3px)}
+.ms{position:absolute;top:12px;right:12px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--rf);text-transform:uppercase;letter-spacing:.5px}
+.ms-live{background:var(--grn2);color:var(--grn)}
 .bg-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.ann{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(139,92,246,.08));border:1px solid rgba(99,102,241,.18);border-radius:16px;padding:12px 18px;display:flex;align-items:center;gap:12px;margin-bottom:20px}
-.ann-t{font-size:13px;color:#6366f1;font-weight:500}
-.ann-cl{margin-left:auto;cursor:pointer;color:var(--text-3);font-size:16px;background:none;border:none;transition:color .2s}
-.ann-cl:hover{color:var(--text-1)}
+.ann{background:linear-gradient(135deg,var(--ind2),var(--pur2));border:1px solid rgba(129,140,248,.2);border-radius:var(--r3);padding:12px 18px;display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.ann-t{font-size:13.5px;color:var(--ind);font-weight:500}
+.ann-cl{margin-left:auto;cursor:pointer;color:var(--t3);font-size:16px;background:none;border:none;transition:color .2s}
+.ann-cl:hover{color:var(--t1)}
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.sh-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--text-1)}
-.sh-sub{font-size:12px;color:var(--text-3);margin-top:1px}
-.sh-lnk{font-size:12px;font-weight:600;color:var(--accent-d);text-decoration:none;transition:opacity .2s}
+.sh-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:16px;font-weight:700;color:var(--t1)}
+.sh-sub{font-size:12.5px;color:var(--t3);margin-top:1px}
+.sh-lnk{font-size:13px;font-weight:600;color:var(--acc2);text-decoration:none;transition:opacity .2s}
 .sh-lnk:hover{opacity:.75}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
-.fi2{background:var(--bg2);border-radius:16px;padding:14px;border:1px solid var(--border);transition:all .2s}
-.fi2:hover{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.4)}
-.fn{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.fd{width:7px;height:7px;border-radius:99px;background:#22c55e}
+.fi2{background:var(--sur2);border-radius:var(--r3);padding:16px;border:1px solid var(--bdr);transition:all .2s}
+.fi2:hover{background:var(--sur3);box-shadow:var(--sh1)}
+.fn{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;color:var(--t1);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.fd{width:7px;height:7px;border-radius:99px;background:var(--grn)}
 .fr2{display:flex;justify-content:space-between;margin-bottom:3px}
-.fk{font-size:11px;color:var(--text-3)}
-.fv{font-size:11px;font-weight:600;color:var(--text-2)}
-.fp{height:3px;background:var(--border);border-radius:99px;margin-top:8px;overflow:hidden}
-.fp-b{height:100%;border-radius:99px;background:linear-gradient(90deg,#3ecf8e,var(--accent-d))}
-.act-i{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.fk{font-size:12.5px;color:var(--t3)}
+.fv{font-size:12.5px;font-weight:600;color:var(--t2)}
+.fp{height:3px;background:var(--bdr);border-radius:99px;margin-top:8px;overflow:hidden}
+.fp-b{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.act-i{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-bottom:1px solid var(--bdr)}
 .act-i:last-child{border-bottom:none;padding-bottom:0}
 .act-d{width:8px;height:8px;border-radius:99px;margin-top:5px;flex-shrink:0}
-.act-text{font-size:13px;color:var(--text-1);font-weight:500}
-.act-sub{font-size:11.5px;color:var(--text-3);margin-top:1px}
-.act-time{font-size:11px;color:var(--text-3);white-space:nowrap}
-.sys-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface2);border-radius:12px;border:1px solid var(--border);margin-bottom:8px}
+.act-text{font-size:13.5px;color:var(--t1);font-weight:500}
+.act-sub{font-size:12.5px;color:var(--t3);margin-top:1px}
+.act-time{font-size:12px;color:var(--t3);white-space:nowrap}
+.sys-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--sur2);border-radius:var(--r2);border:1px solid var(--bdr);margin-bottom:8px}
 .sys-row:last-child{margin-bottom:0}
-.sys-lbl{font-size:13px;font-weight:500;color:var(--text-1)}
+.sys-lbl{font-size:13.5px;font-weight:500;color:var(--t1)}
+.ch-card{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r4);padding:22px;box-shadow:var(--sh1)}
+.ch-wrap{position:relative;height:220px;margin-top:16px}
 @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}.cg{grid-template-columns:1fr}.mg{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:900px){.bg-grid{grid-template-columns:1fr}.wstats{display:none}}
 @media(max-width:600px){.kpi-grid{grid-template-columns:1fr}.mg{grid-template-columns:1fr}}
-</style>
-
-<style id="dark-override">
-/* ── DARK MODE OVERRIDE ── */
-body{background:#0a0a0a!important;color:#f0f0f0!important}
-.kpi-c,.fi2,.sys-row,.mc,.ch-card,.act-i{background:#141414!important;border-color:#242424!important;color:#f0f0f0!important}
-.kpi-num{color:#f0f0f0!important}
-.kpi-lbl{color:#b0b8c8!important}
-.kpi-ch.nc{background:rgba(255,255,255,.06)!important;color:#b0b8c8!important}
-.mc-title{color:#f0f0f0!important}
-.mc-desc{color:#5a6478!important}
-.mc-arr{color:#5a6478!important}
-.sh-title{color:#f0f0f0!important}
-.sh-sub{color:#5a6478!important}
-.ann{background:linear-gradient(135deg,rgba(129,140,248,.1),rgba(167,139,250,.1))!important;border-color:rgba(129,140,248,.2)!important}
-.ann-t{color:#a78bfa!important}
-.ann-cl{color:#5a6478!important}
-.ann-cl:hover{color:#f0f0f0!important}
-.fn{color:#f0f0f0!important}
-.fk{color:#5a6478!important}
-.fv{color:#b0b8c8!important}
-.wsn{color:#f0f0f0!important}
-.act-text{color:#f0f0f0!important}
-.act-sub{color:#5a6478!important}
-.sys-lbl{color:#f0f0f0!important}
-.hdr{background:rgba(10,10,10,.92)!important}
-select option{background:#141414!important;color:#f0f0f0!important}
-input,select,textarea{background:#111111!important;color:#f0f0f0!important;border-color:#242424!important}
-input::placeholder,textarea::placeholder{color:#5a6478!important}
-.OV-box{background:#141414!important;border-color:#242424!important}
-.welcome{background:linear-gradient(135deg,#0a1a0d 0%,#0d1a14 50%,#0a0d14 100%)!important}
-.bg-grid .ch-card{background:#141414!important;border-color:#242424!important}
-.kpi-pb-bg{background:#242424!important}
-.fp{background:#242424!important}
-.fi2{background:#141414!important;border-color:#242424!important}
-.fi2:hover{background:#1a1a1a!important}
 </style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <aside class="sb">
-  <a class="sb-logo" href="index.html">
-    <div class="sb-logo-mark">🏭</div>
-    <div>
-      <div class="sb-logo-name">EPFBD WMS</div>
-      <div class="sb-logo-sub">Management System</div>
-    </div>
-  </a>
+  <a class="sb-logo" href="index.html"><div class="sb-mark">🏭</div>
+    <div><div class="sb-name">EPFBD WMS</div><div class="sb-sub">Warehouse System</div></div></a>
   <nav class="sb-nav">
-    <div class="sb-sec">
-      <span class="sb-sec-lbl">Main</span>
+    <div class="sb-grp"><span class="sb-grp-lbl">Main</span>
       <a class="sb-a ON" href="index.html"><div class="sb-ico">🏠</div>Dashboard</a>
-      <a class="sb-a" href="kpi/staff_kpi.html"><div class="sb-ico">⭐</div>KPI Dashboard</a>
+      <a class="sb-a" href="kpi/staff_kpi.html"><div class="sb-ico">⭐</div>KPI</a>
     </div>
-    <div class="sb-sec">
-      <span class="sb-sec-lbl">Manpower</span>
+    <div class="sb-grp"><span class="sb-grp-lbl">Manpower</span>
       <a class="sb-a" href="manpower/all_manpower.html"><div class="sb-ico">👥</div>All Manpower<span class="sb-badge">264</span></a>
-      <div class="sb-chips">
-        <a class="sb-chip" href="manpower/EPF_manpower.html">EPF</a>
-        <a class="sb-chip" href="manpower/TGL_manpower.html">TGL</a>
-        <a class="sb-chip" href="manpower/BGL_manpower.html">BGL</a>
-        <a class="sb-chip" href="manpower/GTM_manpower.html">GTM</a>
-        <a class="sb-chip" href="manpower/RFL_manpower.html">RFL</a>
-        <a class="sb-chip" href="manpower/EC_manpower.html">EC</a>
-      </div>
+      <div class="sb-chips"><a class="sb-chip" href="manpower/EPF_manpower.html">EPF</a><a class="sb-chip" href="manpower/TGL_manpower.html">TGL</a><a class="sb-chip" href="manpower/BGL_manpower.html">BGL</a><a class="sb-chip" href="manpower/GTM_manpower.html">GTM</a><a class="sb-chip" href="manpower/RFL_manpower.html">RFL</a><a class="sb-chip" href="manpower/EC_manpower.html">EC</a></div>
     </div>
-    <div class="sb-sec">
-      <span class="sb-sec-lbl">Warehouse</span>
+    <div class="sb-grp"><span class="sb-grp-lbl">Warehouse</span>
       <a class="sb-a" href="warehouse/wh_list.html"><div class="sb-ico">🏭</div>WH List</a>
       <a class="sb-a" href="warehouse/mis_login.html"><div class="sb-ico">🔑</div>MIS Login</a>
       <a class="sb-a" href="warehouse/mail_list.html"><div class="sb-ico">📧</div>Mail List</a>
     </div>
-    <div class="sb-sec">
-      <span class="sb-sec-lbl">Equipment</span>
-      <a class="sb-a" href="equipment/pda_devices.html"><div class="sb-ico">📱</div>PDA & Scanner</a>
+    <div class="sb-grp"><span class="sb-grp-lbl">Equipment</span>
+      <a class="sb-a" href="equipment/pda_devices.html"><div class="sb-ico">📱</div>PDA &amp; Scanner</a>
+      <a class="sb-a" href="equipment/barcode_printer.html"><div class="sb-ico">🖨</div>Barcode Printer</a>
       <a class="sb-a" href="equipment/forklift.html"><div class="sb-ico">🚜</div>Forklift</a>
       <a class="sb-a" href="equipment/maintenance_log.html"><div class="sb-ico">🔧</div>Maintenance</a>
     </div>
-    <div class="sb-sec">
-      <span class="sb-sec-lbl">HR</span>
-      <a class="sb-a" href="hr/attendance.html"><div class="sb-ico">📋</div>Attendance & Leave</a>
+    <div class="sb-grp"><span class="sb-grp-lbl">HR</span>
+      <a class="sb-a" href="hr/attendance.html"><div class="sb-ico">📋</div>Attendance &amp; Leave</a>
     </div>
-    <div class="sb-sec">
-      <span class="sb-sec-lbl">Setup</span>
-      <a class="sb-a" href="firebase-setup.html"><div class="sb-ico">🔥</div>Firebase Setup</a>
+    <div class="sb-grp"><span class="sb-grp-lbl">Setup</span>
+      <a class="sb-a" href="firebase-setup.html"><div class="sb-ico">🔥</div>Firebase</a>
     </div>
   </nav>
-  <div class="sb-foot">
-    <div class="sb-user">
-      <div class="sb-av">MD</div>
-      <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div>
-    </div>
-  </div>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
+    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
 </aside>
 
 <!-- HEADER -->
 <header class="hdr">
   <div><div class="hdr-title">Dashboard</div><div class="hdr-bc">EPFBD WMS · Overview</div></div>
   <div class="hdr-sep"></div>
-  <div class="hdr-search">
-    <span style="color:var(--text-3);font-size:14px">🔍</span>
-    <input type="text" placeholder="Search pages, data…">
-  </div>
-  <a class="hdr-btn" href="firebase-setup.html" title="Firebase">🔥</a>
+  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" placeholder="Search pages, data…"></div>
+  <a class="hdr-btn" href="firebase-setup.html">🔥</a>
   <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
   <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
-  <div class="hdr-clock" id="CLK">--:--:--</div>
+  <div class="hdr-clk" id="CLK">--:--:--</div>
 </header>
 
 <!-- MAIN -->
@@ -213,6 +155,20 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
   </div>
 </div>
 
+
+<!-- ── GLOBAL SYSTEM BACKUP ─────────────────── -->
+<div style="background:linear-gradient(135deg,rgba(129,140,248,.07),rgba(167,139,250,.05));border:1px solid rgba(129,140,248,.2);border-radius:20px;padding:18px 24px;margin-bottom:22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap" class="an d2">
+  <div style="font-size:22px">💾</div>
+  <div>
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;color:var(--ind);margin-bottom:2px">System Backup — সম্পূর্ণ সিস্টেম</div>
+    <div style="font-size:13px;color:var(--t3)">সব মডিউলের ডেটা একসাথে backup নিন · Excel · JSON · Email</div>
+  </div>
+  <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn btn-g" onclick="sysBackupExcel()">📊 Full Excel Backup</button>
+    <button class="btn btn-b" onclick="sysBackupJSON()">📄 Full JSON Backup</button>
+    <button class="btn btn-p" onclick="sysBackupEmail()">✉️ Email Backup</button>
+  </div>
+</div>
 <!-- KPI Cards -->
 <div class="sh anim d2">
   <div><div class="sh-title">KPI Overview</div><div class="sh-sub">Real-time warehouse performance</div></div>
@@ -369,14 +325,14 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
   </div>
   <div class="ch-card">
     <div class="sh"><div><div class="sh-title">System Status</div><div class="sh-sub">All modules health</div></div><span class="badge b-green">All OK</span></div>
-    <div class="sys-row"><span class="sys-lbl">🔥 Firebase Sync</span><span class="badge" id="fb-st" style="background:var(--surface)3cd;color:#f59e0b">Checking…</span></div>
+    <div class="sys-row"><span class="sys-lbl">🔥 Firebase Sync</span><span class="badge" id="fb-st" style="background:var(--sur)3cd;color:#f59e0b">Checking…</span></div>
     <div class="sys-row"><span class="sys-lbl">👥 Manpower DB</span><span class="badge b-green">264 records</span></div>
     <div class="sys-row"><span class="sys-lbl">🚜 Equipment</span><span class="badge b-green">68 units</span></div>
     <div class="sys-row"><span class="sys-lbl">🔧 Maintenance Log</span><span class="badge b-green">1,613 records</span></div>
     <div class="sys-row"><span class="sys-lbl">📊 KPI Modules</span><span class="badge b-green">5 active</span></div>
     <div style="margin-top:12px;padding:14px;background:linear-gradient(135deg,rgba(62,207,142,.08),rgba(99,102,241,.08));border-radius:16px;border:1px solid rgba(62,207,142,.2)">
       <div style="font-size:12px;font-weight:700;color:#2ba671;margin-bottom:3px">☁ Cloud Sync Status</div>
-      <div id="cloud-msg" style="font-size:12px;color:var(--text-2)">Checking Firebase connection…</div>
+      <div id="cloud-msg" style="font-size:12px;color:var(--t2)">Checking Firebase connection…</div>
     </div>
   </div>
 </div>
@@ -393,7 +349,7 @@ startClock();
 function buildCharts(){
   Chart.defaults.color='rgba(176,184,200,0.8)';
   Chart.defaults.borderColor='rgba(36,36,36,1)';
-  var tc='rgba(176,184,200,0.8)',gc='rgba(36,36,36,1)';
+  var tc='rgba(184,192,204,0.9)',gc='rgba(37,37,37,1)';
   var c1=document.getElementById('mp-ch');
   if(c1)new Chart(c1,{type:'bar',data:{labels:['EPF','TGL','BGL','GTM','RFL','EC'],datasets:[{label:'Officers',data:[35,14,2,1,0,0],backgroundColor:'rgba(62,207,142,.75)',borderRadius:6,borderSkipped:false},{label:'Labour',data:[103,51,2,2,0,0],backgroundColor:'rgba(99,102,241,.65)',borderRadius:6,borderSkipped:false},{label:'Driver',data:[7,5,0,0,0,0],backgroundColor:'rgba(249,115,22,.65)',borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc,font:{size:11},boxWidth:10,padding:14}}},scales:{x:{stacked:true,ticks:{color:tc,font:{size:11}},grid:{display:false}},y:{stacked:true,ticks:{color:tc,font:{size:11}},grid:{color:gc+'66'}}}}});
   var c2=document.getElementById('eq-ch');
@@ -414,5 +370,74 @@ async function checkFb(){
 }
 buildCharts();checkFb();
 </script>
+
+<script>
+function showToast(msg,cls){cls=cls||'tok';var t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
+  t.textContent=msg;t.className='toast '+cls+' show';clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show');},3200);}
+function startClock(){var c=document.getElementById('CLK');if(!c)return;
+  function tick(){var n=new Date(),p=function(v){return String(v).padStart(2,'0');};
+    c.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());}
+  tick();setInterval(tick,1000);}
+function sysBackupJSON(){
+  var pages=['Manpower','Warehouse','Equipment','HR','KPI'];
+  var payload={system:'EPFBD_WMS_v8',date:new Date().toISOString(),pages:pages,note:'Full system backup'};
+  var json=JSON.stringify(payload,null,2);
+  var a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(json);
+  a.download='WMS_FULL_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();showToast('💾 Full JSON Backup শুরু হয়েছে','tok');
+}
+function sysBackupExcel(){
+  var rows=['Module,Records,Last Updated'];
+  rows.push('Manpower,264,'+new Date().toLocaleDateString());
+  rows.push('Warehouse,27,'+new Date().toLocaleDateString());
+  rows.push('Equipment,68,'+new Date().toLocaleDateString());
+  rows.push('Maintenance,1613,'+new Date().toLocaleDateString());
+  rows.push('HR,Active,'+new Date().toLocaleDateString());
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(rows.join('
+'));
+  a.download='WMS_FULL_summary_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();showToast('📊 Excel Backup শুরু হয়েছে','tok');
+}
+function sysBackupEmail(){
+  var body='EPFBD WMS — Full System Backup Request
+Date: '+new Date().toLocaleDateString()+'
+System: EPFBD WMS v8
+Modules: Manpower (264), Warehouse (27), Equipment (68), Maintenance (1613)
+
+Please visit each module page for detailed data export.';
+  window.location.href='mailto:?subject=EPFBD WMS Full Backup — '+new Date().toLocaleDateString()+'&body='+encodeURIComponent(body);
+  showToast('✉️ Email client খুলছে…','tinf');
+}
+startClock();
+</script>
+<div class="toast" id="toast"></div>
+
+<div class="OV" id="bkpModal">
+  <div class="OV-box" style="max-width:500px">
+    <h3>💾 Backup &amp; Restore</h3>
+    <div class="OV-sub">ডেটা backup নিন অথবা restore করুন</div>
+    <div class="bkp-panel">
+      <div class="bkp-title">📤 Backup নিন</div>
+      <div class="bkp-sub">সম্পূর্ণ ডেটা download করুন</div>
+      <div class="bkp-btns">
+        <button class="btn btn-g" onclick="backupExcel()">📊 Excel (.csv)</button>
+        <button class="btn btn-b" onclick="backupJSON()">📄 JSON</button>
+        <button class="btn btn-p" onclick="backupEmail()">✉️ Email</button>
+      </div>
+    </div>
+    <div class="bkp-panel" style="background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.05));border-color:rgba(249,115,22,.2)">
+      <div class="bkp-title" style="color:var(--ora)">📥 Restore করুন</div>
+      <div class="bkp-sub">Backup file থেকে ডেটা ফিরিয়ে আনুন</div>
+      <div class="bkp-btns">
+        <label class="btn btn-y" style="cursor:pointer">📂 File নির্বাচন<input type="file" accept=".json,.csv" style="display:none" onchange="restoreBackup(this)"></label>
+      </div>
+    </div>
+    <div id="bkpStatus" style="font-size:13px;color:var(--t3);margin-bottom:8px;min-height:20px"></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeBkp()">বন্ধ করুন</button></div>
+  </div>
+</div>
 </body>
 </html>

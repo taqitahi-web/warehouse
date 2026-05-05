@@ -1,259 +1,87 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="slate" data-font="ubuntu">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KPI Dashboard — EPFBD WMS</title>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<style>
-[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
-[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
-[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--bdr:#2a3548;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--ok:#3fb950;--err:#f85149;--wrn:#e3b341;--nav:#0d1117;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shs:0 2px 10px rgba(0,0,0,.4);--shd:0 4px 24px rgba(0,0,0,.6);--ra:rgba(0,201,167,.025);--ch1:rgba(0,201,167,.7);--ch2:rgba(227,179,65,.7);--ch3:rgba(248,81,73,.7);--ch4:rgba(88,166,255,.7)}
-[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--bdr:#d0dae8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--ok:#2e7d32;--err:#c62828;--wrn:#e65100;--nav:#fff;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shs:0 2px 8px rgba(21,101,192,.08);--shd:0 4px 20px rgba(21,101,192,.10);--ra:rgba(21,101,192,.025);--ch1:rgba(21,101,192,.7);--ch2:rgba(230,81,0,.7);--ch3:rgba(198,40,40,.7);--ch4:rgba(46,125,50,.7)}
-[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--bdr:#3f3f46;--acc:#D4A017;--adim:rgba(212,160,23,.10);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--ok:#22c55e;--err:#ef4444;--wrn:#f59e0b;--nav:#111113;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shs:0 2px 10px rgba(0,0,0,.5);--shd:0 4px 24px rgba(0,0,0,.7);--ra:rgba(212,160,23,.025);--ch1:rgba(212,160,23,.7);--ch2:rgba(34,197,94,.7);--ch3:rgba(239,68,68,.7);--ch4:rgba(96,165,250,.7)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--fb);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
-.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;padding:0 16px;height:52px;box-shadow:var(--shs)}
-.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);white-space:nowrap}
-.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400}
-.sep{flex:1}
-.tnav{display:flex;gap:2px}
-.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
-.tnav a:hover{background:var(--adim);color:var(--acc)}
-.tnav a.ON{background:var(--tbg);color:var(--acc)}
-.ctrl{display:flex;align-items:center;gap:8px}
-.clbl{font-size:10px;color:var(--tm)}
-.tdots{display:flex;gap:5px}
-.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
-.tdot[data-t="slate"]{background:#00C9A7}.tdot[data-t="arctic"]{background:#1565C0}.tdot[data-t="ember"]{background:#D4A017}
-.tdot.ON{border-color:var(--th);transform:scale(1.2)}
-.fsw{display:flex;gap:4px}
-.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
-.fbtn:hover,.fbtn.ON{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
-.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
-.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
-.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
-.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
-.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
-.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
-.MN{margin-left:200px;padding:20px;position:relative;z-index:1}
-.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.ph-ico{width:40px;height:40px;background:var(--adim);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.ph-title{font-family:var(--fh);font-size:19px;font-weight:700;color:var(--th)}
-.ph-sub{font-size:11px;color:var(--tm)}
-.ph-right{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-/* KPI selector bar */
-.kpi-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
-.kpi-tab{padding:8px 16px;border-radius:8px;border:1px solid var(--bdr);background:var(--card);color:var(--tm);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--fb);transition:all .2s}
-.kpi-tab:hover{color:var(--tb);border-color:var(--bdrh,var(--bdr))}
-.kpi-tab.ON{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
-.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer;font-family:var(--fb)}
-.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;transition:border .2s;font-family:var(--fb)}
-.si:focus{border-color:var(--acc)}
-/* KPI Section */
-.kpi-sec{display:none}.kpi-sec.active{display:block}
-/* Stat grid */
-.stg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px}
-.stc{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:16px;position:relative;overflow:hidden}
-.stc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);opacity:.6}
-.stc.red::before{background:var(--err)}
-.stc.yellow::before{background:var(--wrn)}
-.stc.green::before{background:var(--ok)}
-.stc.blue::before{background:#58a6ff}
-.stc-num{font-family:var(--fh);font-size:28px;font-weight:700;color:var(--acc);line-height:1}
-.stc.red .stc-num{color:var(--err)}
-.stc.yellow .stc-num{color:var(--wrn)}
-.stc.green .stc-num{color:var(--ok)}
-.stc.blue .stc-num{color:#58a6ff}
-.stc-lbl{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
-.stc-sub{font-size:11px;color:var(--tb);margin-top:4px}
-.stc-trend{font-size:11px;font-weight:600;margin-top:6px}
-.trend-up{color:var(--ok)}.trend-dn{color:var(--err)}.trend-nc{color:var(--tm)}
-/* Chart grid */
-.chg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.chg3{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
-.ch-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:16px;box-shadow:var(--shs)}
-.ch-title{font-family:var(--fh);font-size:13px;font-weight:600;color:var(--th);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
-.ch-sub{font-size:10px;color:var(--tm);font-weight:400}
-.ch-wrap{position:relative;height:200px}
-/* Table card */
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
-.card-hd{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
-.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
-.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
-.tbl td{padding:9px 12px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--adim)}
-.badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700}
-.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
-.b-acc{background:var(--tbg);color:var(--acc)}
-.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
-.b-err{background:rgba(248,81,73,.15);color:var(--err)}
-.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
-.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
-/* Progress bar */
-.prog{background:var(--sur);border-radius:20px;height:8px;overflow:hidden;margin-top:4px}
-.prog-bar{height:100%;border-radius:20px;background:var(--acc);transition:width .5s}
-.prog-bar.red{background:var(--err)}.prog-bar.yellow{background:var(--wrn)}.prog-bar.green{background:var(--ok)}
-/* Add button */
-.a-add{background:var(--acc);color:#000;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--fb);border:none;cursor:pointer}
-.a-add:hover{opacity:.85}
-.abtn{border:none;border-radius:5px;cursor:pointer;padding:4px 8px;font-size:12px;transition:all .2s;background:var(--adim)}
-.a-edit{color:var(--wrn)}.a-edit:hover{background:rgba(227,179,65,.2)}
-.a-del{color:var(--err)}.a-del:hover{background:rgba(248,81,73,.2)}
-/* Modal */
-.OV{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
-.OV.show{display:flex}
-.OV-box{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:var(--shd)}
-.OV-box h3{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--th);margin-bottom:18px}
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fr{display:flex;flex-direction:column;gap:5px}
-.fr label{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.4px}
-.fr input,.fr select,.fr textarea{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--th);font-size:12px;font-family:var(--fb);outline:none;transition:border .2s;width:100%}
-.fr input:focus,.fr select:focus{border-color:var(--acc)}
-.fr select option{background:var(--card)}
-.ff{grid-column:1/-1}
-.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-.btn{border:none;border-radius:7px;padding:9px 20px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--fb);transition:all .2s}
-.btn-acc{background:var(--acc);color:#000}.btn-acc:hover{opacity:.85}
-.btn-sec{background:var(--adim);color:var(--acc);border:1px solid var(--bdr)}.btn-sec:hover{background:var(--tbg)}
-.btn-err{background:rgba(248,81,73,.15);color:var(--err);border:1px solid rgba(248,81,73,.3)}
-/* PIN */
-.pin-pad{display:flex;flex-direction:column;align-items:center;gap:14px}
-.pin-dots{display:flex;gap:10px}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
-.pin-dot.F{background:var(--acc);border-color:var(--acc)}
-.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:200px}
-.pkey{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--th);transition:all .2s;user-select:none}
-.pkey:hover{background:var(--adim);border-color:var(--acc);color:var(--acc)}
-.pin-err{color:var(--err);font-size:12px;display:none}
-/* Toast */
-.toast-el{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:10px 22px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
-.toast-el.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.tok{border-color:var(--ok);color:var(--ok)}.terr{border-color:var(--err);color:var(--err)}
-#sync-ind{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--adim);color:var(--tm)}
-.brow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap;justify-content:space-between}
-.divider{height:1px;background:var(--bdr);margin:20px 0}
-@media(max-width:900px){.chg,.chg3{grid-template-columns:1fr}}
-@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
-</style>
 
-<style id="dark-override">
-/* ── DARK MODE OVERRIDE ── */
-body{background:#0a0a0a!important;color:#f0f0f0!important}
-.kpi-c,.fi2,.sys-row,.mc,.ch-card,.act-i{background:#141414!important;border-color:#242424!important;color:#f0f0f0!important}
-.kpi-num{color:#f0f0f0!important}
-.kpi-lbl{color:#b0b8c8!important}
-.kpi-ch.nc{background:rgba(255,255,255,.06)!important;color:#b0b8c8!important}
-.mc-title{color:#f0f0f0!important}
-.mc-desc{color:#5a6478!important}
-.mc-arr{color:#5a6478!important}
-.sh-title{color:#f0f0f0!important}
-.sh-sub{color:#5a6478!important}
-.ann{background:linear-gradient(135deg,rgba(129,140,248,.1),rgba(167,139,250,.1))!important;border-color:rgba(129,140,248,.2)!important}
-.ann-t{color:#a78bfa!important}
-.ann-cl{color:#5a6478!important}
-.ann-cl:hover{color:#f0f0f0!important}
-.fn{color:#f0f0f0!important}
-.fk{color:#5a6478!important}
-.fv{color:#b0b8c8!important}
-.wsn{color:#f0f0f0!important}
-.act-text{color:#f0f0f0!important}
-.act-sub{color:#5a6478!important}
-.sys-lbl{color:#f0f0f0!important}
-.hdr{background:rgba(10,10,10,.92)!important}
-select option{background:#141414!important;color:#f0f0f0!important}
-input,select,textarea{background:#111111!important;color:#f0f0f0!important;border-color:#242424!important}
-input::placeholder,textarea::placeholder{color:#5a6478!important}
-.OV-box{background:#141414!important;border-color:#242424!important}
-.welcome{background:linear-gradient(135deg,#0a1a0d 0%,#0d1a14 50%,#0a0d14 100%)!important}
-.bg-grid .ch-card{background:#141414!important;border-color:#242424!important}
-.kpi-pb-bg{background:#242424!important}
-.fp{background:#242424!important}
-.fi2{background:#141414!important;border-color:#242424!important}
-.fi2:hover{background:#1a1a1a!important}
-</style>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../wms-theme.css">
 </head>
 <body>
-<nav class="TB">
-  <div class="brand">EPFBD<small>WMS</small></div>
-  <span id="sync-ind">&#9203; Connecting&hellip;</span>
-  <div class="sep"></div>
-  <div class="tnav">
-    <a href="../index.html">Dashboard</a>
-    <a href="../manpower/all_manpower.html">Manpower</a>
-    <a href="../warehouse/wh_list.html">Warehouse</a>
-    <a href="../equipment/forklift.html">Equipment</a>
-    <a href="staff_kpi.html" class="ON">KPI</a>
-  </div>
-  <div class="ctrl">
-    <span class="clbl">Theme</span>
-    <div class="tdots">
-      <div class="tdot" data-t="slate" onclick="setTheme('slate')"></div>
-      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')"></div>
-      <div class="tdot" data-t="ember" onclick="setTheme('ember')"></div>
-    </div>
-    <span class="clbl">Font</span>
-    <div class="fsw">
-      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
-      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
-    </div>
-    <div id="CLK" class="clk">--:--:--</div>
-  </div>
-</nav>
+<header class="hdr">
+  <div><div class="hdr-title">KPI Dashboard</div><div class="hdr-bc">EPFBD WMS · KPI</div></div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" placeholder="Search…"></div>
+  <a class="hdr-btn" href="../firebase-setup.html">🔥</a>
+  <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
+  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <div class="hdr-clk" id="CLK">--:--:--</div>
+</header>
 
-<aside class="SB">
-  <div><div class="sb-hd">Main</div>
-    <a class="sb-a" href="../index.html">&#127968; Dashboard</a>
-  </div>
-  <div><div class="sb-hd">Manpower</div>
-    <a class="sb-a" href="../manpower/all_manpower.html">&#128101; All Manpower</a>
-    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span> EPF</a>
-    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span> TGL</a>
-    <a class="sb-a" href="../manpower/BGL_manpower.html"><span class="sb-badge">BGL</span> BGL</a>
-    <a class="sb-a" href="../manpower/GTM_manpower.html"><span class="sb-badge">GTM</span> GTM</a>
-    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span> RFL</a>
-    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span> EC</a>
-  </div>
-  <div><div class="sb-hd">Warehouse</div>
-    <a class="sb-a" href="../warehouse/wh_list.html">&#127981; WH List</a>
-    <a class="sb-a" href="../warehouse/mis_login.html">&#128272; MIS Login</a>
-    <a class="sb-a" href="../warehouse/mail_list.html">&#128140; Mail List</a>
-  </div>
-  <div><div class="sb-hd">Equipment</div>
-    <a class="sb-a" href="../equipment/pda_devices.html">&#128241; PDA / Scanner</a>
-    <a class="sb-a" href="../equipment/forklift.html">&#128663; Forklift</a>
-    <a class="sb-a" href="../equipment/maintenance_log.html">&#128295; Maintenance</a>
-  </div>
-  <div><div class="sb-hd">KPI</div>
-    <a class="sb-a ON" href="staff_kpi.html">&#11088; KPI Dashboard</a>
-  </div>
-  <div><div class="sb-hd">Setup</div>
-    <a class="sb-a" href="../firebase-setup.html">&#128293; Firebase Setup</a>
-  </div>
+<aside class="sb">
+  <a class="sb-logo" href="../index.html"><div class="sb-mark">🏭</div>
+    <div><div class="sb-name">EPFBD WMS</div><div class="sb-sub">Warehouse System</div></div></a>
+  <nav class="sb-nav">
+    <div class="sb-grp"><span class="sb-grp-lbl">Main</span>
+      <a class="sb-a" href="../index.html"><div class="sb-ico">🏠</div>Dashboard</a>
+      <a class="sb-a ON" href="../kpi/staff_kpi.html"><div class="sb-ico">⭐</div>KPI</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Manpower</span>
+      <a class="sb-a" href="../manpower/all_manpower.html"><div class="sb-ico">👥</div>All Manpower<span class="sb-badge">264</span></a>
+      <div class="sb-chips"><a class="sb-chip" href="../manpower/EPF_manpower.html">EPF</a><a class="sb-chip" href="../manpower/TGL_manpower.html">TGL</a><a class="sb-chip" href="../manpower/BGL_manpower.html">BGL</a><a class="sb-chip" href="../manpower/GTM_manpower.html">GTM</a><a class="sb-chip" href="../manpower/RFL_manpower.html">RFL</a><a class="sb-chip" href="../manpower/EC_manpower.html">EC</a></div>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Warehouse</span>
+      <a class="sb-a" href="../warehouse/wh_list.html"><div class="sb-ico">🏭</div>WH List</a>
+      <a class="sb-a" href="../warehouse/mis_login.html"><div class="sb-ico">🔑</div>MIS Login</a>
+      <a class="sb-a" href="../warehouse/mail_list.html"><div class="sb-ico">📧</div>Mail List</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Equipment</span>
+      <a class="sb-a" href="../equipment/pda_devices.html"><div class="sb-ico">📱</div>PDA &amp; Scanner</a>
+      <a class="sb-a" href="../equipment/barcode_printer.html"><div class="sb-ico">🖨</div>Barcode Printer</a>
+      <a class="sb-a" href="../equipment/forklift.html"><div class="sb-ico">🚜</div>Forklift</a>
+      <a class="sb-a" href="../equipment/maintenance_log.html"><div class="sb-ico">🔧</div>Maintenance</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">HR</span>
+      <a class="sb-a" href="../hr/attendance.html"><div class="sb-ico">📋</div>Attendance &amp; Leave</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Setup</span>
+      <a class="sb-a" href="../firebase-setup.html"><div class="sb-ico">🔥</div>Firebase</a>
+    </div>
+  </nav>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
+    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
 </aside>
 
-<main class="MN">
+<main class="mn">
 <!-- PAGE HEADER -->
 <div class="ph">
   <div class="ph-ico">&#11088;</div>
+<div class="imp-bar an d1">
+  <div><div class="imp-bar-title">📥 Import / Export</div><div class="imp-bar-sub">Excel import · Template · Backup</div></div>
+  <div class="imp-btns">
+    <button class="btn btn-b" onclick="dlTemplate()">⬇ Template (.csv)</button>
+    <label class="btn btn-g" style="cursor:pointer">📂 Import Excel<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importFile(this)"></label>
+    <button class="btn btn-y" onclick="exportExcel()">📤 Export</button>
+    <button class="btn btn-s" onclick="openBackup()">💾 Backup</button>
+  </div>
+</div>
+
   <div>
     <div class="ph-title">KPI Dashboard</div>
     <div class="ph-sub">Daily In/Out &#183; Attendance &#183; Forklift &#183; Inventory Accuracy &#183; Damage/Loss — EPF &amp; TGL</div>
   </div>
-  <div class="ph-right">
-    <select class="fsel" id="gFac" onchange="refreshAll()">
+  <div class="ph-r">
+    <select class="fi" id="gFac" onchange="refreshAll()">
       <option value="ALL">All Factory</option>
       <option value="EPF">EPF</option>
       <option value="TGL">TGL</option>
     </select>
-    <select class="fsel" id="gMonth" onchange="refreshAll()"></select>
-    <span id="sync-pill" style="font-size:11px;padding:4px 12px;border-radius:20px;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)">Loading&hellip;</span>
+    <select class="fi" id="gMonth" onchange="refreshAll()"></select>
+    <span id="sync-pill" style="font-size:11px;padding:4px 12px;border-radius:20px;background:var(--acc3);color:var(--acc);border:1px solid var(--bdr)">Loading&hellip;</span>
   </div>
 </div>
 
@@ -283,11 +111,11 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
   </div>
   <div class="brow">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="io-date" type="month" onchange="renderIoTable()">
-      <select class="fsel" id="io-fac" onchange="renderIoTable()">
+      <input class="fi" id="io-date" type="month" onchange="renderIoTable()">
+      <select class="fi" id="io-fac" onchange="renderIoTable()">
         <option value="">All Factory</option><option>EPF</option><option>TGL</option>
       </select>
-      <select class="fsel" id="io-dept" onchange="renderIoTable()">
+      <select class="fi" id="io-dept" onchange="renderIoTable()">
         <option value="">All Dept</option>
         <option>MM</option><option>PM</option><option>SM</option>
         <option>HH</option><option>EQ</option><option>FG</option>
@@ -296,7 +124,7 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
     <button class="a-add" onclick="openPin(function(){openModal('io')})">&#65291; Add Record</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#128230; In/Out Log</div><span class="card-hd-badge" id="io-badge">0</span></div>
+    <div class="card-hd"><div class="card-title">&#128230; In/Out Log</div><span class="card-cnt" id="io-badge">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Date</th><th>Factory</th><th>Dept</th><th>WH Code</th><th>Receive (IN)</th><th>Issue (OUT)</th><th>Unit</th><th>Remark</th><th>Act</th></tr></thead>
@@ -322,15 +150,15 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
   </div>
   <div class="brow">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="att-date" type="month" onchange="renderAttTable()">
-      <select class="fsel" id="att-fac" onchange="renderAttTable()">
+      <input class="fi" id="att-date" type="month" onchange="renderAttTable()">
+      <select class="fi" id="att-fac" onchange="renderAttTable()">
         <option value="">All Factory</option><option>EPF</option><option>TGL</option>
       </select>
     </div>
     <button class="a-add" onclick="openPin(function(){openModal('att')})">&#65291; Add Record</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#128101; Attendance Record</div><span class="card-hd-badge" id="att-badge">0</span></div>
+    <div class="card-hd"><div class="card-title">&#128101; Attendance Record</div><span class="card-cnt" id="att-badge">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Month</th><th>Factory</th><th>Dept</th><th>Total Staff</th><th>Present</th><th>Absent</th><th>Att. %</th><th>OT Hours</th><th>Remark</th><th>Act</th></tr></thead>
@@ -356,8 +184,8 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
   </div>
   <div class="brow">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="fk-date" type="month" onchange="renderFkTable()">
-      <select class="fsel" id="fk-fl" onchange="renderFkTable()">
+      <input class="fi" id="fk-date" type="month" onchange="renderFkTable()">
+      <select class="fi" id="fk-fl" onchange="renderFkTable()">
         <option value="">All Forklift</option>
         <option>02 (FD-30)</option><option>03 (FD-30)</option><option>04 (FD-30)</option>
         <option>05 (FD-30)</option><option>06 (CPC-30)</option><option>07 (CQD-20)</option><option>08 (CQD-20)</option>
@@ -366,7 +194,7 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
     <button class="a-add" onclick="openPin(function(){openModal('fk')})">&#65291; Add Record</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#128663; Forklift Utilization Log</div><span class="card-hd-badge" id="fk-badge">0</span></div>
+    <div class="card-hd"><div class="card-title">&#128663; Forklift Utilization Log</div><span class="card-cnt" id="fk-badge">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Month</th><th>Forklift</th><th>Factory</th><th>Working Days</th><th>Used Days</th><th>Util. %</th><th>Total Hours</th><th>Down Days</th><th>Down Reason</th><th>Act</th></tr></thead>
@@ -392,15 +220,15 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
   </div>
   <div class="brow">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="inv-date" type="month" onchange="renderInvTable()">
-      <select class="fsel" id="inv-fac" onchange="renderInvTable()">
+      <input class="fi" id="inv-date" type="month" onchange="renderInvTable()">
+      <select class="fi" id="inv-fac" onchange="renderInvTable()">
         <option value="">All Factory</option><option>EPF</option><option>TGL</option>
       </select>
     </div>
     <button class="a-add" onclick="openPin(function(){openModal('inv')})">&#65291; Add Record</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#128203; Inventory Accuracy Log</div><span class="card-hd-badge" id="inv-badge">0</span></div>
+    <div class="card-hd"><div class="card-title">&#128203; Inventory Accuracy Log</div><span class="card-cnt" id="inv-badge">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Date</th><th>Factory</th><th>Dept/WH</th><th>System Qty</th><th>Physical Qty</th><th>Variance</th><th>Accuracy %</th><th>Counted By</th><th>Remark</th><th>Act</th></tr></thead>
@@ -426,18 +254,18 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
   </div>
   <div class="brow">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="dmg-date" type="month" onchange="renderDmgTable()">
-      <select class="fsel" id="dmg-fac" onchange="renderDmgTable()">
+      <input class="fi" id="dmg-date" type="month" onchange="renderDmgTable()">
+      <select class="fi" id="dmg-fac" onchange="renderDmgTable()">
         <option value="">All Factory</option><option>EPF</option><option>TGL</option>
       </select>
-      <select class="fsel" id="dmg-type" onchange="renderDmgTable()">
+      <select class="fi" id="dmg-type" onchange="renderDmgTable()">
         <option value="">All Type</option><option>Damage</option><option>Loss</option><option>Theft</option><option>Expired</option>
       </select>
     </div>
     <button class="a-add" onclick="openPin(function(){openModal('dmg')})">&#65291; Add Report</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#9888; Damage &amp; Loss Report</div><span class="card-hd-badge" id="dmg-badge">0</span></div>
+    <div class="card-hd"><div class="card-title">&#9888; Damage &amp; Loss Report</div><span class="card-cnt" id="dmg-badge">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Date</th><th>Factory</th><th>Dept</th><th>Type</th><th>Item</th><th>Qty</th><th>Est. Value</th><th>Cause</th><th>Action Taken</th><th>Status</th><th>Act</th></tr></thead>
@@ -618,7 +446,7 @@ input::placeholder,textarea::placeholder{color:#5a6478!important}
         <div class="pkey" onclick="pressPin('4')">4</div><div class="pkey" onclick="pressPin('5')">5</div><div class="pkey" onclick="pressPin('6')">6</div>
         <div class="pkey" onclick="pressPin('7')">7</div><div class="pkey" onclick="pressPin('8')">8</div><div class="pkey" onclick="pressPin('9')">9</div>
         <div class="pkey" onclick="pressPin('del')">&#9003;</div><div class="pkey" onclick="pressPin('0')">0</div>
-        <div class="pkey" onclick="pressPin('ok')" style="color:var(--ok);border-color:var(--ok)">&#10003;</div>
+        <div class="pkey" onclick="pressPin('ok')" style="color:var(--grn);border-color:var(--grn)">&#10003;</div>
       </div>
       <div class="pin-err" id="pin-err">&#10060; Wrong PIN.</div>
     </div>
@@ -655,7 +483,7 @@ async function _initFbSync(){
   if(!window.WmsDb){await new Promise(function(r){setTimeout(r,700);});}
   var cloud=window.WmsDb&&WmsDb.isCloud();
   var ind=document.getElementById('sync-ind'),pill=document.getElementById('sync-pill');
-  if(ind){ind.textContent=cloud?'\u2601 Cloud Sync ON':'\uD83D\uDCBE Local Only';ind.style.color=cloud?'var(--ok)':'var(--wrn)';}
+  if(ind){ind.textContent=cloud?'\u2601 Cloud Sync ON':'\uD83D\uDCBE Local Only';ind.style.color=cloud?'var(--grn)':'var(--yel)';}
   if(pill){pill.textContent=cloud?'\u2601 Cloud Sync ON':'\uD83D\uDCBE Local Only';}
   Object.keys(FB_NODES).forEach(function(k){
     var node=FB_NODES[k];
@@ -768,17 +596,17 @@ function renderIoTable(){
   var data=getIoData();
   document.getElementById('io-badge').textContent=data.length;
   document.getElementById('io-tbody').innerHTML=data.map(function(r,i){
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'io\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
-    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'io\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit(\'io\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-d" onclick="openPin(function(){askDel(\'io\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>'+
       '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
       '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
       '<td><span class="badge b-grey">'+r.dept+'</span></td>'+
       '<td style="font-family:monospace;font-size:11px;color:var(--acc)">'+(r.wh||'&#8212;')+'</td>'+
-      '<td style="color:var(--ok);font-weight:600">'+numFmt(r.recv)+'</td>'+
-      '<td style="color:var(--err);font-weight:600">'+numFmt(r.issue)+'</td>'+
+      '<td style="color:var(--grn);font-weight:600">'+numFmt(r.recv)+'</td>'+
+      '<td style="color:var(--red);font-weight:600">'+numFmt(r.issue)+'</td>'+
       '<td><span class="badge b-grey">'+(r.unit||'KG')+'</span></td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.remark||'&#8212;')+'</td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   }).join('');
   // Stats
@@ -825,18 +653,18 @@ function renderAttTable(){
   document.getElementById('att-badge').textContent=data.length;
   document.getElementById('att-tbody').innerHTML=data.map(function(r,i){
     var p=r.total?pct(parseFloat(r.pres)||0,parseFloat(r.total)||0):0;
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'att\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
-    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'att\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit(\'att\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-d" onclick="openPin(function(){askDel(\'att\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>'+
       '<td style="font-size:11px">'+r.month+'</td>'+
       '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
       '<td><span class="badge b-grey">'+(r.dept||'All')+'</span></td>'+
-      '<td style="font-weight:600;color:var(--th)">'+(r.total||0)+'</td>'+
-      '<td style="color:var(--ok)">'+(r.pres||0)+'</td>'+
-      '<td style="color:var(--err)">'+(r.abs||0)+'</td>'+
+      '<td style="font-weight:600;color:var(--t1)">'+(r.total||0)+'</td>'+
+      '<td style="color:var(--grn)">'+(r.pres||0)+'</td>'+
+      '<td style="color:var(--red)">'+(r.abs||0)+'</td>'+
       '<td>'+pctBadge(p)+'</td>'+
-      '<td style="color:var(--wrn)">'+(r.ot||0)+' hrs</td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td style="color:var(--yel)">'+(r.ot||0)+' hrs</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.remark||'&#8212;')+'</td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   }).join('');
   var totStaff=data.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
@@ -855,7 +683,7 @@ function buildAttCharts(){
   months=months.slice(-6);
   months.forEach(function(m){var sub=data.filter(function(r){return r.month===m;});var avg=sub.length?Math.round(sub.reduce(function(s,r){return s+(r.total?pct(parseFloat(r.pres)||0,parseFloat(r.total)||0):0);},0)/sub.length):0;rates.push(avg);});
   makeChart('att-line','line',months,[
-    {label:'Attendance %',data:rates,borderColor:'var(--acc)',backgroundColor:'var(--adim)',tension:.4,fill:true,pointBackgroundColor:'var(--acc)'}
+    {label:'Attendance %',data:rates,borderColor:'var(--acc)',backgroundColor:'var(--acc3)',tension:.4,fill:true,pointBackgroundColor:'var(--acc)'}
   ]);
   var depts=['MM','PM','SM','HH','EQ','FG'];
   var otByDept=depts.map(function(d){return DATA.att.filter(function(r){return r.dept===d;}).reduce(function(s,r){return s+(parseFloat(r.ot)||0);},0);});
@@ -881,18 +709,18 @@ function renderFkTable(){
   document.getElementById('fk-badge').textContent=data.length;
   document.getElementById('fk-tbody').innerHTML=data.map(function(r,i){
     var u=r.wd?pct(parseFloat(r.ud)||0,parseFloat(r.wd)||0):0;
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'fk\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
-    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'fk\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit(\'fk\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-d" onclick="openPin(function(){askDel(\'fk\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>'+
       '<td style="font-size:11px">'+r.month+'</td>'+
       '<td style="font-family:monospace;color:var(--acc);font-weight:600">'+(r.forklift||'&#8212;')+'</td>'+
       '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+(r.fty||'&#8212;')+'</span></td>'+
       '<td style="text-align:center">'+(r.wd||0)+'</td>'+
-      '<td style="text-align:center;color:var(--ok)">'+(r.ud||0)+'</td>'+
+      '<td style="text-align:center;color:var(--grn)">'+(r.ud||0)+'</td>'+
       '<td>'+pctBadge(u)+'</td>'+
-      '<td style="color:var(--wrn)">'+(r.hrs||0)+' hrs</td>'+
-      '<td style="text-align:center;color:var(--err)">'+(r.dn||0)+'</td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.dr||'&#8212;')+'</td>'+
+      '<td style="color:var(--yel)">'+(r.hrs||0)+' hrs</td>'+
+      '<td style="text-align:center;color:var(--red)">'+(r.dn||0)+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.dr||'&#8212;')+'</td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   }).join('');
   var avgUtil=data.length?Math.round(data.reduce(function(s,r){return s+(r.wd?pct(parseFloat(r.ud)||0,parseFloat(r.wd)||0):0);},0)/data.length):0;
@@ -934,18 +762,18 @@ function renderInvTable(){
   document.getElementById('inv-tbody').innerHTML=data.map(function(r,i){
     var sys=parseFloat(r.sys)||0,phy=parseFloat(r.phy)||0;
     var variance=phy-sys,acc=sys?Math.round(Math.min(phy,sys)/Math.max(phy,sys)*100):100;
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'inv\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
-    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'inv\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit(\'inv\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-d" onclick="openPin(function(){askDel(\'inv\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>'+
       '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
       '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
       '<td><span class="badge b-grey">'+r.dept+'</span></td>'+
       '<td style="font-weight:600">'+numFmt(sys)+'</td>'+
-      '<td style="font-weight:600;color:var(--ok)">'+numFmt(phy)+'</td>'+
-      '<td style="color:'+(variance>=0?'var(--ok)':'var(--err)')+';font-weight:600">'+(variance>=0?'+':'')+numFmt(variance.toFixed(1))+'</td>'+
+      '<td style="font-weight:600;color:var(--grn)">'+numFmt(phy)+'</td>'+
+      '<td style="color:'+(variance>=0?'var(--grn)':'var(--red)')+';font-weight:600">'+(variance>=0?'+':'')+numFmt(variance.toFixed(1))+'</td>'+
       '<td>'+pctBadge(acc)+'</td>'+
       '<td style="font-size:11px">'+(r.by||'&#8212;')+'</td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.remark||'&#8212;')+'</td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   }).join('');
   var avgAcc=data.length?Math.round(data.reduce(function(s,r){var sy=parseFloat(r.sys)||0,ph=parseFloat(r.phy)||0;return s+(sy?Math.round(Math.min(ph,sy)/Math.max(ph,sy)*100):100);},0)/data.length):0;
@@ -961,7 +789,7 @@ function buildInvCharts(){
   sorted.forEach(function(r){var m=(r.date||'').slice(0,7);if(!months.includes(m))months.push(m);});
   months.slice(-6).forEach(function(m){var sub=DATA.inv.filter(function(r){return(r.date||'').slice(0,7)===m;});var avg=sub.length?Math.round(sub.reduce(function(s,r){var sy=parseFloat(r.sys)||0,ph=parseFloat(r.phy)||0;return s+(sy?Math.round(Math.min(ph,sy)/Math.max(ph,sy)*100):100);},0)/sub.length):0;accs.push(avg);});
   makeChart('inv-line','line',months.slice(-6),[
-    {label:'Accuracy %',data:accs,borderColor:'var(--acc)',backgroundColor:'var(--adim)',tension:.4,fill:true}
+    {label:'Accuracy %',data:accs,borderColor:'var(--acc)',backgroundColor:'var(--acc3)',tension:.4,fill:true}
   ]);
   var depts=['MM','PM','SM','HH','EQ','FG'];
   var vars=depts.map(function(d){var sub=DATA.inv.filter(function(r){return r.dept===d;});return sub.length?Math.round(sub.reduce(function(s,r){return s+(parseFloat(r.phy)||0)-(parseFloat(r.sys)||0);},0)):0;});
@@ -989,18 +817,18 @@ function renderDmgTable(){
   document.getElementById('dmg-tbody').innerHTML=data.map(function(r,i){
     var stC=r.status==='Resolved'||r.status==='Written Off'?'b-ok':r.status==='Investigated'?'b-wrn':'b-err';
     var tC=r.type==='Damage'?'b-wrn':r.type==='Loss'?'b-err':r.type==='Theft'?'b-err':'b-grey';
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit(\'dmg\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
-    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel(\'dmg\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit(\'dmg\',\''+( r._fbKey||'')+'\')})">&#9998;</button>';
+    var dB='<button class="abtn a-d" onclick="openPin(function(){askDel(\'dmg\',\''+( r._fbKey||'')+'\')})">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-size:11px">'+(i+1)+'</td>'+
       '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
       '<td><span class="badge '+(r.fty==='EPF'?'b-acc':'b-wrn')+'">'+r.fty+'</span></td>'+
       '<td><span class="badge b-grey">'+(r.dept||'&#8212;')+'</span></td>'+
       '<td><span class="badge '+tC+'">'+r.type+'</span></td>'+
-      '<td style="font-weight:500;color:var(--th)">'+(r.item||'&#8212;')+'</td>'+
+      '<td style="font-weight:500;color:var(--t1)">'+(r.item||'&#8212;')+'</td>'+
       '<td style="font-weight:600">'+(r.qty||0)+'</td>'+
-      '<td style="color:var(--wrn)">&#2547;'+(r.val?numFmt(r.val):'&#8212;')+'</td>'+
+      '<td style="color:var(--yel)">&#2547;'+(r.val?numFmt(r.val):'&#8212;')+'</td>'+
       '<td style="font-size:11px;max-width:130px">'+(r.cause||'&#8212;')+'</td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.action||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.action||'&#8212;')+'</td>'+
       '<td><span class="badge '+stC+'">'+(r.status||'Open')+'</span></td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   }).join('');
@@ -1184,5 +1012,30 @@ initApp();
 initMonthFilter();
 _initFbSync().then(function(){if(!window.WmsDb){refreshAll();rebuildCharts();}});
 </script>
+<div class="OV" id="bkpModal">
+  <div class="OV-box" style="max-width:500px">
+    <h3>💾 Backup &amp; Restore</h3>
+    <div class="OV-sub">ডেটা backup নিন অথবা restore করুন</div>
+    <div class="bkp-panel">
+      <div class="bkp-title">📤 Backup নিন</div>
+      <div class="bkp-sub">সম্পূর্ণ ডেটা download করুন</div>
+      <div class="bkp-btns">
+        <button class="btn btn-g" onclick="backupExcel()">📊 Excel (.csv)</button>
+        <button class="btn btn-b" onclick="backupJSON()">📄 JSON</button>
+        <button class="btn btn-p" onclick="backupEmail()">✉️ Email</button>
+      </div>
+    </div>
+    <div class="bkp-panel" style="background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.05));border-color:rgba(249,115,22,.2)">
+      <div class="bkp-title" style="color:var(--ora)">📥 Restore করুন</div>
+      <div class="bkp-sub">Backup file থেকে ডেটা ফিরিয়ে আনুন</div>
+      <div class="bkp-btns">
+        <label class="btn btn-y" style="cursor:pointer">📂 File নির্বাচন<input type="file" accept=".json,.csv" style="display:none" onchange="restoreBackup(this)"></label>
+      </div>
+    </div>
+    <div id="bkpStatus" style="font-size:13px;color:var(--t3);margin-bottom:8px;min-height:20px"></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeBkp()">বন্ধ করুন</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
 </body>
 </html>

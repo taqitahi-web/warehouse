@@ -1,193 +1,79 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="slate" data-font="ubuntu">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Maintenance Log — EPFBD WMS</title>
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&family=Josefin+Sans:wght@400;600;700&family=Exo+2:wght@400;600;700;800&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-[data-font="ubuntu"]{--fh:'Ubuntu',sans-serif;--fb:'Josefin Sans',sans-serif}
-[data-font="exo"]{--fh:'Exo 2',sans-serif;--fb:'Alegreya Sans',sans-serif}
-[data-theme="slate"]{--bg:#0d1117;--sur:#161b22;--card:#1c2330;--bdr:#2a3548;--acc:#00C9A7;--adim:rgba(0,201,167,.10);--th:#e6edf3;--tb:#b0bec5;--tm:#4a6070;--tbg:rgba(0,201,167,.12);--ok:#3fb950;--err:#f85149;--wrn:#e3b341;--nav:#0d1117;--hdr:linear-gradient(135deg,#0d1117,#1a2540,#0d1117);--shs:0 2px 10px rgba(0,0,0,.4);--shd:0 4px 24px rgba(0,0,0,.6);--ra:rgba(0,201,167,.025)}
-[data-theme="arctic"]{--bg:#f0f4f8;--sur:#fff;--card:#fff;--bdr:#d0dae8;--acc:#1565C0;--adim:rgba(21,101,192,.07);--th:#1a2540;--tb:#2d3d55;--tm:#8a9db5;--tbg:rgba(21,101,192,.08);--ok:#2e7d32;--err:#c62828;--wrn:#e65100;--nav:#fff;--hdr:linear-gradient(135deg,#e8f0fe,#dce8ff,#e8f0fe);--shs:0 2px 8px rgba(21,101,192,.08);--shd:0 4px 20px rgba(21,101,192,.10);--ra:rgba(21,101,192,.025)}
-[data-theme="ember"]{--bg:#18181b;--sur:#1f1f23;--card:#27272a;--bdr:#3f3f46;--acc:#D4A017;--adim:rgba(212,160,23,.10);--th:#fafaf9;--tb:#d4cfc8;--tm:#6b6462;--tbg:rgba(212,160,23,.12);--ok:#22c55e;--err:#ef4444;--wrn:#f59e0b;--nav:#111113;--hdr:linear-gradient(135deg,#1f1f23,#2a2620,#1f1f23);--shs:0 2px 10px rgba(0,0,0,.5);--shd:0 4px 24px rgba(0,0,0,.7);--ra:rgba(212,160,23,.025)}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--fb);background:var(--bg);color:var(--tb);min-height:100vh;font-size:13px;line-height:1.55;transition:background .3s,color .3s;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(128,128,128,.04)1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.04)1px,transparent 1px);background-size:44px 44px}
-.TB{position:sticky;top:0;z-index:100;background:var(--nav);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;padding:0 16px;height:52px;box-shadow:var(--shs)}
-.brand{font-family:var(--fh);font-weight:700;font-size:15px;color:var(--acc);white-space:nowrap}
-.brand small{display:block;font-size:10px;color:var(--tm);font-weight:400}
-.sep{flex:1}
-.tnav{display:flex;gap:2px}
-.tnav a{padding:6px 11px;border-radius:6px;color:var(--tb);text-decoration:none;font-size:12px;font-weight:500;transition:all .2s}
-.tnav a:hover{background:var(--adim);color:var(--acc)}
-.tnav a.ON{background:var(--tbg);color:var(--acc)}
-.ctrl{display:flex;align-items:center;gap:8px}
-.clbl{font-size:10px;color:var(--tm)}
-.tdots{display:flex;gap:5px}
-.tdot{width:14px;height:14px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s}
-.tdot[data-t="slate"]{background:#00C9A7}.tdot[data-t="arctic"]{background:#1565C0}.tdot[data-t="ember"]{background:#D4A017}
-.tdot.ON{border-color:var(--th);transform:scale(1.2)}
-.fsw{display:flex;gap:4px}
-.fbtn{background:var(--card);border:1px solid var(--bdr);color:var(--tb);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:11px;transition:all .2s}
-.fbtn:hover,.fbtn.ON{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
-.clk{font-family:var(--fh);font-size:12px;color:var(--acc);min-width:70px;text-align:right}
-.SB{position:fixed;left:0;top:52px;bottom:0;width:200px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;z-index:90;padding:10px 0}
-.sb-hd{font-size:10px;font-weight:700;color:var(--tm);letter-spacing:1px;padding:8px 14px 4px;text-transform:uppercase}
-.sb-a{display:flex;align-items:center;gap:8px;padding:7px 14px;color:var(--tb);text-decoration:none;font-size:12px;transition:all .2s;border-left:3px solid transparent}
-.sb-a:hover{background:var(--adim);color:var(--acc);border-left-color:var(--acc)}
-.sb-a.ON{background:var(--tbg);color:var(--acc);border-left-color:var(--acc);font-weight:600}
-.sb-badge{background:var(--tbg);color:var(--acc);font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700}
-.MN{margin-left:200px;padding:20px;position:relative;z-index:1}
-.ph{background:var(--hdr);border-bottom:1px solid var(--bdr);padding:14px 20px;margin:-20px -20px 20px;display:flex;align-items:center;gap:12px}
-.ph-ico{width:40px;height:40px;background:var(--adim);border:1px solid var(--bdr);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.ph-title{font-family:var(--fh);font-size:19px;font-weight:700;color:var(--th)}
-.ph-sub{font-size:11px;color:var(--tm)}
-.ph-right{margin-left:auto}
-.stg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px}
-.stc{background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:13px 15px}
-.stc-num{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--acc)}
-.stc-lbl{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
-.stc-sub{font-size:11px;color:var(--tb);margin-top:3px}
-.tab-bar{display:flex;gap:0;margin-bottom:0;border-bottom:2px solid var(--bdr)}
-.tab{padding:9px 20px;border:none;background:transparent;color:var(--tm);cursor:pointer;font-size:12px;font-weight:600;font-family:var(--fb);transition:all .2s;border-bottom:2px solid transparent;margin-bottom:-2px}
-.tab:hover{color:var(--tb)}
-.tab.ON{color:var(--acc);border-bottom-color:var(--acc)}
-.tab-cnt{font-size:10px;background:var(--adim);padding:1px 7px;border-radius:8px;margin-left:5px;color:var(--acc)}
-.tab-content{display:none;padding-top:16px}
-.tab-content.active{display:block}
-.brow{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
-.brow.fu{justify-content:space-between}
-.si{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;transition:border .2s;font-family:var(--fb)}
-.si:focus{border-color:var(--acc)}
-.fsel{background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:7px 10px;color:var(--th);font-size:12px;outline:none;cursor:pointer;font-family:var(--fb)}
-.a-add{background:var(--acc);color:#000;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--fb);border:none;cursor:pointer}
-.a-add:hover{opacity:.85}
-.abtn{border:none;border-radius:5px;cursor:pointer;padding:4px 8px;font-size:12px;transition:all .2s;background:var(--adim)}
-.a-edit{color:var(--wrn)}.a-edit:hover{background:rgba(227,179,65,.2)}
-.a-del{color:var(--err)}.a-del:hover{background:rgba(248,81,73,.2)}
-.card{background:var(--card);border:1px solid var(--bdr);border-radius:10px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shs)}
-.card-hd{padding:11px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:8px;background:var(--ra)}
-.card-hd-title{font-family:var(--fh);font-size:14px;font-weight:600;color:var(--th)}
-.card-hd-badge{font-size:10px;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:10px;font-weight:700}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{padding:9px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;background:var(--ra);border-bottom:1px solid var(--bdr);white-space:nowrap}
-.tbl td{padding:8px 10px;border-bottom:1px solid var(--bdr);font-size:12px;color:var(--tb);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--adim)}
-.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
-.b-ok{background:rgba(63,185,80,.15);color:var(--ok)}
-.b-acc{background:var(--tbg);color:var(--acc)}
-.b-wrn{background:rgba(227,179,65,.15);color:var(--wrn)}
-.b-err{background:rgba(248,81,73,.15);color:var(--err)}
-.b-blue{background:rgba(88,166,255,.15);color:#58a6ff}
-.b-grey{background:rgba(100,110,120,.15);color:var(--tm)}
-.b-purple{background:rgba(163,113,247,.15);color:#a371f7}
-.chip{display:inline-block;background:var(--tbg);color:var(--acc);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;font-family:monospace}
-.pag{display:flex;gap:4px;align-items:center;padding:10px 14px;border-top:1px solid var(--bdr);flex-wrap:wrap}
-.pag-info{font-size:11px;color:var(--tm);margin-right:auto}
-.pb{background:var(--sur);border:1px solid var(--bdr);color:var(--tb);padding:4px 9px;border-radius:5px;cursor:pointer;font-size:12px;transition:all .2s}
-.pb:hover:not([disabled]){background:var(--adim);color:var(--acc)}
-.pb.CUR{background:var(--tbg);color:var(--acc);border-color:var(--acc)}
-.pb[disabled]{opacity:.4;cursor:default}
-.OV{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
-.OV.show{display:flex}
-.OV-box{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:24px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:var(--shd)}
-.OV-box h3{font-family:var(--fh);font-size:16px;font-weight:700;color:var(--th);margin-bottom:18px}
-.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.fr{display:flex;flex-direction:column;gap:5px}
-.fr label{font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.4px}
-.fr input,.fr select,.fr textarea{background:var(--bg);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--th);font-size:12px;font-family:var(--fb);outline:none;transition:border .2s;width:100%}
-.fr input:focus,.fr select:focus{border-color:var(--acc)}
-.fr select option{background:var(--card)}
-.ff{grid-column:1/-1}
-.mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
-.btn{border:none;border-radius:7px;padding:9px 20px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--fb);transition:all .2s}
-.btn-acc{background:var(--acc);color:#000}.btn-acc:hover{opacity:.85}
-.btn-sec{background:var(--adim);color:var(--acc);border:1px solid var(--bdr)}.btn-sec:hover{background:var(--tbg)}
-.btn-err{background:rgba(248,81,73,.15);color:var(--err);border:1px solid rgba(248,81,73,.3)}.btn-err:hover{background:rgba(248,81,73,.25)}
-.pin-pad{display:flex;flex-direction:column;align-items:center;gap:14px}
-.pin-dots{display:flex;gap:10px}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--bdr);background:transparent;transition:all .2s}
-.pin-dot.F{background:var(--acc);border-color:var(--acc)}
-.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:200px}
-.pkey{background:var(--sur);border:1px solid var(--bdr);border-radius:8px;padding:11px;text-align:center;cursor:pointer;font-size:15px;font-weight:600;color:var(--th);transition:all .2s;user-select:none}
-.pkey:hover{background:var(--adim);border-color:var(--acc);color:var(--acc)}
-.pin-err{color:var(--err);font-size:12px;display:none}
-.toast-el{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:10px 22px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
-.toast-el.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.tok{border-color:var(--ok);color:var(--ok)}.terr{border-color:var(--err);color:var(--err)}
-#sync-ind{font-size:10px;padding:3px 8px;border-radius:10px;background:var(--adim);color:var(--tm)}
-@media(max-width:768px){.SB{display:none}.MN{margin-left:0}.tnav{display:none}}
-</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../wms-theme.css">
 </head>
 <body>
-<nav class="TB">
-  <div class="brand">EPFBD<small>WMS</small></div>
-  <span id="sync-ind">&#9203; Connecting&hellip;</span>
-  <div class="sep"></div>
-  <div class="tnav">
-    <a href="../index.html">Dashboard</a>
-    <a href="../manpower/all_manpower.html">Manpower</a>
-    <a href="../warehouse/wh_list.html">Warehouse</a>
-    <a href="forklift.html">Equipment</a>
-  </div>
-  <div class="ctrl">
-    <span class="clbl">Theme</span>
-    <div class="tdots">
-      <div class="tdot" data-t="slate" onclick="setTheme('slate')"></div>
-      <div class="tdot" data-t="arctic" onclick="setTheme('arctic')"></div>
-      <div class="tdot" data-t="ember" onclick="setTheme('ember')"></div>
+<header class="hdr">
+  <div><div class="hdr-title">Maintenance Log</div><div class="hdr-bc">EPFBD WMS · Equipment</div></div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" placeholder="Search…"></div>
+  <a class="hdr-btn" href="../firebase-setup.html">🔥</a>
+  <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
+  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <div class="hdr-clk" id="CLK">--:--:--</div>
+</header>
+<aside class="sb">
+  <a class="sb-logo" href="../index.html"><div class="sb-mark">🏭</div>
+    <div><div class="sb-name">EPFBD WMS</div><div class="sb-sub">Warehouse System</div></div></a>
+  <nav class="sb-nav">
+    <div class="sb-grp"><span class="sb-grp-lbl">Main</span>
+      <a class="sb-a" href="../index.html"><div class="sb-ico">🏠</div>Dashboard</a>
+      <a class="sb-a" href="../kpi/staff_kpi.html"><div class="sb-ico">⭐</div>KPI</a>
     </div>
-    <span class="clbl">Font</span>
-    <div class="fsw">
-      <button class="fbtn" data-f="ubuntu" onclick="setFont('ubuntu')">Ubuntu</button>
-      <button class="fbtn" data-f="exo" onclick="setFont('exo')">Exo 2</button>
+    <div class="sb-grp"><span class="sb-grp-lbl">Manpower</span>
+      <a class="sb-a" href="../manpower/all_manpower.html"><div class="sb-ico">👥</div>All Manpower<span class="sb-badge">264</span></a>
+      <div class="sb-chips"><a class="sb-chip" href="../manpower/EPF_manpower.html">EPF</a><a class="sb-chip" href="../manpower/TGL_manpower.html">TGL</a><a class="sb-chip" href="../manpower/BGL_manpower.html">BGL</a><a class="sb-chip" href="../manpower/GTM_manpower.html">GTM</a><a class="sb-chip" href="../manpower/RFL_manpower.html">RFL</a><a class="sb-chip" href="../manpower/EC_manpower.html">EC</a></div>
     </div>
-    <div id="CLK" class="clk">--:--:--</div>
-  </div>
-</nav>
-<aside class="SB">
-  <div><div class="sb-hd">Main</div>
-    <a class="sb-a" href="../index.html">&#127968; Dashboard</a>
-  </div>
-  <div><div class="sb-hd">Manpower</div>
-    <a class="sb-a" href="../manpower/all_manpower.html">&#128101; All Manpower</a>
-    <a class="sb-a" href="../manpower/EPF_manpower.html"><span class="sb-badge">EPF</span> EPF</a>
-    <a class="sb-a" href="../manpower/TGL_manpower.html"><span class="sb-badge">TGL</span> TGL</a>
-    <a class="sb-a" href="../manpower/BGL_manpower.html"><span class="sb-badge">BGL</span> BGL</a>
-    <a class="sb-a" href="../manpower/GTM_manpower.html"><span class="sb-badge">GTM</span> GTM</a>
-    <a class="sb-a" href="../manpower/RFL_manpower.html"><span class="sb-badge">RFL</span> RFL</a>
-    <a class="sb-a" href="../manpower/EC_manpower.html"><span class="sb-badge">EC</span> EC</a>
-  </div>
-  <div><div class="sb-hd">Warehouse</div>
-    <a class="sb-a" href="../warehouse/wh_list.html">&#127981; WH List</a>
-    <a class="sb-a" href="../warehouse/mis_login.html">&#128272; MIS Login</a>
-    <a class="sb-a" href="../warehouse/mail_list.html">&#128140; Mail List</a>
-  </div>
-  <div><div class="sb-hd">Equipment</div>
-    <a class="sb-a" href="pda_devices.html">&#128241; PDA / Scanner</a>
-    <a class="sb-a" href="forklift.html">&#128663; Forklift</a>
-    <a class="sb-a ON" href="maintenance_log.html">&#128295; Maintenance</a>
-  </div>
-  <div><div class="sb-hd">Setup</div>
-    <a class="sb-a" href="../firebase-setup.html">&#128293; Firebase Setup</a>
-  </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Warehouse</span>
+      <a class="sb-a" href="../warehouse/wh_list.html"><div class="sb-ico">🏭</div>WH List</a>
+      <a class="sb-a" href="../warehouse/mis_login.html"><div class="sb-ico">🔑</div>MIS Login</a>
+      <a class="sb-a" href="../warehouse/mail_list.html"><div class="sb-ico">📧</div>Mail List</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Equipment</span>
+      <a class="sb-a" href="../equipment/pda_devices.html"><div class="sb-ico">📱</div>PDA &amp; Scanner</a>
+      <a class="sb-a" href="../equipment/barcode_printer.html"><div class="sb-ico">🖨</div>Barcode Printer</a>
+      <a class="sb-a" href="../equipment/forklift.html"><div class="sb-ico">🚜</div>Forklift</a>
+      <a class="sb-a ON" href="../equipment/maintenance_log.html"><div class="sb-ico">🔧</div>Maintenance</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">HR</span>
+      <a class="sb-a" href="../hr/attendance.html"><div class="sb-ico">📋</div>Attendance &amp; Leave</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Setup</span>
+      <a class="sb-a" href="../firebase-setup.html"><div class="sb-ico">🔥</div>Firebase</a>
+    </div>
+  </nav>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
+    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
 </aside>
 
-<main class="MN">
+<main class="mn">
 <div class="ph">
   <div class="ph-ico">&#128295;</div>
   <div>
     <div class="ph-title">Maintenance &amp; Fuel Log</div>
     <div class="ph-sub">Spare Parts &#183; Fuel Record &#183; Maintenance — EPF Forklifts</div>
   </div>
-  <div class="ph-right">
-    <span id="sync-pill" style="font-size:11px;padding:4px 12px;border-radius:20px;background:var(--tbg);color:var(--acc);border:1px solid var(--bdr)">Loading&hellip;</span>
+  <div class="ph-r">
+    <span id="sync-pill" style="font-size:11px;padding:4px 12px;border-radius:20px;background:var(--acc3);color:var(--acc);border:1px solid var(--bdr)">Loading&hellip;</span>
   </div>
 </div>
 
-<div class="stg" id="STATS"></div>
+<div class="imp-bar an d1">
+  <div><div class="imp-bar-title">📥 Import / Export</div><div class="imp-bar-sub">Excel import · Template · Backup</div></div>
+  <div class="imp-btns">
+    <button class="btn btn-b" onclick="dlTemplate()">⬇ Template (.csv)</button>
+    <label class="btn btn-g" style="cursor:pointer">📂 Import Excel<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importFile(this)"></label>
+    <button class="btn btn-y" onclick="exportExcel()">📤 Export</button>
+    <button class="btn btn-s" onclick="openBackup()">💾 Backup</button>
+  </div>
+</div>
+" id="STATS"></div>
 
 <div class="tab-bar">
   <button class="tab ON" onclick="switchTab('parts',this)">&#128297; Spare Parts <span class="tab-cnt" id="parts-cnt">0</span></button>
@@ -199,15 +85,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <div id="tab-parts" class="tab-content active">
   <div class="brow fu">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="pq" placeholder="&#128269; Search material, forklift&hellip;" style="width:200px" oninput="renderParts()">
-      <select class="fsel" id="pfl" onchange="renderParts()"><option value="">All Forklift</option><option value="02 (FD-30)">02 (FD-30)</option><option value="03 (FD-30)">03 (FD-30)</option><option value="04 (FD-30)">04 (FD-30)</option><option value="05 (FD-30)">05 (FD-30)</option><option value="06 (CPC-30)">06 (CPC-30)</option><option value="07 (CQD-20)">07 (CQD-20)</option><option value="08 (CQD-20)">08 (CQD-20)</option></select>
-      <select class="fsel" id="pdr" onchange="renderParts()"><option value="">All Driver</option><option>Md. Monowar Hossin</option><option>Md. Manik Chandro Roy</option><option>Md. Sadek Alli</option><option>Md. Mamun</option><option>Md. Aminul</option><option>Ripon Chandro Roy</option><option>Md. Momin</option></select>
-      <input class="si" id="pyr" placeholder="Year e.g. 2024" style="width:110px" oninput="renderParts()">
+      <input class="fi" id="pq" placeholder="&#128269; Search material, forklift&hellip;" style="width:200px" oninput="renderParts()">
+      <select class="fi" id="pfl" onchange="renderParts()"><option value="">All Forklift</option><option value="02 (FD-30)">02 (FD-30)</option><option value="03 (FD-30)">03 (FD-30)</option><option value="04 (FD-30)">04 (FD-30)</option><option value="05 (FD-30)">05 (FD-30)</option><option value="06 (CPC-30)">06 (CPC-30)</option><option value="07 (CQD-20)">07 (CQD-20)</option><option value="08 (CQD-20)">08 (CQD-20)</option></select>
+      <select class="fi" id="pdr" onchange="renderParts()"><option value="">All Driver</option><option>Md. Monowar Hossin</option><option>Md. Manik Chandro Roy</option><option>Md. Sadek Alli</option><option>Md. Mamun</option><option>Md. Aminul</option><option>Ripon Chandro Roy</option><option>Md. Momin</option></select>
+      <input class="fi" id="pyr" placeholder="Year e.g. 2024" style="width:110px" oninput="renderParts()">
     </div>
     <button class="a-add" onclick="openPin(function(){openAdd('parts')})">&#65291; Add Parts Record</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#128297; Spare Parts</div><span class="card-hd-badge" id="PBADGE">0</span></div>
+    <div class="card-hd"><div class="card-title">&#128297; Spare Parts</div><span class="card-cnt" id="PBADGE">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Date</th><th>Forklift</th><th>Driver</th><th>ID</th><th>Material</th><th>Qty</th><th>Unit</th><th>Meter</th><th>Maint.By</th><th>Remark</th><th>Act</th></tr></thead>
@@ -221,15 +107,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <div id="tab-fuel" class="tab-content">
   <div class="brow fu">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="fq2" placeholder="&#128269; Search forklift, driver&hellip;" style="width:200px" oninput="renderFuel()">
-      <select class="fsel" id="ffl" onchange="renderFuel()"><option value="">All Forklift</option><option value="02 (FD-30)">02 (FD-30)</option><option value="03 (FD-30)">03 (FD-30)</option><option value="04 (FD-30)">04 (FD-30)</option><option value="05 (FD-30)">05 (FD-30)</option><option value="06 (CPC-30)">06 (CPC-30)</option><option value="07 (CQD-20)">07 (CQD-20)</option><option value="08 (CQD-20)">08 (CQD-20)</option></select>
-      <select class="fsel" id="fdr" onchange="renderFuel()"><option value="">All Driver</option><option>Md. Monowar Hossin</option><option>Md. Manik Chandro Roy</option><option>Md. Sadek Alli</option><option>Md. Mamun</option><option>Md. Aminul</option><option>Ripon Chandro Roy</option><option>Md. Momin</option></select>
-      <input class="si" id="fyr" placeholder="Year e.g. 2024" style="width:110px" oninput="renderFuel()">
+      <input class="fi" id="fq2" placeholder="&#128269; Search forklift, driver&hellip;" style="width:200px" oninput="renderFuel()">
+      <select class="fi" id="ffl" onchange="renderFuel()"><option value="">All Forklift</option><option value="02 (FD-30)">02 (FD-30)</option><option value="03 (FD-30)">03 (FD-30)</option><option value="04 (FD-30)">04 (FD-30)</option><option value="05 (FD-30)">05 (FD-30)</option><option value="06 (CPC-30)">06 (CPC-30)</option><option value="07 (CQD-20)">07 (CQD-20)</option><option value="08 (CQD-20)">08 (CQD-20)</option></select>
+      <select class="fi" id="fdr" onchange="renderFuel()"><option value="">All Driver</option><option>Md. Monowar Hossin</option><option>Md. Manik Chandro Roy</option><option>Md. Sadek Alli</option><option>Md. Mamun</option><option>Md. Aminul</option><option>Ripon Chandro Roy</option><option>Md. Momin</option></select>
+      <input class="fi" id="fyr" placeholder="Year e.g. 2024" style="width:110px" oninput="renderFuel()">
     </div>
     <button class="a-add" onclick="openPin(function(){openAdd('fuel')})">&#65291; Add Fuel Record</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#9981; Fuel Record</div><span class="card-hd-badge" id="FBADGE">0</span></div>
+    <div class="card-hd"><div class="card-title">&#9981; Fuel Record</div><span class="card-cnt" id="FBADGE">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Date</th><th>Forklift</th><th>Driver</th><th>ID</th><th>Meter</th><th>Fuel (L)</th><th>Unit</th><th>Remark</th><th>Act</th></tr></thead>
@@ -243,14 +129,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <div id="tab-maint" class="tab-content">
   <div class="brow fu">
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <input class="si" id="mq" placeholder="&#128269; Search problem, forklift&hellip;" style="width:200px" oninput="renderMaint()">
-      <select class="fsel" id="mfl" onchange="renderMaint()"><option value="">All Forklift</option><option value="02 (FD-30)">02 (FD-30)</option><option value="03 (FD-30)">03 (FD-30)</option><option value="04 (FD-30)">04 (FD-30)</option><option value="05 (FD-30)">05 (FD-30)</option><option value="06 (CPC-30)">06 (CPC-30)</option><option value="07 (CQD-20)">07 (CQD-20)</option><option value="08 (CQD-20)">08 (CQD-20)</option></select>
-      <select class="fsel" id="mst" onchange="renderMaint()"><option value="">All Status</option><option>Pending</option><option>In Progress</option><option>Done</option><option>Cancelled</option></select>
+      <input class="fi" id="mq" placeholder="&#128269; Search problem, forklift&hellip;" style="width:200px" oninput="renderMaint()">
+      <select class="fi" id="mfl" onchange="renderMaint()"><option value="">All Forklift</option><option value="02 (FD-30)">02 (FD-30)</option><option value="03 (FD-30)">03 (FD-30)</option><option value="04 (FD-30)">04 (FD-30)</option><option value="05 (FD-30)">05 (FD-30)</option><option value="06 (CPC-30)">06 (CPC-30)</option><option value="07 (CQD-20)">07 (CQD-20)</option><option value="08 (CQD-20)">08 (CQD-20)</option></select>
+      <select class="fi" id="mst" onchange="renderMaint()"><option value="">All Status</option><option>Pending</option><option>In Progress</option><option>Done</option><option>Cancelled</option></select>
     </div>
     <button class="a-add" onclick="openPin(function(){openAdd('maint')})">&#65291; Add Maintenance</button>
   </div>
   <div class="card">
-    <div class="card-hd"><div class="card-hd-title">&#128295; Maintenance History</div><span class="card-hd-badge" id="MBADGE">0</span></div>
+    <div class="card-hd"><div class="card-title">&#128295; Maintenance History</div><span class="card-cnt" id="MBADGE">0</span></div>
     <div style="overflow-x:auto">
     <table class="tbl">
       <thead><tr><th>#</th><th>Forklift</th><th>Driver</th><th>ID</th><th>Problem/Reason</th><th>Maint.By</th><th>Delay</th><th>Status</th><th>Remark</th><th>Act</th></tr></thead>
@@ -333,7 +219,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <div class="OV" id="OV-DEL">
   <div class="OV-box" style="max-width:360px;text-align:center">
     <h3>&#9888; Delete Confirm</h3>
-    <p style="font-size:13px;margin:14px 0 20px;color:var(--tb)">এই record মুছে ফেলবেন?<br><strong id="DNAME" style="color:var(--th)"></strong></p>
+    <p style="font-size:13px;margin:14px 0 20px;color:var(--t2)">এই record মুছে ফেলবেন?<br><strong id="DNAME" style="color:var(--t1)"></strong></p>
     <div class="mbtns" style="justify-content:center">
       <button class="btn btn-sec" onclick="closeOv('OV-DEL')">Cancel</button>
       <button class="btn btn-err" onclick="confirmDel()">&#128465; Delete</button>
@@ -355,7 +241,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
         <div class="pkey" onclick="pressPin('4')">4</div><div class="pkey" onclick="pressPin('5')">5</div><div class="pkey" onclick="pressPin('6')">6</div>
         <div class="pkey" onclick="pressPin('7')">7</div><div class="pkey" onclick="pressPin('8')">8</div><div class="pkey" onclick="pressPin('9')">9</div>
         <div class="pkey" onclick="pressPin('del')">&#9003;</div><div class="pkey" onclick="pressPin('0')">0</div>
-        <div class="pkey" onclick="pressPin('ok')" style="color:var(--ok);border-color:var(--ok)">&#10003;</div>
+        <div class="pkey" onclick="pressPin('ok')" style="color:var(--grn);border-color:var(--grn)">&#10003;</div>
       </div>
       <div class="pin-err" id="pin-err">&#10060; Wrong PIN. Try again.</div>
     </div>
@@ -399,7 +285,7 @@ async function _initFbSync(){
   if(!window.WmsDb){await new Promise(function(r){setTimeout(r,700);});}
   var cloud=window.WmsDb&&WmsDb.isCloud();
   var ind=document.getElementById('sync-ind'),pill=document.getElementById('sync-pill');
-  if(ind){ind.textContent=cloud?'☁ Cloud Sync ON':'💾 Local Only';ind.style.color=cloud?'var(--ok)':'var(--wrn)';}
+  if(ind){ind.textContent=cloud?'☁ Cloud Sync ON':'💾 Local Only';ind.style.color=cloud?'var(--grn)':'var(--yel)';}
   if(pill){pill.textContent=cloud?'☁ Cloud Sync ON':'💾 Local Only';}
   if(window.WmsDb){
     WmsDb.listen('fl_parts',function(d){_parts=d;renderParts();buildStats();});
@@ -433,9 +319,9 @@ function buildStats(){
   var fls={};ap.forEach(function(r){if(r.forklift&&r.forklift.trim())fls[r.forklift]=1;});
   document.getElementById('STATS').innerHTML=
     '<div class="stc"><div class="stc-num">'+ap.length+'</div><div class="stc-lbl">Parts Records</div><div class="stc-sub">Total entries</div></div>'+
-    '<div class="stc"><div class="stc-num" style="color:var(--wrn)">'+totalFuel+'</div><div class="stc-lbl">Total Fuel (L)</div><div class="stc-sub">'+af.length+' fill-ups</div></div>'+
-    '<div class="stc"><div class="stc-num" style="color:var(--ok)">'+Object.keys(fls).length+'</div><div class="stc-lbl">Forklifts</div><div class="stc-sub">With records</div></div>'+
-    '<div class="stc"><div class="stc-num" style="color:var(--err)">'+am.length+'</div><div class="stc-lbl">Maintenance</div><div class="stc-sub">Log entries</div></div>';
+    '<div class="stc"><div class="stc-num" style="color:var(--yel)">'+totalFuel+'</div><div class="stc-lbl">Total Fuel (L)</div><div class="stc-sub">'+af.length+' fill-ups</div></div>'+
+    '<div class="stc"><div class="stc-num" style="color:var(--grn)">'+Object.keys(fls).length+'</div><div class="stc-lbl">Forklifts</div><div class="stc-sub">With records</div></div>'+
+    '<div class="stc"><div class="stc-num" style="color:var(--red)">'+am.length+'</div><div class="stc-lbl">Maintenance</div><div class="stc-sub">Log entries</div></div>';
   document.getElementById('parts-cnt').textContent=ap.length;
   document.getElementById('fuel-cnt').textContent=af.length;
   document.getElementById('maint-cnt').textContent=am.length;
@@ -508,19 +394,19 @@ function renderParts(){
   var data=getFilteredParts();
   pPg=paginate(data,pPg,'PTBODY','PBADGE','PPI','PPBS',function(r,i){
     var isBase=r._gi<bLen;
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit('parts','+r._gi+')})" title="Edit">&#9998;</button>';
-    var dB=isBase?'':'<button class="abtn a-del" onclick="openPin(function(){askDel('parts',' +(r._gi-bLen)+ ',''+r.material.replace(/'/g,"\'")+ '',''+( r._fbKey||'')+'' )})" title="Delete">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-family:monospace;font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit('parts','+r._gi+')})" title="Edit">&#9998;</button>';
+    var dB=isBase?'':'<button class="abtn a-d" onclick="openPin(function(){askDel('parts',' +(r._gi-bLen)+ ',''+r.material.replace(/'/g,"\'")+ '',''+( r._fbKey||'')+'' )})" title="Delete">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-family:monospace;font-size:11px">'+(i+1)+'</td>'+
       '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
       '<td><span class="chip">'+r.forklift+'</span></td>'+
       '<td style="font-size:11px">'+r.driver+'</td>'+
       '<td style="font-family:monospace;font-size:11px;color:var(--acc)">'+r.driver_id+'</td>'+
-      '<td style="font-weight:500;color:var(--th);max-width:160px">'+r.material+'</td>'+
+      '<td style="font-weight:500;color:var(--t1);max-width:160px">'+r.material+'</td>'+
       '<td style="text-align:center;font-weight:700">'+r.qty+'</td>'+
       '<td><span class="badge b-grey">'+r.unit+'</span></td>'+
       '<td style="font-family:monospace;font-size:11px">'+(r.meter||'&#8212;')+'</td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+r.maintenance+'</td>'+
-      '<td style="font-size:11px;color:var(--tm);max-width:100px">'+(r.remark||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+r.maintenance+'</td>'+
+      '<td style="font-size:11px;color:var(--t3);max-width:100px">'+(r.remark||'&#8212;')+'</td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   });
 }
@@ -531,17 +417,17 @@ function renderFuel(){
   var data=getFilteredFuel();
   fPg=paginate(data,fPg,'FTBODY','FBADGE','FPI','FPBS',function(r,i){
     var isBase=r._gi<bLen;
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit('fuel','+r._gi+')})" title="Edit">&#9998;</button>';
-    var dB=isBase?'':'<button class="abtn a-del" onclick="openPin(function(){askDel('fuel','+(r._gi-bLen)+','Fuel '+r.date.replace(/'/g,"\'")+ '',''+(r._fbKey||'')+'' )})" title="Delete">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-family:monospace;font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit('fuel','+r._gi+')})" title="Edit">&#9998;</button>';
+    var dB=isBase?'':'<button class="abtn a-d" onclick="openPin(function(){askDel('fuel','+(r._gi-bLen)+','Fuel '+r.date.replace(/'/g,"\'")+ '',''+(r._fbKey||'')+'' )})" title="Delete">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-family:monospace;font-size:11px">'+(i+1)+'</td>'+
       '<td style="white-space:nowrap;font-size:11px">'+r.date+'</td>'+
       '<td><span class="chip">'+r.forklift+'</span></td>'+
       '<td style="font-size:11px">'+r.driver+'</td>'+
       '<td style="font-family:monospace;font-size:11px;color:var(--acc)">'+r.driver_id+'</td>'+
       '<td style="font-family:monospace;font-size:11px">'+(r.meter||'&#8212;')+'</td>'+
-      '<td style="font-weight:700;color:var(--wrn)">'+r.fuel_qty+' <span style="font-size:10px;color:var(--tm);font-weight:400">'+r.unit+'</span></td>'+
+      '<td style="font-weight:700;color:var(--yel)">'+r.fuel_qty+' <span style="font-size:10px;color:var(--t3);font-weight:400">'+r.unit+'</span></td>'+
       '<td><span class="badge b-grey">'+r.unit+'</span></td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.remark||'&#8212;')+'</td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   });
 }
@@ -552,17 +438,17 @@ function renderMaint(){
   mPg=paginate(data,mPg,'MTBODY','MBADGE','MPI','MPBS',function(r,i){
     var st=r.status||'Pending';
     var sb=st==='Done'?'b-ok':st==='In Progress'?'b-wrn':st==='Pending'?'b-err':'b-grey';
-    var eB='<button class="abtn a-edit" onclick="openPin(function(){openEdit('maint','+r._gi+')})" title="Edit">&#9998;</button>';
-    var dB='<button class="abtn a-del" onclick="openPin(function(){askDel('maint','+r._gi+',''+(r.problem||'').replace(/'/g,"\'")+ '',''+(r._fbKey||'')+'' )})" title="Delete">&#128465;</button>';
-    return '<tr><td style="color:var(--tm);font-family:monospace;font-size:11px">'+(i+1)+'</td>'+
+    var eB='<button class="abtn a-e" onclick="openPin(function(){openEdit('maint','+r._gi+')})" title="Edit">&#9998;</button>';
+    var dB='<button class="abtn a-d" onclick="openPin(function(){askDel('maint','+r._gi+',''+(r.problem||'').replace(/'/g,"\'")+ '',''+(r._fbKey||'')+'' )})" title="Delete">&#128465;</button>';
+    return '<tr><td style="color:var(--t3);font-family:monospace;font-size:11px">'+(i+1)+'</td>'+
       '<td><span class="chip">'+(r.forklift||'&#8212;')+'</span></td>'+
       '<td style="font-size:11px">'+(r.driver||'&#8212;')+'</td>'+
       '<td style="font-family:monospace;font-size:11px;color:var(--acc)">'+(r.driver_id||'&#8212;')+'</td>'+
-      '<td style="font-weight:500;color:var(--th);max-width:160px">'+(r.problem||'&#8212;')+'</td>'+
+      '<td style="font-weight:500;color:var(--t1);max-width:160px">'+(r.problem||'&#8212;')+'</td>'+
       '<td style="font-size:11px">'+(r.under_maint||'&#8212;')+'</td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.delay_reason||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.delay_reason||'&#8212;')+'</td>'+
       '<td><span class="badge '+sb+'">'+st+'</span></td>'+
-      '<td style="font-size:11px;color:var(--tm)">'+(r.remark||'&#8212;')+'</td>'+
+      '<td style="font-size:11px;color:var(--t3)">'+(r.remark||'&#8212;')+'</td>'+
       '<td><div style="display:flex;gap:3px">'+eB+dB+'</div></td></tr>';
   });
 }
@@ -736,5 +622,30 @@ function confirmDel(){
 initApp();
 _initFbSync().then(function(){if(!window.WmsDb){renderAll();buildStats();}});
 </script>
+<div class="OV" id="bkpModal">
+  <div class="OV-box" style="max-width:500px">
+    <h3>💾 Backup &amp; Restore</h3>
+    <div class="OV-sub">ডেটা backup নিন অথবা restore করুন</div>
+    <div class="bkp-panel">
+      <div class="bkp-title">📤 Backup নিন</div>
+      <div class="bkp-sub">সম্পূর্ণ ডেটা download করুন</div>
+      <div class="bkp-btns">
+        <button class="btn btn-g" onclick="backupExcel()">📊 Excel (.csv)</button>
+        <button class="btn btn-b" onclick="backupJSON()">📄 JSON</button>
+        <button class="btn btn-p" onclick="backupEmail()">✉️ Email</button>
+      </div>
+    </div>
+    <div class="bkp-panel" style="background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.05));border-color:rgba(249,115,22,.2)">
+      <div class="bkp-title" style="color:var(--ora)">📥 Restore করুন</div>
+      <div class="bkp-sub">Backup file থেকে ডেটা ফিরিয়ে আনুন</div>
+      <div class="bkp-btns">
+        <label class="btn btn-y" style="cursor:pointer">📂 File নির্বাচন<input type="file" accept=".json,.csv" style="display:none" onchange="restoreBackup(this)"></label>
+      </div>
+    </div>
+    <div id="bkpStatus" style="font-size:13px;color:var(--t3);margin-bottom:8px;min-height:20px"></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeBkp()">বন্ধ করুন</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
 </body>
 </html>
