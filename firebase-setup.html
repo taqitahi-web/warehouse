@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firebase Setup — EPFBD WMS</title>
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./wms-theme.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <h1>🔥 Firebase Setup</h1>
+    <p>EPFBD Warehouse Management System — Cloud Sync Configuration</p>
+  </div>
+
+  <!-- Step by step guide -->
+  <div class="card">
+    <h2>📋 Firebase Project তৈরির ধাপ</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <p><strong style="color:var(--t1)">Firebase Console যান:</strong> <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> — Google account দিয়ে login করুন</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <p><strong style="color:var(--t1)">New Project:</strong> "Add project" → Project name: <code>epfbd-wms</code> → Analytics off করুন → "Create project"</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <p><strong style="color:var(--t1)">Realtime Database চালু করুন:</strong> Left sidebar → Build → Realtime Database → "Create Database" → Location: <code>us-central1</code> → <strong>Start in test mode</strong> → Enable</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <p><strong style="color:var(--t1)">Web App যোগ করুন:</strong> Project Overview → "&lt;/&gt;" icon → App nickname: <code>EPFBD WMS</code> → Register app → নিচে config copy করুন</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <p><strong style="color:var(--t1)">Database Rules সেট করুন:</strong> Realtime Database → Rules → এই rule paste করুন:</p>
+          <div style="position:relative">
+            <button class="copy-btn" onclick="copyRules()">Copy</button>
+            <div class="cfg-preview" id="rules-pre">{
+  "rules": {
+    "wms": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}</div>
+          </div>
+          <p style="margin-top:8px;font-size:11px;color:var(--t3)">⚠️ Test mode — পরে PIN-based auth যোগ করা যাবে</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Config input -->
+  <div class="card">
+    <h2>⚙️ Firebase Config এখানে পেস্ট করুন</h2>
+    <div class="alert">
+      ⚠️ Firebase Console → Project Settings → Your apps → SDK setup → Config object থেকে values copy করুন
+    </div>
+    <div class="form-row">
+      <label>API Key</label>
+      <input type="text" id="apiKey" placeholder="AIzaSy...">
+    </div>
+    <div class="form-row">
+      <label>Auth Domain</label>
+      <input type="text" id="authDomain" placeholder="epfbd-wms.firebaseapp.com">
+    </div>
+    <div class="form-row">
+      <label>Database URL <span style="color:var(--acc)">★ Important</span></label>
+      <input type="text" id="databaseURL" placeholder="https://epfbd-wms-default-rtdb.firebaseio.com">
+    </div>
+    <div class="form-row">
+      <label>Project ID</label>
+      <input type="text" id="projectId" placeholder="epfbd-wms">
+    </div>
+    <div class="form-row">
+      <label>Storage Bucket</label>
+      <input type="text" id="storageBucket" placeholder="epfbd-wms.appspot.com">
+    </div>
+    <div class="form-row">
+      <label>Messaging Sender ID</label>
+      <input type="text" id="messagingSenderId" placeholder="123456789">
+    </div>
+    <div class="form-row">
+      <label>App ID</label>
+      <input type="text" id="appId" placeholder="1:123456789:web:abc123">
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn btn-sec" style="width:auto;padding:10px 16px" onclick="testConnection()">🔌 Test Connection</button>
+      <button class="btn" onclick="saveConfig()">💾 Save Config to All Pages</button>
+    </div>
+    <div style="margin-top:12px">
+      <div class="status-box" id="status">Firebase config এখানে দিন এবং Test Connection চাপুন...</div>
+    </div>
+  </div>
+
+  <!-- Generated config preview -->
+  <div class="card" id="cfg-card" style="display:none">
+    <h2>✅ Generated Config <button class="copy-btn" onclick="copyCfg()" style="float:right">Copy</button></h2>
+    <div class="cfg-preview" id="cfg-preview"></div>
+    <div style="margin-top:16px">
+      <p style="font-size:12px;color:var(--t3);margin-bottom:12px">এই config টি নিচের সব পেজে inject করতে হবে। "Download Updated Pages" চাপলে automatically inject হবে।</p>
+      <button class="btn" onclick="downloadAll()">⬇️ Download All Pages (Firebase Enabled)</button>
+    </div>
+  </div>
+
+  <!-- Pages that will be synced -->
+  <div class="card">
+    <h2>📄 যে পেজগুলো Sync হবে</h2>
+    <div class="pages-grid" id="pagesGrid">
+      <div class="page-item"><strong>🏭 EPF Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/EPF_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 TGL Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/TGL_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 BGL Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/BGL_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 GTM Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/GTM_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 RFL Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/RFL_manpower.html</span></div>
+      <div class="page-item"><strong>🏭 EC Manpower</strong><span><span class="sync-dot dot-off"></span>manpower/EC_manpower.html</span></div>
+      <div class="page-item"><strong>📋 Warehouse List</strong><span><span class="sync-dot dot-off"></span>wh_list.html</span></div>
+      <div class="page-item"><strong>🔑 MIS Login</strong><span><span class="sync-dot dot-off"></span>warehouse/mis_login.html</span></div>
+    </div>
+    <div style="margin-top:12px;padding:10px;background:var(--sur);border-radius:6px;font-size:11px;color:var(--t3);line-height:1.8">
+      <strong style="color:var(--t1)">Firebase DB Structure:</strong><br>
+      /wms/epf_manpower/ → EPF extra records + overrides<br>
+      /wms/tgl_manpower/ → TGL extra records + overrides<br>
+      /wms/bgl_manpower/ → BGL data<br>
+      /wms/gtm_manpower/ → GTM data<br>
+      /wms/rfl_manpower/ → RFL data<br>
+      /wms/ec_manpower/ → EC data<br>
+      /wms/wh_list/ → Warehouse list edits<br>
+      /wms/settings/ → Shared app settings
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+let fbApp = null, fbDb = null;
+
+function getConfig(){
+  return {
+    apiKey: document.getElementById('apiKey').value.trim(),
+    authDomain: document.getElementById('authDomain').value.trim(),
+    databaseURL: document.getElementById('databaseURL').value.trim(),
+    projectId: document.getElementById('projectId').value.trim(),
+    storageBucket: document.getElementById('storageBucket').value.trim(),
+    messagingSenderId: document.getElementById('messagingSenderId').value.trim(),
+    appId: document.getElementById('appId').value.trim(),
+  };
+}
+
+function setStatus(msg, type){
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status-box ' + (type==='ok'?'status-ok':type==='err'?'status-err':'status-wrn');
+}
+
+window.testConnection = async function(){
+  const cfg = getConfig();
+  if(!cfg.databaseURL){ setStatus('❌ Database URL দিন!','err'); return; }
+  setStatus('⏳ Firebase connect করছে...','');
+  try {
+    if(fbApp){ try{ fbApp.delete(); }catch(e){} }
+    fbApp = initializeApp(cfg, 'test-'+Date.now());
+    fbDb = getDatabase(fbApp);
+    await set(ref(fbDb, 'wms/connection_test'), { ts: Date.now(), msg: 'EPFBD WMS Connected' });
+    const snap = await get(ref(fbDb, 'wms/connection_test'));
+    if(snap.exists()){
+      setStatus('✅ Firebase সংযুক্ত! Database URL: ' + cfg.databaseURL, 'ok');
+      localStorage.setItem('wms_fb_config', JSON.stringify(cfg));
+      showConfig(cfg);
+      updateDots(true);
+    }
+  } catch(e){
+    setStatus('❌ Error: ' + e.message, 'err');
+  }
+}
+
+function showConfig(cfg){
+  const preview = `const WMS_FB_CONFIG = ${JSON.stringify(cfg, null, 2)};`;
+  document.getElementById('cfg-preview').textContent = preview;
+  document.getElementById('cfg-card').style.display = 'block';
+}
+
+function updateDots(ok){
+  document.querySelectorAll('.sync-dot').forEach(d=>{
+    d.className = 'sync-dot ' + (ok?'dot-ok':'dot-off');
+  });
+}
+
+window.saveConfig = function(){
+  const cfg = getConfig();
+  if(!cfg.databaseURL){ setStatus('❌ আগে Test Connection করুন','err'); return; }
+  localStorage.setItem('wms_fb_config', JSON.stringify(cfg));
+  setStatus('✅ Config saved locally. এখন "Download All Pages" চাপুন।','ok');
+  showConfig(cfg);
+}
+
+window.copyRules = function(){
+  navigator.clipboard.writeText(document.getElementById('rules-pre').textContent);
+  document.querySelector('.copy-btn').textContent='Copied!';
+  setTimeout(()=>document.querySelector('.copy-btn').textContent='Copy',2000);
+}
+
+window.copyCfg = function(){
+  navigator.clipboard.writeText(document.getElementById('cfg-preview').textContent);
+}
+
+window.downloadAll = function(){
+  setStatus('⚠️ GitHub এ pages upload করার পর, প্রতিটি page এ Firebase config inject করতে হবে। নিচের config টি copy করে প্রতিটি পেজের <script> এর শুরুতে WMS_FB_CONFIG হিসেবে add করুন।','wrn');
+}
+
+// Load saved config
+const saved = localStorage.getItem('wms_fb_config');
+if(saved){
+  const cfg = JSON.parse(saved);
+  Object.keys(cfg).forEach(k=>{
+    const el = document.getElementById(k);
+    if(el) el.value = cfg[k];
+  });
+  showConfig(cfg);
+}
+</script>
+<div class="OV" id="bkpModal">
+  <div class="OV-box" style="max-width:500px">
+    <h3>💾 Backup &amp; Restore</h3>
+    <div class="OV-sub">ডেটা backup নিন অথবা restore করুন</div>
+    <div class="bkp-panel">
+      <div class="bkp-title">📤 Backup নিন</div>
+      <div class="bkp-sub">সম্পূর্ণ ডেটা download করুন</div>
+      <div class="bkp-btns">
+        <button class="btn btn-g" onclick="backupExcel()">📊 Excel (.csv)</button>
+        <button class="btn btn-b" onclick="backupJSON()">📄 JSON</button>
+        <button class="btn btn-p" onclick="backupEmail()">✉️ Email</button>
+      </div>
+    </div>
+    <div class="bkp-panel" style="background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.05));border-color:rgba(249,115,22,.2)">
+      <div class="bkp-title" style="color:var(--ora)">📥 Restore করুন</div>
+      <div class="bkp-sub">Backup file থেকে ডেটা ফিরিয়ে আনুন</div>
+      <div class="bkp-btns">
+        <label class="btn btn-y" style="cursor:pointer">📂 File নির্বাচন<input type="file" accept=".json,.csv" style="display:none" onchange="restoreBackup(this)"></label>
+      </div>
+    </div>
+    <div id="bkpStatus" style="font-size:13px;color:var(--t3);margin-bottom:8px;min-height:20px"></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeBkp()">বন্ধ করুন</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+</body>
+</html>

@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Manpower — EPFBD WMS</title>
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../wms-theme.css">
+<style>
+/* ── All Manpower page fixes ── */
+.mn-inner{padding:26px 26px 44px}
+/* Page header fix */
+.ph.fu{background:linear-gradient(135deg,#0c1a0e,#0a1614,#0d1118);border:1px solid var(--bdr);border-radius:20px;padding:22px 26px;margin-bottom:18px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden}
+.ph.fu h1{font-family:'Plus Jakarta Sans',sans-serif;font-size:22px;font-weight:800;color:var(--t1);margin:0}
+.ph.fu p{font-size:13.5px;color:var(--t3);margin:3px 0 0}
+/* Stat row */
+.srow{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:18px}
+.sbox{background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:14px 16px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.sv{font-family:'Plus Jakarta Sans',sans-serif;font-size:24px;font-weight:800;color:var(--acc);line-height:1}
+.sl{font-size:11.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:4px}
+/* Tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;border-bottom:2px solid var(--bdr);padding-bottom:0}
+.tab{padding:9px 16px;border:none;background:transparent;color:var(--t3);cursor:pointer;font-size:13.5px;font-weight:600;font-family:'Inter',sans-serif;transition:all .18s;border-bottom:2px solid transparent;margin-bottom:-2px}
+.tab:hover{color:var(--t1)}
+.tab.ON{color:var(--acc);border-bottom-color:var(--acc)}
+/* Button row */
+.brow{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.badd{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#0a0a0a;border:none;padding:9px 20px;border-radius:12px;font-size:13.5px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;box-shadow:0 4px 22px rgba(62,207,142,.22)}
+.badd:hover{opacity:.88;transform:translateY(-1px)}
+/* Filter bar */
+.fbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.fbar input,.fbar select{background:var(--sur);border:1px solid var(--bdr);border-radius:12px;padding:9px 13px;color:var(--t1);font-size:13.5px;outline:none;font-family:'Inter',sans-serif}
+.fbar input{width:260px}
+.fbar input:focus,.fbar select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(62,207,142,.14)}
+.fbar select{cursor:pointer}
+.fbar select option{background:var(--sur);color:var(--t1)}
+/* Table wrapper */
+.twrap{overflow-x:auto;background:var(--sur);border:1px solid var(--bdr);border-radius:20px;box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.twrap table{width:100%;border-collapse:collapse}
+.twrap th{padding:11px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;background:rgba(255,255,255,.025);border-bottom:1px solid var(--bdr);white-space:nowrap}
+.twrap td{padding:11px 14px;border-bottom:1px solid var(--bdr);font-size:13.5px;color:var(--t2);vertical-align:middle}
+.twrap tr:last-child td{border-bottom:none}
+.twrap tr:hover td{background:rgba(62,207,142,.04)}
+/* Pagination */
+.pgn{display:flex;align-items:center;gap:6px;padding:14px 18px;background:var(--sur);border:1px solid var(--bdr);border-top:none;border-radius:0 0 20px 20px;flex-wrap:wrap;margin-top:-18px}
+.pi{font-size:12.5px;color:var(--t3);margin-right:auto}
+.pbs{display:flex;gap:4px;flex-wrap:wrap}
+/* Pagination buttons (rendered by JS as .pb) */
+.pb{background:var(--sur2);border:1px solid var(--bdr);color:var(--t2);padding:6px 12px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:500;transition:all .18s;font-family:'Inter',sans-serif}
+.pb:hover:not([disabled]){background:rgba(62,207,142,.14);color:var(--acc);border-color:rgba(62,207,142,.28)}
+.pb.CUR{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#0a0a0a;border-color:transparent;box-shadow:0 4px 22px rgba(62,207,142,.22)}
+.pb[disabled]{opacity:.3;cursor:default}
+/* Modal */
+.modal{background:var(--sur);border:1px solid var(--bdr);border-radius:24px;padding:28px;width:100%;max-width:580px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.65)}
+/* Footer */
+.pgfoot{display:flex;justify-content:space-between;padding:12px 4px;font-size:12px;color:var(--t4);margin-top:8px}
+/* fu = full-width */
+.fu{width:100%}
+/* Badge overrides for this page */
+.bt-O{background:rgba(62,207,142,.14);color:var(--acc);border-radius:9999px;padding:3px 10px;font-size:11.5px;font-weight:600;display:inline-block}
+.bt-L{background:rgba(96,165,250,.14);color:var(--blu);border-radius:9999px;padding:3px 10px;font-size:11.5px;font-weight:600;display:inline-block}
+.bt-D{background:rgba(249,115,22,.14);color:var(--ora);border-radius:9999px;padding:3px 10px;font-size:11.5px;font-weight:600;display:inline-block}
+.bs-a{background:rgba(74,222,128,.14);color:var(--grn);border-radius:9999px;padding:2px 8px;font-size:11px;font-weight:600}
+.bs-i{background:rgba(248,113,113,.14);color:var(--red);border-radius:9999px;padding:2px 8px;font-size:11px;font-weight:600}
+/* Mobile toggle buttons */
+.tb-edit,.tb-tog{border:none;background:transparent;cursor:pointer;padding:5px 8px;border-radius:8px;font-size:14px;transition:all .18s;color:var(--t3)}
+.tb-edit:hover{background:rgba(251,191,36,.14);color:var(--yel)}
+.tb-tog:hover{background:rgba(74,222,128,.14);color:var(--grn)}
+
+/* Form grid inside modal */
+.fr{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.fr label{font-size:11.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.fr input,.fr select,.fr textarea{background:var(--bg2);border:1px solid var(--bdr);border-radius:12px;padding:10px 12px;color:var(--t1);font-size:13.5px;font-family:'Inter',sans-serif;outline:none;transition:all .18s;width:100%}
+.fr input:focus,.fr select:focus,.fr textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(62,207,142,.14)}
+.fr select option{background:var(--sur);color:var(--t1)}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div><div class="hdr-title">All Manpower</div><div class="hdr-bc">EPFBD WMS · Manpower</div></div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" placeholder="Search…"></div>
+  <a class="hdr-btn" href="../firebase-setup.html">🔥</a>
+  <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
+  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <div class="hdr-clk" id="CLK">--:--:--</div>
+</header>
+<aside class="sb">
+  <a class="sb-logo" href="../index.html"><div class="sb-mark">🏭</div>
+    <div><div class="sb-name">EPFBD WMS</div><div class="sb-sub">Warehouse System</div></div></a>
+  <nav class="sb-nav">
+    <div class="sb-grp"><span class="sb-grp-lbl">Main</span>
+      <a class="sb-a" href="../index.html"><div class="sb-ico">🏠</div>Dashboard</a>
+      <a class="sb-a" href="../kpi/staff_kpi.html"><div class="sb-ico">⭐</div>KPI</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Manpower</span>
+      <a class="sb-a ON" href="../manpower/all_manpower.html"><div class="sb-ico">👥</div>All Manpower<span class="sb-badge">264</span></a>
+      <div class="sb-chips"><a class="sb-chip" href="../manpower/EPF_manpower.html">EPF</a><a class="sb-chip" href="../manpower/TGL_manpower.html">TGL</a><a class="sb-chip" href="../manpower/BGL_manpower.html">BGL</a><a class="sb-chip" href="../manpower/GTM_manpower.html">GTM</a><a class="sb-chip" href="../manpower/RFL_manpower.html">RFL</a><a class="sb-chip" href="../manpower/EC_manpower.html">EC</a></div>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Warehouse</span>
+      <a class="sb-a" href="../warehouse/wh_list.html"><div class="sb-ico">🏭</div>WH List</a>
+      <a class="sb-a" href="../warehouse/mis_login.html"><div class="sb-ico">🔑</div>MIS Login</a>
+      <a class="sb-a" href="../warehouse/mail_list.html"><div class="sb-ico">📧</div>Mail List</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Equipment</span>
+      <a class="sb-a" href="../equipment/pda_devices.html"><div class="sb-ico">📱</div>PDA &amp; Scanner</a>
+      <a class="sb-a" href="../equipment/barcode_printer.html"><div class="sb-ico">🖨</div>Barcode Printer</a>
+      <a class="sb-a" href="../equipment/forklift.html"><div class="sb-ico">🚜</div>Forklift</a>
+      <a class="sb-a" href="../equipment/maintenance_log.html"><div class="sb-ico">🔧</div>Maintenance</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">HR</span>
+      <a class="sb-a" href="../hr/attendance.html"><div class="sb-ico">📋</div>Attendance &amp; Leave</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Setup</span>
+      <a class="sb-a" href="../firebase-setup.html"><div class="sb-ico">🔥</div>Firebase</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Settings</span>
+      <a class="sb-a" href="../settings/index.html"><div class="sb-ico">⚙️</div>Settings</a>
+    </div>
+  </nav>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
+    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
+</aside>
+<main class="mn">
+
+<div class="ph an" style="margin-bottom:18px">
+  <div class="ph-ico">👥</div>
+  <div>
+    <div class="ph-title">All Manpower</div>
+    <div class="ph-sub">EPF · TGL · BGL · GTM · RFL · EC — সব স্টাফ</div>
+  </div>
+  <div class="ph-r" id="ph-count">
+    <span class="badge b-a" style="font-size:13.5px;padding:7px 16px">264 Staff</span>
+  </div>
+</div>
+  <div class="imp-btns">
+    <button class="btn btn-b" onclick="dlTemplate()">⬇ Template (.csv)</button>
+    <label class="btn btn-g" style="cursor:pointer">📂 Import Excel<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importFile(this)"></label>
+    <button class="btn btn-y" onclick="exportExcel()">📤 Export</button>
+    <button class="btn btn-s" onclick="openBackup()">💾 Backup</button>
+  </div>
+</div>
+
+<div class="srow fu">
+  <div class="sbox"><div class="sv" id="st-tot">222</div><div class="sl">Total</div></div>
+  <div class="sbox"><div class="sv" id="st-off">60</div><div class="sl">Officers</div></div>
+  <div class="sbox"><div class="sv" id="st-lab">150</div><div class="sl">Labour</div></div>
+  <div class="sbox"><div class="sv" id="st-drv">12</div><div class="sl">Drivers</div></div>
+  <div class="sbox"><div class="sv" id="st-epf">145</div><div class="sl">EPF</div></div><div class="sbox"><div class="sv" id="st-tgl">70</div><div class="sl">TGL</div></div><div class="sbox"><div class="sv" id="st-bgl">4</div><div class="sl">BGL</div></div><div class="sbox"><div class="sv" id="st-gtm">3</div><div class="sl">GTM</div></div>
+</div>
+<div class="tabs fu">
+  <button class="tab ON" data-t="" onclick="setTab('')">All</button>
+  <button class="tab" data-t="Officer" onclick="setTab('Officer')">&#127894; Officers</button>
+  <button class="tab" data-t="Labour" onclick="setTab('Labour')">&#128119; Labour</button>
+  <button class="tab" data-t="Driver" onclick="setTab('Driver')">&#128663; Drivers</button>
+  <button class="tab" data-t="active" onclick="setTab('active')">&#10003; Active</button>
+  <button class="tab" data-t="inactive" onclick="setTab('inactive')">&#10005; Inactive</button>
+</div>
+<div class="brow fu">
+  <button class="btn badd" onclick="openAdd()">&#65291; Add</button>
+  <span style="font-size:11px;color:var(--t3)"></span>
+</div>
+<div class="fbar fu">
+  <input id="fq" placeholder="&#128269; Search name, ID, designation, department..." oninput="renderTable()">
+  <select id="fwh" onchange="renderTable()"><option value="">All WH Codes</option><option value="BDC110">BDC110</option><option value="BDC150">BDC150</option><option value="BDC170">BDC170</option><option value="BDC210">BDC210</option><option value="BDC310">BDC310</option><option value="BDC410">BDC410</option><option value="BDC515">BDC515</option><option value="BDC610A">BDC610A</option><option value="BDC610B">BDC610B</option><option value="BDC620">BDC620</option><option value="BDW110">BDW110</option><option value="BDW150">BDW150</option><option value="BDW170">BDW170</option><option value="BDW210">BDW210</option><option value="BDW310">BDW310</option><option value="BDW410">BDW410</option><option value="BDW515">BDW515</option><option value="BDW610">BDW610</option><option value="EPF Construction">EPF Construction</option><option value="EPF Loading">EPF Loading</option><option value="EPF UnLoading">EPF UnLoading</option><option value="EPF Unloading">EPF Unloading</option><option value="EPF WH Forklift">EPF WH Forklift</option><option value="GT-06-WH">GT-06-WH</option><option value="GT-08-WH">GT-08-WH</option><option value="General">General</option><option value="Load/ Unload">Load/ Unload</option><option value="Sub Contact">Sub Contact</option><option value="TGL Construction">TGL Construction</option><option value="TGL Forklift driver">TGL Forklift driver</option></select>
+  <select id="fdept" onchange="renderTable()"><option value="">All Depts</option><option value="Construction">Construction</option><option value="Cutting
+Warehouse">Cutting
+Warehouse</option><option value="Cutting Ware-House">Cutting Ware-House</option><option value="Electrial  W.H.">Electrial  W.H.</option><option value="Electronic Equipment and Parts">Electronic Equipment and Parts</option><option value="Finished Goods">Finished Goods</option><option value="H H Warehouse">H H Warehouse</option><option value="H.H.warehouse">H.H.warehouse</option><option value="Human Hair Warehouse">Human Hair Warehouse</option><option value="Load/ Unload">Load/ Unload</option><option value="Loading">Loading</option><option value="Main Material">Main Material</option><option value="PM-BX,SB,CC">PM-BX,SB,CC</option><option value="PM-HC">PM-HC</option><option value="PM-HT">PM-HT</option><option value="PM-IC">PM-IC</option><option value="PM-LB">PM-LB</option><option value="PM-LT,NT,LC">PM-LT,NT,LC</option><option value="PM-PP,PVC">PM-PP,PVC</option><option value="PP,PVC">PP,PVC</option><option value="Packing Material">Packing Material</option><option value="Sub-Material">Sub-Material</option><option value="Unloading">Unloading</option><option value="WH Forklift">WH Forklift</option><option value="Warehouse">Warehouse</option></select>
+  <select id="ffac" onchange="renderTable()">
+      <option value="">All Factories</option>
+      <option value="EPF">EPF</option><option value="TGL">TGL</option>
+      <option value="BGL">BGL</option><option value="GTM">GTM</option>
+    </select>
+  <select id="fty" onchange="renderTable()"><option value="">All Types</option><option value="Officer">Officer</option><option value="Labour">Labour</option><option value="Driver">Driver</option></select>
+</div>
+<div class="twrap fu">
+  <table>
+    <thead><tr>
+      <th>#</th><th>WH</th><th>Name</th><th>ID</th><th>Designation</th>
+      <th>Type</th><th>Department</th><th>Building</th><th>Responsibility</th>
+      <th>Factory</th><th>Mobile</th><th>Status</th><th>&#9881;</th>
+    </tr></thead>
+    <tbody id="TBODY"></tbody>
+  </table>
+</div>
+<div class="pgn">
+  <div class="pi" id="PI">&#8212;</div>
+  <div class="pbs" id="PBS"></div>
+</div>
+<div class="pgfoot"><span>EPFBD WMS &bull; All Manpower</span><span id="FDATE">&#8212;</span></div>
+
+<div class="OV" id="OV-FORM">
+  <div class="modal" style="max-width:620px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <span style="font-size:22px">👤</span>
+      <div>
+        <h3 id="FTITLE" style="font-family:'Plus Jakarta Sans',sans-serif;font-size:18px;font-weight:800;color:var(--t1);margin:0">Add New Staff</h3>
+        <div style="font-size:12.5px;color:var(--t3);margin-top:2px">সব তথ্য সঠিকভাবে পূরণ করুন</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="fr"><label>Staff ID *</label><input id="FID" placeholder="e.g. 30678"></div>
+      <div class="fr"><label>Full Name *</label><input id="FN" placeholder="e.g. Md. Masud"></div>
+      <div class="fr"><label>Factory *</label>
+        <select id="FF">
+          <option value="EPF">EPF — Evergreen Packaging</option>
+          <option value="TGL">TGL — Tippu Garments</option>
+          <option value="BGL">BGL</option>
+          <option value="GTM">GTM</option>
+          <option value="RFL">RFL</option>
+          <option value="EC">EC</option>
+        </select>
+      </div>
+      <div class="fr"><label>Type *</label>
+        <select id="FD">
+          <option value="Officer">Officer</option>
+          <option value="Labour">Labour</option>
+          <option value="Driver">Driver</option>
+        </select>
+      </div>
+      <div class="fr"><label>Designation</label>
+        <select id="FDE">
+          <option>Manager</option>
+          <option>Sr. Executive</option>
+          <option>Executive</option>
+          <option>Executive (Grade-I)</option>
+          <option>Executive (Grade-II)</option>
+          <option>Executive (Grade-III)</option>
+          <option>Jr. Executive</option>
+          <option>Jr. Executive (NES Grade-I)</option>
+          <option>Jr. Executive (NES Grade-II)</option>
+          <option>Jr. Executive (NES Grade-III)</option>
+          <option>Ass.Jr.Executive</option>
+          <option>Labour</option>
+          <option>Driver</option>
+          <option>Forklift driver</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fr"><label>Department</label>
+        <select id="FDE2">
+          <option>Warehouse</option>
+          <option>Main Material</option>
+          <option>Sub-Material</option>
+          <option>Packing Material</option>
+          <option>Finished Goods</option>
+          <option>Human Hair Warehouse</option>
+          <option>H.H.warehouse</option>
+          <option>Cutting Warehouse</option>
+          <option>Electronic Equipment and Parts</option>
+          <option>Electrial W.H.</option>
+          <option>Construction</option>
+          <option>Loading</option>
+          <option>Unloading</option>
+          <option>Load/ Unload</option>
+          <option>WH Forklift</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fr"><label>WH Code</label>
+        <select id="FWH2">
+          <option value="">-- Select WH --</option>
+          <option>BDC110</option><option>BDC150</option><option>BDC170</option>
+          <option>BDC210</option><option>BDC310</option><option>BDC410</option>
+          <option>BDC515</option><option>BDC610A</option><option>BDC610B</option>
+          <option>BDC620</option><option>BDW110</option><option>BDW150</option>
+          <option>BDW170</option><option>BDW210</option><option>BDW310</option>
+          <option>BDW410</option><option>BDW515</option><option>BDW610</option>
+          <option>EPF Construction</option><option>EPF Loading</option>
+          <option>EPF UnLoading</option><option>EPF WH Forklift</option>
+          <option>GT-06-WH</option><option>GT-08-WH</option>
+          <option>TGL Construction</option><option>TGL Forklift driver</option>
+          <option>Load/ Unload</option><option>Sub Contact</option><option>General</option>
+        </select>
+      </div>
+      <div class="fr"><label>Building / Location</label>
+        <input id="FB" placeholder="e.g. BD-3B, GT07C-1st F"></div>
+      <div class="fr"><label>Responsibility</label>
+        <input id="FR" placeholder="e.g. MIS, Physical, Log Book"></div>
+      <div class="fr"><label>Mobile</label>
+        <input id="FM" placeholder="01XXXXXXXXX"></div>
+      <div class="fr"><label>Joining Date</label>
+        <input id="FJ" type="date"></div>
+      <div class="fr"><label>Status</label>
+        <select id="FST"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+      <button class="btn btn-d" onclick="document.getElementById('OV-FORM').classList.remove('show')">বাতিল</button>
+      <button class="btn btn-p" onclick="saveRec()">💾 সংরক্ষণ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div id="TOAST" class="toast-el"></div>
+<script>
+
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('ON',d.dataset.t===t));localStorage.setItem('epf-t',t);}
+function setFont(f){document.documentElement.setAttribute('data-font',f);document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('ON',b.dataset.f===f));localStorage.setItem('epf-f',f);}
+function startClock(){const tick=()=>{const n=new Date(),p=v=>String(v).padStart(2,'0'),el=document.getElementById('CLK');if(el)el.textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());};tick();setInterval(tick,1000);}
+function initApp(){setTheme(localStorage.getItem('epf-t')||'slate');setFont(localStorage.getItem('epf-f')||'ubuntu');startClock();const dt=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});const fd=document.getElementById('FDATE');if(fd)fd.textContent='Updated: '+dt;}
+
+
+
+function showOv(id){const e=document.getElementById(id);if(e)e.classList.add('show');}
+function closeOv(id){const e=document.getElementById(id);if(e)e.classList.remove('show');}
+document.addEventListener('click',e=>{document.querySelectorAll('.OV.show').forEach(o=>{if(e.target===o)closeOv(o.id);});});
+function toast(msg,type,ms){ms=ms||2500;const el=document.getElementById('TOAST');el.textContent=msg;el.className='toast-el show '+(type==='err'?'terr':'tok');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),ms);}
+
+
+let pendDel=null, tabF='', mpPg=1;
+const PER=30,all='epfbd_all_extra',OV_KEY='epfbd_all_ov';
+const BASE=[{"sl": 1, "wh": "General", "name": "Md. Abdullah-Al-Masud", "id": "30678", "desig": "Manager", "type": "Officer", "dept": "Warehouse", "building": "BD-3B", "resp": "Warehouse", "factory": "EPF", "mobile": "01678858934", "location": "Digholdangi,Nilphamari"}, {"sl": 2, "wh": "BDC110", "name": "Golam Rabbani", "id": "30353", "desig": "Executive", "type": "Officer", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01764930255", "location": "Vill :- Sepaitari Textail, Nilphamari "}, {"sl": 3, "wh": "BDC110", "name": "Md. Abdul Baten", "id": "32668", "desig": "Jr. Executive (NES Grade-I)", "type": "Officer", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01738431073", "location": "Vill :- Pakherhat khanshama, Dinajpur"}, {"sl": 4, "wh": "BDC110", "name": "Md. Abdul Malek", "id": "33508", "desig": "Executive", "type": "Officer", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "MIS", "factory": "EPF", "mobile": "01750552479", "location": "Vill :-Gobindopur, Nilphamari"}, {"sl": 5, "wh": "BDC110", "name": "Md. Fajlar Rahman", "id": "33359", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Excel", "factory": "EPF", "mobile": "01864100760", "location": "Vill :-Dakkhin Balapara Shangolshi, Nilphamari"}, {"sl": 6, "wh": "BDC110", "name": "Sree. Dhaneswar Roy", "id": "33317", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Logbook", "factory": "EPF", "mobile": "01580980117", "location": "Vill :-Kukuradanga , Nilphamari"}, {"sl": 7, "wh": "BDC110", "name": "Ripon Kazi", "id": "33504", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Bin card", "factory": "EPF", "mobile": "01751304207", "location": "Vill :-Kazipara Shangolshi,  Nilphamri"}, {"sl": 8, "wh": "BDC110", "name": "Sree. Hembabu", "id": "33506", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Bin card", "factory": "EPF", "mobile": "01764810069", "location": "Vill :- Kisamate Charaykhola, Nilphamri"}, {"sl": 9, "wh": "BDC110", "name": "Md. Anisur Rahman", "id": "31947", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01706754612", "location": "Vill:- Chakdogulia Sonaray , Nilphamari"}, {"sl": 10, "wh": "BDC110", "name": "Md. Jiarul Islam", "id": "31944", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01733023387", "location": "Vill:- Angerpara khanshama, Dinajpur "}, {"sl": 11, "wh": "BDC110", "name": "Sudendronath Roy", "id": "33408", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01751264464", "location": "Vill:- Tonggua khansama, Dinajpur"}, {"sl": 12, "wh": "BDC110", "name": "Md. Roni", "id": "33325", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01783780942", "location": "Vill :- Sepaitari Textail, Nilphamari "}, {"sl": 13, "wh": "BDC110", "name": "Md. Azizul Houque", "id": "34421", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01710254475", "location": "Vill:- Shutipara , Nilphamari"}, {"sl": 14, "wh": "BDC110", "name": "Md. Rofiqul Islam", "id": "32375", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01737246025", "location": "Vill:- Newla khashama, Dinajpur"}, {"sl": 15, "wh": "BDC110", "name": "Swapon Roy", "id": "34959", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "BD-3B Inside WH", "resp": "Physical", "factory": "EPF", "mobile": "01788003660", "location": "Nilphamari"}, {"sl": 16, "wh": "BDC110", "name": "Sobuj", "id": "30885", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "BD-3B", "resp": "Cleaner", "factory": "EPF", "mobile": "00138219904", "location": "Nilphamari"}, {"sl": 17, "wh": "BDC150", "name": "Md. Moshiur Rahman", "id": "30355", "desig": "Executive", "type": "Officer", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "MIS/ physical follow up", "factory": "EPF", "mobile": "01738276322", "location": "Charaikhola, \nNilphamari"}, {"sl": 18, "wh": "BDC150", "name": "Abdur Rahim", "id": "33906", "desig": "Jr. Executive", "type": "Officer", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "MIS", "factory": "EPF", "mobile": "01932143178", "location": "Saidpur\n Nilphamri"}, {"sl": 19, "wh": "BDC170", "name": "Md. Toffazzol", "id": "33244", "desig": "Executive", "type": "Officer", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "MIS", "factory": "EPF", "mobile": "01964018526", "location": "Nilphamari Sader"}, {"sl": 20, "wh": "BDC170", "name": "Dhiraj Chandra Roy", "id": "34713", "desig": "Jr. Executive", "type": "Officer", "dept": "Warehouse", "building": "BDC210", "resp": "Excel", "factory": "EPF", "mobile": "01783260122", "location": "—"}, {"sl": 21, "wh": "BDC150", "name": "Sohel", "id": "33557", "desig": "Labour", "type": "Labour", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "Bin Card", "factory": "EPF", "mobile": "01304750764", "location": "Nilphamari Sader"}, {"sl": 22, "wh": "BDC150", "name": "Sujon", "id": "34414", "desig": "Labour", "type": "Labour", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "Bin Card", "factory": "EPF", "mobile": "01722817773", "location": "Nilphamari Sader"}, {"sl": 23, "wh": "BDC150", "name": "Sree. Roton", "id": "32159", "desig": "Labour", "type": "Labour", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "Physical", "factory": "EPF", "mobile": "01796034317", "location": "Nilphamari Sader"}, {"sl": 24, "wh": "BDC150", "name": "Md. Dulal", "id": "33550", "desig": "Labour", "type": "Labour", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "Physical", "factory": "EPF", "mobile": "01770952217", "location": "Nilphamari Sader"}, {"sl": 25, "wh": "BDC150", "name": "Gonopati", "id": "31515", "desig": "Labour", "type": "Labour", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "Physical", "factory": "EPF", "mobile": "01733027943", "location": "Khansama, Dinajpur"}, {"sl": 26, "wh": "BDC150", "name": "Dhira kanto roy", "id": "34420", "desig": "Labour", "type": "Labour", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "Physical", "factory": "EPF", "mobile": "01311874399", "location": "Nilphamari Sader"}, {"sl": 27, "wh": "BDC170", "name": "Forid", "id": "33567", "desig": "Labour", "type": "Labour", "dept": "Cutting\nWarehouse", "building": "Bd-3A 1st Floor", "resp": "Physical", "factory": "EPF", "mobile": "01322710335", "location": "Khansama, Dinajpur"}, {"sl": 28, "wh": "BDC210", "name": "Md. Al Amin", "id": "34720", "desig": "Jr. Executive", "type": "Officer", "dept": "Packing Material", "building": "BD 3B", "resp": "MIS & XL", "factory": "EPF", "mobile": "01740496538", "location": "—"}, {"sl": 29, "wh": "BDC210", "name": "Mst. Khaleda Akter", "id": "31288", "desig": "Executive", "type": "Officer", "dept": "PM-LT,NT,LC", "building": "BD-3G-1st Floor", "resp": "Log Book , MIS & Following", "factory": "EPF", "mobile": "01732064669", "location": "—"}, {"sl": 30, "wh": "BDC210", "name": "Md. Abdur Hakim", "id": "31503", "desig": "Labour", "type": "Labour", "dept": "PM-LT,NT,LC", "building": "BD-3G-1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01733029149", "location": "—"}, {"sl": 31, "wh": "BDC210", "name": "Atiqul Islam", "id": "34861", "desig": "Labour", "type": "Labour", "dept": "PM-LT,NT,LC", "building": "BD-3G-1st Floor", "resp": "Physical Work & Bin Card", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 32, "wh": "BDC210", "name": "Md. Kawsar Ali", "id": "34832", "desig": "Labour", "type": "Labour", "dept": "PM-LT,NT,LC", "building": "BD-3G-1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01797750547", "location": "—"}, {"sl": 33, "wh": "BDC210", "name": "Aynul Islam", "id": "34960", "desig": "Labour", "type": "Labour", "dept": "PM-LT,NT,LC", "building": "BD-3G-1st Floor", "resp": "Physical", "factory": "EPF", "mobile": "—", "location": "Nilphamari"}, {"sl": 34, "wh": "BDC210", "name": "Md. Sovon Shah ", "id": "33927", "desig": "Executive", "type": "Officer", "dept": "PP,PVC", "building": "BD-3G-1st Floor", "resp": "Log Book , MIS & Following", "factory": "EPF", "mobile": "01318019858", "location": "—"}, {"sl": 35, "wh": "BDC210", "name": "Jibon Roy", "id": "33327", "desig": "Labour", "type": "Labour", "dept": "PM-PP,PVC", "building": "BD-3G-1st Floor", "resp": "Physical Work & Bin Card", "factory": "EPF", "mobile": "01771666910", "location": "—"}, {"sl": 36, "wh": "BDC210", "name": "Md. Jahangir Alom", "id": "33495", "desig": "Labour", "type": "Labour", "dept": "PM-PP,PVC", "building": "BD-3G-1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01881056723", "location": "—"}, {"sl": 37, "wh": "BDC210", "name": "Habib", "id": "33936", "desig": "Labour", "type": "Labour", "dept": "PM-PP,PVC", "building": "BD-3G-1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01317266963", "location": "—"}, {"sl": 38, "wh": "BDC210", "name": "Sree Chandon Ray", "id": "32496", "desig": "Labour", "type": "Labour", "dept": "PM-PP,PVC", "building": "BD-3G-1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01733027961", "location": "Nilphamari"}, {"sl": 39, "wh": "BDC210", "name": "Jagodish Roy", "id": "32907", "desig": "Executive", "type": "Officer", "dept": "PM-BX,SB,CC", "building": "BD-3G-5th Floor", "resp": "Log Book , MIS & Following", "factory": "EPF", "mobile": "01723513517", "location": "—"}, {"sl": 40, "wh": "BDC210", "name": "Asadul", "id": "33501", "desig": "Labour", "type": "Labour", "dept": "PM-BX,SB,CC", "building": "BD-3G-5th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01781547955", "location": "2024-11-26 00:00:00"}, {"sl": 41, "wh": "BDC210", "name": "Bourn Mukharji", "id": "33590", "desig": "Labour", "type": "Labour", "dept": "PM-BX,SB,CC", "building": "BD-3G-5th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01307352458", "location": "—"}, {"sl": 42, "wh": "BDC210", "name": "Md. Akibul islam", "id": "34228", "desig": "Labour", "type": "Labour", "dept": "PM-BX,SB,CC", "building": "BD-3G-5th Floor", "resp": "Physical Work & Bin Card", "factory": "EPF", "mobile": "00178442620", "location": "—"}, {"sl": 43, "wh": "BDC210", "name": "Niranjaon", "id": "33699", "desig": "Labour", "type": "Labour", "dept": "PM-HT", "building": "BD-3G-5th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01737820599", "location": "—"}, {"sl": 44, "wh": "BDC210", "name": "Ratan Ali", "id": "33056", "desig": "Sr. Executive", "type": "Officer", "dept": "PM-LB", "building": "BD-3G-7th Floor", "resp": "Log Book , MIS & Following", "factory": "EPF", "mobile": "01924772124", "location": "—"}, {"sl": 45, "wh": "BDC210", "name": "Md. Saiful Isalm", "id": "34742", "desig": "Jr. Executive", "type": "Officer", "dept": "PM-LB", "building": "BD-3G-7th Floor", "resp": "Log Book", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 46, "wh": "BDC210", "name": "Rubel", "id": "32902", "desig": "Labour", "type": "Labour", "dept": "PM-LB", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01318213020", "location": "—"}, {"sl": 47, "wh": "BDC210", "name": "Monotosh Roy", "id": "34321", "desig": "Labour", "type": "Labour", "dept": "PM-LB", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01774605161", "location": "—"}, {"sl": 48, "wh": "BDC210", "name": "Md. Hafizul Islam", "id": "84311", "desig": "Labour", "type": "Labour", "dept": "PM-LB", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01764177088", "location": "—"}, {"sl": 49, "wh": "BDC210", "name": "Imran", "id": "92337", "desig": "Labour", "type": "Labour", "dept": "PM-LB", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01628595872", "location": "—"}, {"sl": 50, "wh": "BDC210", "name": "Md. Emdadul Haque", "id": "32359", "desig": "Executive", "type": "Officer", "dept": "PM-HC", "building": "BD-3G-7th Floor", "resp": "Log Book , MIS & Following", "factory": "EPF", "mobile": "01780818648", "location": "—"}, {"sl": 51, "wh": "BDC210", "name": "Moynul Islam", "id": "34614", "desig": "Jr. Executive (NES Grade-I)", "type": "Officer", "dept": "PM-HC", "building": "BD-3G-7th Floor", "resp": "Bin Card", "factory": "EPF", "mobile": "01717338239", "location": "—"}, {"sl": 52, "wh": "BDC210", "name": "Manik Roy", "id": "32498", "desig": "Labour", "type": "Labour", "dept": "PM-HC", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01783051754", "location": "—"}, {"sl": 53, "wh": "BDC210", "name": "Md. Julfikar Ali", "id": "32541", "desig": "Labour", "type": "Labour", "dept": "PM-HC", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01742394246", "location": "—"}, {"sl": 54, "wh": "BDC210", "name": "Md. Rasedul Haque", "id": "33507", "desig": "Labour", "type": "Labour", "dept": "PM-IC", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01881055142", "location": "—"}, {"sl": 55, "wh": "BDC210", "name": "Ishtiaq Ahamed", "id": "34734", "desig": "Jr. Executive", "type": "Officer", "dept": "PM-HT", "building": "BD-3G-7th Floor", "resp": "MIS ,Log Book & Following", "factory": "EPF", "mobile": "01955018644", "location": "—"}, {"sl": 56, "wh": "BDC210", "name": "Md. Ajharul Islam", "id": "32234", "desig": "Labour", "type": "Labour", "dept": "PM-HT", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01786977306", "location": "—"}, {"sl": 57, "wh": "BDC210", "name": "Tarun Chandra Adhikari", "id": "32388", "desig": "Labour", "type": "Labour", "dept": "PM-HT", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01786731484", "location": "—"}, {"sl": 58, "wh": "BDC210", "name": "Md. Rabbani", "id": "33712", "desig": "Labour", "type": "Labour", "dept": "PM-HT", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01730482620", "location": "—"}, {"sl": 59, "wh": "BDC210", "name": "Md Sadekul Islam", "id": "33889", "desig": "Labour", "type": "Labour", "dept": "PM-HT", "building": "BD-3G-7th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01300160435", "location": "—"}, {"sl": 60, "wh": "BDC310", "name": "Md.Anarul Islam", "id": "30569", "desig": "Executive", "type": "Officer", "dept": "Sub-Material", "building": "3B-1st floor& Admin", "resp": "Mis & Excel(all lookafter)", "factory": "EPF", "mobile": "01783234086", "location": "Nilphamari"}, {"sl": 61, "wh": "BDC310", "name": "Md.Anisur Rahman", "id": "31651", "desig": "Executive", "type": "Officer", "dept": "Sub-Material", "building": "3E-3rd,3G-3rd", "resp": "Physical & Excel", "factory": "EPF", "mobile": "01778439970", "location": "Saidpur-Nilphamari"}, {"sl": 62, "wh": "BDC310", "name": "Md.Rasidul Haque", "id": "34257", "desig": "Jr. Executive (NES Grade-II)", "type": "Officer", "dept": "Sub-Material", "building": "3B-1st floor", "resp": "Physical & Log book", "factory": "EPF", "mobile": "01722841136", "location": "Dinajpur"}, {"sl": 63, "wh": "BDC310", "name": "Md. Firoj Sarker", "id": "34744", "desig": "Jr. Executive", "type": "Officer", "dept": "Sub-Material", "building": "3E-3rd floor", "resp": "Physical & Log book", "factory": "EPF", "mobile": "01759389380", "location": "—"}, {"sl": 64, "wh": "BDC310", "name": "Md. Jillur Rahman", "id": "31816", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "3E-1st floor", "resp": "log-book", "factory": "EPF", "mobile": "01761274157", "location": "Jamatir Bazar, Texile"}, {"sl": 65, "wh": "BDC310", "name": "Md.Mursalin", "id": "34251", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "3B-1st floor", "resp": "Delivery", "factory": "EPF", "mobile": "01315185698", "location": "Nilphamari"}, {"sl": 66, "wh": "BDC310", "name": "Biplob Roy", "id": "35015", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "3B-1st floor", "resp": "Delivery", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 67, "wh": "BDC310", "name": "Sree Nabo krisno Ray", "id": "33293", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Chemical warehouse", "resp": "Delivery &Bin Card", "factory": "EPF", "mobile": "01722765320", "location": "Nilphamari"}, {"sl": 68, "wh": "BDC310", "name": "Sree Jayanto Ray", "id": "33494", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Mac-Cap01", "resp": "Delivery &Bin Card", "factory": "EPF", "mobile": "01746696672", "location": "Dinajpur"}, {"sl": 69, "wh": "BDC310", "name": "Md.Badal Islam", "id": "32904", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Mac-Cap01", "resp": "Delivery &Bin Card", "factory": "EPF", "mobile": "01613009728", "location": "Nilphamari"}, {"sl": 70, "wh": "BDC310", "name": "Sree Liton Chandro", "id": "32203", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Stationery", "resp": "Delivery &Bin Card", "factory": "EPF", "mobile": "01733027801", "location": "Nilphamari"}, {"sl": 71, "wh": "BDC310", "name": "Md.Rajib Islam", "id": "33888", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Stationery", "resp": "Delivery &Bin Card", "factory": "EPF", "mobile": "01731949987", "location": "Rajshahi"}, {"sl": 72, "wh": "BDC310", "name": "Md.Sohel Rana", "id": "33413", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Hal-Costume01", "resp": "Delivery &Bin Card", "factory": "EPF", "mobile": "01780894225", "location": "Nilphamari"}, {"sl": 73, "wh": "BDC310", "name": "Md.Mijanur Rahman", "id": "33698", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Hal-Costume01", "resp": "Delivery &Bin Card", "factory": "EPF", "mobile": "01743312858", "location": "Saidpur-Nil"}, {"sl": 74, "wh": "BDC310", "name": "MD. Saiful Islam", "id": "31156", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "03E 3rd Floor", "resp": "Physical", "factory": "EPF", "mobile": "01759103124", "location": "nilphamari"}, {"sl": 75, "wh": "BDC410", "name": "Md.Mozammel", "id": "34499", "desig": "Jr. Executive", "type": "Officer", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "Physical", "factory": "EPF", "mobile": "01765969921", "location": "Textali Dola para Nilphamari"}, {"sl": 76, "wh": "BDC410", "name": "Md. Mostofa Kamal", "id": "34885", "desig": "Jr. Executive (NES Grade)", "type": "Officer", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "MIS", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 77, "wh": "BDC410", "name": "Md. Tonmoy", "id": "35043", "desig": "Jr. Executive (NES Grade)", "type": "Officer", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "MIS", "factory": "EPF", "mobile": "01797398853", "location": "—"}, {"sl": 78, "wh": "BDC410", "name": "Md. Shahin Alom", "id": "32778", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "Physical", "factory": "EPF", "mobile": "01737314956", "location": "Arazi Quchiyar Mor, Sorkar Para, Babrijhar"}, {"sl": 79, "wh": "BDC410", "name": "Md. Sirazul Islam", "id": "32048", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "Physical", "factory": "EPF", "mobile": "01814202132", "location": "Khalisa Chapani Alim Madrasha, Dimla"}, {"sl": 80, "wh": "BDC410", "name": "Kazi Mister", "id": "33492", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "Physical", "factory": "EPF", "mobile": "01726019253", "location": "Kazi Para, Kazir Hut"}, {"sl": 81, "wh": "BDC410", "name": "Piear Ali", "id": "33491", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "Physical", "factory": "EPF", "mobile": "01780956838", "location": "Nozi Para, Nolbari, Khansama"}, {"sl": 82, "wh": "BDC410", "name": "Md. Soriful Islam", "id": "33701", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "log-book", "factory": "EPF", "mobile": "01763210459", "location": "Dokhin Suti Para, Soyra Para, Textile"}, {"sl": 83, "wh": "BDC410", "name": "Polash Chandro Roy", "id": "33548", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "log-book", "factory": "EPF", "mobile": "01709409180", "location": "Dhoni Para, Uttara Sosi, Panchopukur"}, {"sl": 84, "wh": "BDC410", "name": "Ronjit", "id": "33549", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01773487614", "location": "Nilphamari"}, {"sl": 85, "wh": "BDC410", "name": "Md. Azaharul Hoque", "id": "34836", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "3E-1st floor", "resp": "log-book", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 86, "wh": "BDC515", "name": "MD. Mithun sarker", "id": "30866", "desig": "Executive", "type": "Officer", "dept": "Electrial  W.H.", "building": "BD-3B", "resp": "MIS, Excel Following &Construction Warehouse Following", "factory": "EPF", "mobile": "01722667817", "location": "Dinajpur"}, {"sl": 87, "wh": "BDC515", "name": "Sujon Roy", "id": "32283", "desig": "Jr. Executive (NES Grade-III)", "type": "Officer", "dept": "Electrial  W.H.", "building": "BD-3E 1st Floor", "resp": "Log Book &Following", "factory": "EPF", "mobile": "01746315027", "location": "Nilphamari"}, {"sl": 88, "wh": "BDC515", "name": "Md. Alamin", "id": "33552", "desig": "Labour", "type": "Labour", "dept": "Electrial  W.H.", "building": "BD-3E 1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01726619170", "location": "Nilphamari"}, {"sl": 89, "wh": "BDC515", "name": "Md. Hamidul Islam", "id": "33560", "desig": "Labour", "type": "Labour", "dept": "Electrial  W.H.", "building": "BD-3E 1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01714450565", "location": "Nilphamari"}, {"sl": 90, "wh": "BDC515", "name": "Md. Ziarul Islam", "id": "32391", "desig": "Labour", "type": "Labour", "dept": "Electrial  W.H.", "building": "BD-3E 1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01791877783", "location": "Nilphamari"}, {"sl": 91, "wh": "BDC515", "name": "Ujjal Biswas", "id": "31468", "desig": "Labour", "type": "Labour", "dept": "Electrial  W.H.", "building": "BD-3E 6th Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01701565019", "location": "Nilphamari"}, {"sl": 92, "wh": "EPF Construction", "name": "Md. Javed Hossain", "id": "30894", "desig": "Executive", "type": "Officer", "dept": "Construction", "building": "Canteen Building -1st Floor", "resp": "Excel &Construction Warehouse Following", "factory": "EPF", "mobile": "01740478090", "location": "Nilphamari"}, {"sl": 93, "wh": "EPF Construction", "name": "Mahadeb Roy", "id": "33766", "desig": "Labour", "type": "Labour", "dept": "Construction", "building": "Canteen Building -1st Floor", "resp": "Physical Work", "factory": "EPF", "mobile": "01762703841", "location": "Dinajpur"}, {"sl": 94, "wh": "BDC610A", "name": "Md.Al faruque", "id": "33423", "desig": "Jr. Executive (NES Grade-II)", "type": "Officer", "dept": "H.H.warehouse", "building": "3A-Cutting", "resp": "MIS, Excel", "factory": "EPF", "mobile": "01999517961", "location": "saidpur"}, {"sl": 95, "wh": "BDC610A", "name": "Liton ray", "id": "33636", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "3A-Cutting", "resp": "Bin card/Delivery", "factory": "EPF", "mobile": "01733241765", "location": "Chowra,Nilphamari"}, {"sl": 96, "wh": "BDC610A", "name": "Md. Ripon", "id": "33555", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "3A-Cutting", "resp": "Delivery man", "factory": "EPF", "mobile": "01610838704", "location": "textile, Nilphamary"}, {"sl": 97, "wh": "BDC610A", "name": "Md.Najrul", "id": "24156", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "3A-Cutting", "resp": "Delivery man", "factory": "EPF", "mobile": "01953073573", "location": "Kazirhat, Simoltoli"}, {"sl": 98, "wh": "BDC610A", "name": "Md. Rabbi", "id": "31385", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "3A-Cutting", "resp": "Delivery man", "factory": "EPF", "mobile": "01733027620", "location": "Textile, Nilphamary"}, {"sl": 99, "wh": "BDC610B", "name": "Paritosh roy", "id": "32440", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "BD-3B", "resp": "MIS/Log book/Bin card/physical", "factory": "EPF", "mobile": "01773620683", "location": "Nilphamari"}, {"sl": 100, "wh": "BDC610B", "name": "Asadul", "id": "32497", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "BD-3B", "resp": "physical", "factory": "EPF", "mobile": "01733023414", "location": "Nilphamari"}, {"sl": 101, "wh": "BDC610B", "name": "Kajol Roy", "id": "32542", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "BD-3B", "resp": "physical", "factory": "EPF", "mobile": "01762741185", "location": "Jaldhaka"}, {"sl": 102, "wh": "BDC610B", "name": "SOHEL", "id": "31316", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "BD-3B", "resp": "physical", "factory": "EPF", "mobile": "01763231136", "location": "Nilphamari"}, {"sl": 103, "wh": "BDC610B", "name": "Arif", "id": "34415", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "BD-3B", "resp": "physical", "factory": "EPF", "mobile": "01614512860", "location": "Nilphamari"}, {"sl": 104, "wh": "BDC610B", "name": "Sonjoy Roy", "id": "33410", "desig": "Labour", "type": "Labour", "dept": "H.H.warehouse", "building": "BD-3B", "resp": "SEL,physical", "factory": "EPF", "mobile": "01767239639", "location": "Dinajpur"}, {"sl": 105, "wh": "BDC620", "name": "Najmul Islam", "id": "34193", "desig": "Executive", "type": "Officer", "dept": "H H Warehouse", "building": "03C 3rd Floor", "resp": "TGL MIS/Excel/physical Follow Up", "factory": "EPF", "mobile": "01706231822", "location": "Kaligonj/Lalmonirhut"}, {"sl": 106, "wh": "BDC620", "name": "Mrinal Roy", "id": "33418", "desig": "Executive", "type": "Officer", "dept": "H H Warehouse", "building": "03C 3rd Floor", "resp": "Log book & 650 MIS", "factory": "EPF", "mobile": "01957010729", "location": "Nilphamari"}, {"sl": 107, "wh": "BDC620", "name": "Md. Ahsan Habib", "id": "32766", "desig": "Jr. Executive (NES Grade-I)", "type": "Officer", "dept": "H H Warehouse", "building": "03C 3rd Floor", "resp": "EPF MIS", "factory": "EPF", "mobile": "01737530809", "location": "Jaldhaka"}, {"sl": 108, "wh": "BDC620", "name": "Mariam Akthar", "id": "34440", "desig": "Jr. Executive", "type": "Officer", "dept": "H H Warehouse", "building": "03C 3rd Floor", "resp": "Bin card", "factory": "EPF", "mobile": "01739441325", "location": "Domar"}, {"sl": 109, "wh": "BDC620", "name": "Md. Maruf Alom", "id": "34743", "desig": "Jr. Executive", "type": "Officer", "dept": "H H Warehouse", "building": "03C 3rd Floor", "resp": "Log book/ BDC650 MIS", "factory": "EPF", "mobile": "01773939093", "location": "—"}, {"sl": 110, "wh": "BDC620", "name": "Merisina", "id": "33151", "desig": "Jr. Executive (NES Grade-I)", "type": "Officer", "dept": "H H Warehouse", "building": "03C 3rd Floor", "resp": "Bin card", "factory": "EPF", "mobile": "01768759784", "location": "Uttra Epz, \nNilphamari"}, {"sl": 111, "wh": "EPF Loading", "name": "Mostakim", "id": "34434", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01731914012", "location": "Dinajpur"}, {"sl": 112, "wh": "EPF Loading", "name": "Nejam", "id": "33290", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01785384662", "location": "Nilphamari"}, {"sl": 113, "wh": "EPF Loading", "name": "Tohidul", "id": "33503", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01719191382", "location": "Nilphamari"}, {"sl": 114, "wh": "EPF Loading", "name": "Sunil", "id": "33517", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01755460511", "location": "Dinajpur"}, {"sl": 115, "wh": "EPF Loading", "name": "Nuwton", "id": "32277", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01796003152", "location": "Dinajpur"}, {"sl": 116, "wh": "EPF Loading", "name": "Milon", "id": "32453", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01737785429", "location": "Nilphamari"}, {"sl": 117, "wh": "EPF Loading", "name": "Aziz", "id": "32698", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "01318219902", "location": "Nilphamari"}, {"sl": 118, "wh": "EPF Loading", "name": "Md. Nur Alom", "id": "34833", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 119, "wh": "EPF Loading", "name": "Md. Jillur", "id": "33523", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 120, "wh": "EPF Loading", "name": "Md. Khairul", "id": "33520", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 121, "wh": "EPF Loading", "name": "Md. Anisur Rahman", "id": "32637", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 122, "wh": "EPF Loading", "name": "Md Sadekul Islam", "id": "34306", "desig": "Labour", "type": "Labour", "dept": "Loading", "building": "BD-3E & BD-3B", "resp": "LOAD & UNLODE", "factory": "EPF", "mobile": "—", "location": "—"}, {"sl": 123, "wh": "EPF UnLoading", "name": "Kabir", "id": "33496", "desig": "Labour", "type": "Labour", "dept": "Unloading", "building": "BD-3B", "resp": "Unloading", "factory": "EPF", "mobile": "01824851648", "location": "Nilphamari"}, {"sl": 124, "wh": "EPF UnLoading", "name": "Jogonnath", "id": "33887", "desig": "Labour", "type": "Labour", "dept": "Unloading", "building": "BD-3B", "resp": "Unloading", "factory": "EPF", "mobile": "01606363438", "location": "Nilphamari"}, {"sl": 125, "wh": "EPF Unloading", "name": "Md. Asik Islam", "id": "33380", "desig": "Labour", "type": "Labour", "dept": "Unloading", "building": "BD-3B", "resp": "Unloading", "factory": "EPF", "mobile": "01806899151", "location": "—"}, {"sl": 126, "wh": "EPF Unloading", "name": "Enamul", "id": "33379", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "BD-3B", "resp": "Unloading", "factory": "EPF", "mobile": "01773623409", "location": "Nilphamari"}, {"sl": 127, "wh": "Sub Contact", "name": "Mostofa", "id": "31364", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01794858921", "location": "Nilphamari"}, {"sl": 128, "wh": "Sub Contact", "name": "Robiul", "id": "33289", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01796071006", "location": "Nilphamari"}, {"sl": 129, "wh": "Sub Contact", "name": "Mahabub", "id": "31813", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01733027949", "location": "Saidpur"}, {"sl": 130, "wh": "Sub Contact", "name": "Mosiar", "id": "32346", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01739312881", "location": "Saidpur"}, {"sl": 131, "wh": "Sub Contact", "name": "Mostakin", "id": "33594", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01735964688", "location": "Nilphamari"}, {"sl": 132, "wh": "Sub Contact", "name": "Belal", "id": "32078", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01733024927", "location": "Nilphamari"}, {"sl": 133, "wh": "Sub Contact", "name": "Momenur", "id": "33591", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01739636510", "location": "Nilphamari"}, {"sl": 134, "wh": "Sub Contact", "name": "Hamidul", "id": "32825", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01722278210", "location": "Nilphamari"}, {"sl": 135, "wh": "Sub Contact", "name": "Alamin", "id": "33645", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01767270776", "location": "Nilphamari"}, {"sl": 136, "wh": "Sub Contact", "name": "Khadimul", "id": "34319", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01717785372", "location": "Dinajpur"}, {"sl": 137, "wh": "Sub Contact", "name": "Tojammel", "id": "33515", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "EPF TO GT-07", "resp": "SUB CONTACT", "factory": "EPF", "mobile": "01775910318", "location": "Nilphamari"}, {"sl": 138, "wh": "EPF WH Forklift", "name": "Apon Chandre Roy", "id": "34545", "desig": "Jr. Executive", "type": "Officer", "dept": "WH Forklift", "building": "BD-3B WH", "resp": "MIS/Physical warehouse follow up/ Forklift department", "factory": "EPF", "mobile": "01751047929", "location": "Nilphamari Sador"}, {"sl": 139, "wh": "EPF WH Forklift", "name": "Md. Monowar Hossain", "id": "33376", "desig": "Driver", "type": "Driver", "dept": "WH Forklift", "building": "EPF-Outside", "resp": "Driver", "factory": "EPF", "mobile": "01304241829", "location": "Saidpur,Nilphamari"}, {"sl": 140, "wh": "EPF WH Forklift", "name": "Manik Roy", "id": "33219", "desig": "Driver", "type": "Driver", "dept": "WH Forklift", "building": "EPF-Outside", "resp": "Driver", "factory": "EPF", "mobile": "01611463003", "location": "Khansama, Dinajpur"}, {"sl": 141, "wh": "EPF WH Forklift", "name": "Md. Sadak Alli", "id": "33083", "desig": "Driver", "type": "Driver", "dept": "WH Forklift", "building": "EPF-Outside", "resp": "Driver", "factory": "EPF", "mobile": "01762708021", "location": "Nilphamari Sador"}, {"sl": 142, "wh": "EPF WH Forklift", "name": "Ripon Roy", "id": "33886", "desig": "Driver", "type": "Driver", "dept": "WH Forklift", "building": "EPF-Outside", "resp": "Driver", "factory": "EPF", "mobile": "01776978402", "location": "Nilphamari Sador"}, {"sl": 143, "wh": "EPF WH Forklift", "name": "Md. Mominur", "id": "30877", "desig": "Driver", "type": "Driver", "dept": "WH Forklift", "building": "BD-3B Inside WH", "resp": "Driver", "factory": "EPF", "mobile": "01705827733", "location": "Saidpur,Nilphamari"}, {"sl": 144, "wh": "EPF WH Forklift", "name": "Md. Aminul Haque", "id": "33362", "desig": "Driver", "type": "Driver", "dept": "WH Forklift", "building": "BD-3B Inside WH", "resp": "Driver", "factory": "EPF", "mobile": "01789074860", "location": "Saidpur,Nilphamari"}, {"sl": 145, "wh": "EPF WH Forklift", "name": "Md. Saiful Islam", "id": "33500", "desig": "Driver", "type": "Driver", "dept": "WH Forklift", "building": "BD-3E Inside WH", "resp": "Driver", "factory": "EPF", "mobile": "01797976293", "location": "Nilphamari Sador"}, {"sl": 1, "wh": "BDW110", "name": "Md.Nurun Naby", "id": "32028", "desig": "Executive (Grade-III)", "type": "Officer", "dept": "Main Material", "building": "C-Building First Floor", "resp": "MIS/Physical All Flowup", "factory": "TGL", "joining": "26-Jul-2017", "mobile": "01568806372"}, {"sl": 2, "wh": "BDW110", "name": "Mis.Zinnat Zahan", "id": "10066", "desig": "Executive (Grade-III)", "type": "Officer", "dept": "Main Material", "building": "C-Building First Floor", "resp": "Excel/Logbook Physical Flowup", "factory": "TGL", "joining": "26-Oct-2019", "mobile": "01710454314"}, {"sl": 3, "wh": "BDW110", "name": "Md. Foridul Islam", "id": "32832", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "C-Building First Floor", "resp": "Physical Fiber Delivery, Fiber Decoration & Others", "factory": "TGL", "joining": "20-Oct-2018", "mobile": "01550697399"}, {"sl": 4, "wh": "BDW110", "name": "Shree. Beraj Ray", "id": "51142", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "C-Building First Floor", "resp": "Physical Fiber Delivery, Fiber Decoration & Others", "factory": "TGL", "joining": "15-Sep-2020", "mobile": "01774648073"}, {"sl": 5, "wh": "BDW110", "name": "Md. Firoz Ahamad", "id": "51143", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "C-Building First Floor", "resp": "Bin Card & Others", "factory": "TGL", "joining": "15-Sep-2020", "mobile": "01717545376"}, {"sl": 6, "wh": "BDW110", "name": "Shree. Kajol Ray", "id": "51145", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "C-Building First Floor", "resp": "Logbook Saport , Physical Fiber In & Others", "factory": "TGL", "joining": "15-Sep-2020", "mobile": "01309943169"}, {"sl": 7, "wh": "BDW110", "name": "Md. Mostafijur Rahaman", "id": "51220", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "C-Building First Floor", "resp": "Physical Fiber Delivery ,Fiber Decoration & Others", "factory": "TGL", "joining": "12-Dec-2020", "mobile": "01767228939"}, {"sl": 8, "wh": "BDW110", "name": "Arshad Hossain", "id": "51327", "desig": "Executive (Grade-III)", "type": "Officer", "dept": "Main Material", "building": "C.Building", "resp": "Log book", "factory": "TGL", "joining": "28-Jun-2021", "mobile": "01744569616"}, {"sl": 9, "wh": "BDW110", "name": "Jadob Roy", "id": "51228", "desig": "Labour", "type": "Labour", "dept": "Main Material", "building": "C-Bilding", "resp": "LT,HT,NT                Physica Delivery", "factory": "TGL", "joining": "19-Dec-2020", "mobile": "01751341550"}, {"sl": 10, "wh": "BDW150", "name": "Shafikul Islam", "id": "51878", "desig": "Jr. Executive", "type": "Officer", "dept": "Cutting Ware-House", "building": "C-Building", "resp": "MIS", "factory": "TGL", "joining": "25-Jul-2023", "mobile": "01738731441"}, {"sl": 11, "wh": "BDW170", "name": "Sujon Ray", "id": "51215", "desig": "Executive (Grade-lll)", "type": "Officer", "dept": "Cutting Ware-House", "building": "C-Building", "resp": "MIS", "factory": "TGL", "joining": "05-Dec-2020", "mobile": "01755444493"}, {"sl": 12, "wh": "BDW210", "name": "MD.Shamim Ahamed", "id": "32585", "desig": "Executive (Grade-II)", "type": "Officer", "dept": "Packing Material", "building": "C-Bilding ", "resp": "Physica/Excel/MIS", "factory": "TGL", "joining": "08-May-2018", "mobile": "01745210012"}, {"sl": 13, "wh": "BDW210", "name": "MD.Tosaddeque Hossain", "id": "51674", "desig": "Jr. Executive", "type": "Officer", "dept": "Packing Material", "building": "C-Bilding", "resp": "Log book/IN WH/OUT WH", "factory": "TGL", "joining": "10-Sep-2022", "mobile": "01723889475"}, {"sl": 14, "wh": "BDW210", "name": "MD.Sazzad Hossain", "id": "51497", "desig": "Labour", "type": "Labour", "dept": "Packing Material", "building": "C-Bilding", "resp": "Bin card", "factory": "TGL", "joining": "24-Jan-2022", "mobile": "01725354487"}, {"sl": 15, "wh": "BDW210", "name": "Md.Joynal Abedin", "id": "10018", "desig": "Labour", "type": "Labour", "dept": "Packing Material", "building": "C-Bilding", "resp": "SB,IC,HC,BX,CC,          Physica Delivery", "factory": "TGL", "joining": "03-Aug-2019", "mobile": "01737500886"}, {"sl": 16, "wh": "BDW210", "name": "Md. Shoriful Islam", "id": "51494", "desig": "Labour", "type": "Labour", "dept": "Packing Material", "building": "C-Bilding", "resp": "Delivery Saport, In Fiber Separation & Others", "factory": "TGL", "joining": "24-Jan-2020", "mobile": "01783278110"}, {"sl": 17, "wh": "BDW210", "name": "Hasanur", "id": "52150", "desig": "Labour", "type": "Labour", "dept": "Packing Material", "building": "C-Bilding", "resp": "Physica Delivery", "factory": "TGL", "joining": "12-Aug-2025", "mobile": "—"}, {"sl": 18, "wh": "BDW310", "name": "Bulbul Ahamed", "id": "51757", "desig": "Jr. Executive", "type": "Officer", "dept": "Sub-Material", "building": "GT07C-1st floor", "resp": "Stationary & Sub-Material\n Log Book/physical/\n Wooden Scarp & Coal Weight", "factory": "TGL", "joining": "09-Nov-2022", "mobile": "01738-594807"}, {"sl": 19, "wh": "BDW310", "name": "Sherajul Islam", "id": "52148", "desig": "Jr. Executive", "type": "Officer", "dept": "Sub-Material", "building": "GT07C-1st floor", "resp": "Stationary & Sub-Material\n Log Book/physical/\n Wooden Scarp & Coal Weight", "factory": "TGL", "joining": "08-Nov-2025", "mobile": "01738731441"}, {"sl": 20, "wh": "BDW310", "name": "Dhanonjoy Roy", "id": "52159", "desig": "Jr. Executive", "type": "Officer", "dept": "Sub-Material", "building": "GT07C-1st floor", "resp": "Stationary & Sub-Material\n Log Book/physical/\n Wooden Scarp & Coal Weight", "factory": "TGL", "joining": "29-Sep-2025", "mobile": "—"}, {"sl": 21, "wh": "BDW310", "name": "Md. Abdul Kadar", "id": "32165", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "GT07F-3rd floor", "resp": "Requistion Receive&Delivary\n(Wastage materials)", "factory": "TGL", "joining": "27-Sep-2017", "mobile": "1740-339040"}, {"sl": 22, "wh": "BDW310", "name": "Sree. Dayaram", "id": "32386", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "GT07F-3rd floor", "resp": "Requistion Receive&Delivary\n(Wastage materials)", "factory": "TGL", "joining": "07-Feb-2018", "mobile": "01723-685931"}, {"sl": 23, "wh": "BDW310", "name": "Ratan Kumar Roy", "id": "32775", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "Chemical Room", "resp": "Requistion Receive&Delivary\n(Chemical)", "factory": "TGL", "joining": "17-Sep-2018", "mobile": "01782-544528"}, {"sl": 24, "wh": "BDW310", "name": "Md. Abdul Kaium", "id": "52087", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "—", "resp": "Physica Delivery", "factory": "TGL", "joining": "15-Jun-2025", "mobile": "—"}, {"sl": 25, "wh": "BDW310", "name": "Abdul.Halim", "id": "52095", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "—", "resp": "Physica Delivery", "factory": "TGL", "joining": "18-Jun-2025", "mobile": "—"}, {"sl": 26, "wh": "BDW310", "name": "Khairul", "id": "52099", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "—", "resp": "Physica Delivery", "factory": "TGL", "joining": "24-Jun-2025", "mobile": "—"}, {"sl": 27, "wh": "BDW310", "name": "Md . Shahajul", "id": "52088", "desig": "Labour", "type": "Labour", "dept": "Sub-Material", "building": "—", "resp": "Physica Delivery", "factory": "TGL", "joining": "15-Jun-2025", "mobile": "—"}, {"sl": 28, "wh": "BDW410", "name": "Maksuda Begum", "id": "31352", "desig": "Executive (Grade-II)", "type": "Officer", "dept": "Finished Goods", "building": "C.Building", "resp": "MIS", "factory": "TGL", "joining": "28-Dec-2015", "mobile": "01731495738"}, {"sl": 29, "wh": "BDW410", "name": "Rion shah", "id": "51328", "desig": "Jr. Executive", "type": "Officer", "dept": "Finished Goods", "building": "C.Building", "resp": "Physical", "factory": "TGL", "joining": "28-Jun-2021", "mobile": "01729804843"}, {"sl": 30, "wh": "BDW410", "name": "Md. Azaharul Hoque", "id": "51964", "desig": "Jr. Executive", "type": "Officer", "dept": "Electronic Equipment and Parts", "building": "GT07C-1st F", "resp": "Purchase ,IQC,Attendace,overtime,", "factory": "TGL", "joining": "14-Dec-2023", "mobile": "01723-141644"}, {"sl": 31, "wh": "BDW410", "name": "Jahid Hasan", "id": "51133", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "C.Building", "resp": "Physical", "factory": "TGL", "joining": "02-Sep-2020", "mobile": "01774648073"}, {"sl": 32, "wh": "BDW410", "name": "Mamun", "id": "51330", "desig": "Labour", "type": "Labour", "dept": "Finished Goods", "building": "C.Building", "resp": "Physical", "factory": "TGL", "joining": "29-Jun-2021", "mobile": "01324016324"}, {"sl": 33, "wh": "BDW410", "name": "Md. Raihan -1", "id": "51065", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "03-Mar-2020", "mobile": "01784007061"}, {"sl": 34, "wh": "BDW515", "name": "Md. Mijar Rahaman", "id": "32149", "desig": "Executive (Grade-I)", "type": "Officer", "dept": "Electronic Equipment and Parts", "building": "GT07C-1st F", "resp": "MIS, Excel& GT07 all warehouse Flowup", "factory": "TGL", "joining": "23-Sep-2017", "mobile": "01721-142160"}, {"sl": 35, "wh": "BDW515", "name": "Manik Chandro", "id": "51673", "desig": "Jr. Executive", "type": "Officer", "dept": "Electronic Equipment and Parts", "building": "GT07C-1st F", "resp": "Log book, Physical", "factory": "TGL", "joining": "10-Sep-2022", "mobile": "01743-069044"}, {"sl": 36, "wh": "BDW515", "name": "Sazzad Hossan 2", "id": "52155", "desig": "Labour", "type": "Labour", "dept": "Electronic Equipment and Parts", "building": "GT07C-1st F", "resp": " Physical", "factory": "TGL", "joining": "23-Aug-2025", "mobile": "—"}, {"sl": 37, "wh": "BDW515", "name": "Md. Rahim", "id": "32837", "desig": "Labour", "type": "Labour", "dept": "Electronic Equipment and Parts", "building": "GT07C-1st F", "resp": "Receive & Delivary", "factory": "TGL", "joining": "20-Oct-2018", "mobile": "01936-469195"}, {"sl": 38, "wh": "BDW515", "name": "Mizanur Rahman", "id": "51773", "desig": "Labour", "type": "Labour", "dept": "Electronic Equipment and Parts", "building": "GT07C-1st F", "resp": "Delivary, bin card", "factory": "TGL", "joining": "07-Dec-2022", "mobile": "01757-890630"}, {"sl": 39, "wh": "BDW610", "name": "Ashamony", "id": "51096", "desig": "Executive (Grade-III)", "type": "Officer", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "MIS", "factory": "TGL", "joining": "20-Jul-2020", "mobile": "01745112345"}, {"sl": 40, "wh": "BDW610", "name": "Mukta Begum", "id": "51472", "desig": "Jr. Executive", "type": "Officer", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical Follow UP,Log Book, Bin Card(A Hair)", "factory": "TGL", "joining": "23-Dec-2021", "mobile": "01773603227"}, {"sl": 41, "wh": "BDW610", "name": "Ramkrishna devsharma", "id": "51815", "desig": "Jr. Executive", "type": "Officer", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical Follow UP,Log Book, Bin Card(A Hair)", "factory": "TGL", "joining": "25-Apr-2023", "mobile": "01717082439"}, {"sl": 42, "wh": "BDW610", "name": "Mahababur Rahman", "id": "51962", "desig": "Ass.Jr.Executive", "type": "Officer", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical Follow UP,Log Book, Bin Card(B Hair),Exel", "factory": "TGL", "joining": "14-Dec-2023", "mobile": "01861974498"}, {"sl": 43, "wh": "BDW610", "name": "Moynul Islam", "id": "51877", "desig": "Jr. Executive", "type": "Officer", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Excel", "factory": "TGL", "joining": "25-Jul-2023", "mobile": "—"}, {"sl": 44, "wh": "BDW610", "name": "Alokanto", "id": "32553", "desig": "Labour", "type": "Labour", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical in&out and requistion written", "factory": "TGL", "joining": "24-Apr-2018", "mobile": "01740817551"}, {"sl": 45, "wh": "BDW610", "name": "Sujon Chondro ray", "id": "32884", "desig": "Labour", "type": "Labour", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical in&out", "factory": "TGL", "joining": "03-Nov-2018", "mobile": "01744734469"}, {"sl": 46, "wh": "BDW610", "name": "Abdur rahim", "id": "10041", "desig": "Labour", "type": "Labour", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical in&out", "factory": "TGL", "joining": "01-Sep-2019", "mobile": "01717726208"}, {"sl": 47, "wh": "BDW610", "name": "Sudhan chondro roy", "id": "51260", "desig": "Labour", "type": "Labour", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical in&out and cleaning", "factory": "TGL", "joining": "08-Feb-2021", "mobile": "01791822233"}, {"sl": 48, "wh": "BDW610", "name": "Najmul islam", "id": "51817", "desig": "Labour", "type": "Labour", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical in&out", "factory": "TGL", "joining": "25-Apr-2023", "mobile": "01762766321"}, {"sl": 49, "wh": "BDW610", "name": "Habib Rahman", "id": "51385", "desig": "Labour", "type": "Labour", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical in&out", "factory": "TGL", "joining": "01-Sep-2021", "mobile": "01723206390"}, {"sl": 50, "wh": "BDW610", "name": "Mizanur Rahman", "id": "51824", "desig": "Labour", "type": "Labour", "dept": "Human Hair Warehouse", "building": "F building 3rd flroor", "resp": "Physical in&out", "factory": "TGL", "joining": "11-May-2023", "mobile": "01324101313"}, {"sl": 51, "wh": "TGL Construction", "name": "Krishno ray", "id": "51843", "desig": "Jr. Executive", "type": "Officer", "dept": "Construction", "building": "GT07Motor Grace-3rd F", "resp": "Physical, Log book, bin card", "factory": "TGL", "joining": "04-Jun-2023", "mobile": "01744-404881"}, {"sl": 52, "wh": "TGL Construction", "name": "Aklil ray", "id": "51895", "desig": "Labour", "type": "Labour", "dept": "Construction", "building": "GT07Motor Grace-3rd F", "resp": "Receive & Delivary", "factory": "TGL", "joining": "17-Aug-2023", "mobile": "01760-380720"}, {"sl": 53, "wh": "Load/ Unload", "name": "Md. Maruf", "id": "51161", "desig": "Executive (Grade-III)", "type": "Officer", "dept": "Load/ Unload", "building": "C.Building", "resp": "Sub -Contact&All GT(Load-Unload)", "factory": "TGL", "joining": "30-Sep-2020", "mobile": "01760043722"}, {"sl": 54, "wh": "Load/ Unload", "name": "Md. Imran", "id": "10067", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "27-Oct-2019", "mobile": "01717264713"}, {"sl": 55, "wh": "Load/ Unload", "name": "Harish chandro", "id": "51219", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "08-Dec-2020", "mobile": "01717411750"}, {"sl": 56, "wh": "Load/ Unload", "name": "Liton das", "id": "51430", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "31-Oct-2021", "mobile": "01934296303"}, {"sl": 57, "wh": "Load/ Unload", "name": "Liton ray", "id": "51498", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "24-Jan-2022", "mobile": "01305116909"}, {"sl": 58, "wh": "Load/ Unload", "name": "Dilip Chandro", "id": "51002", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "GT07C-1st floor", "resp": "All Warehouse Clean&Delivary\n(Sub materials)", "factory": "TGL", "joining": "11-Nov-2019", "mobile": "01717-300172"}, {"sl": 59, "wh": "Load/ Unload", "name": "Majedur", "id": "51495", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "24-Jan-2022", "mobile": "01701682975"}, {"sl": 60, "wh": "Load/ Unload", "name": "Chittro Ranjon", "id": "52092", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "18-Jun-2025", "mobile": "—"}, {"sl": 61, "wh": "Load/ Unload", "name": "Shuvo-Roy", "id": "52109", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "02-Jul-2025", "mobile": "—"}, {"sl": 62, "wh": "Load/ Unload", "name": "Md.Monower", "id": "32611", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "27-May-2018", "mobile": "01315-174213"}, {"sl": 63, "wh": "Load/ Unload", "name": "Md. Amzad Hossain", "id": "52161", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "04-Oct-2025", "mobile": "—"}, {"sl": 64, "wh": "Load/ Unload", "name": "Md. Kaosar", "id": "52163", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "04-Oct-2025", "mobile": "—"}, {"sl": 65, "wh": "Load/ Unload", "name": "Md. Mokter Islam", "id": "52162", "desig": "Labour", "type": "Labour", "dept": "Load/ Unload", "building": "C.Building", "resp": "Load-Unload", "factory": "TGL", "joining": "04-Oct-2025", "mobile": "—"}, {"sl": 66, "wh": "TGL Forklift driver", "name": "Golam Rabbani", "id": "51929", "desig": "Forklift driver", "type": "Driver", "dept": "WH Forklift", "building": "GT07 Warehoude", "resp": "Load, Unload & Delivery", "factory": "TGL", "joining": "03-Oct-2023", "mobile": "01887-841738"}, {"sl": 67, "wh": "TGL Forklift driver", "name": "Rajaul Haque", "id": "51754", "desig": "Forklift driver", "type": "Driver", "dept": "WH Forklift", "building": "GT07 Warehoude", "resp": "Load, Unload & Delivery", "factory": "TGL", "joining": "02-Nov-2022", "mobile": "01722-855903"}, {"sl": 68, "wh": "TGL Forklift driver", "name": "Md. Ziyaur Rahman", "id": "32109", "desig": "Forklift driver", "type": "Driver", "dept": "WH Forklift", "building": "GT07 Warehoude", "resp": "Load, Unload & Delivery", "factory": "TGL", "joining": "13-Sep-2017", "mobile": "01763-238558"}, {"sl": 69, "wh": "TGL Forklift driver", "name": "Md. Tuhin", "id": "10022", "desig": "Forklift driver", "type": "Driver", "dept": "WH Forklift", "building": "GT07 Warehoude", "resp": "Load, Unload & Delivery", "factory": "TGL", "joining": "03-Aug-2019", "mobile": "01714-947843"}, {"sl": 70, "wh": "TGL Forklift driver", "name": "Ariful", "id": "51432", "desig": "Forklift driver", "type": "Driver", "dept": "WH Forklift", "building": "GT07 Warehoude", "resp": "Load, Unload & Delivery", "factory": "TGL", "joining": "02-Nov-2021", "mobile": "01617-112282"}, {"sl": 71, "wh": "GT-06-WH", "name": "Md. Abul hasanat", "id": "32275", "desig": "Executive", "type": "Officer", "dept": "Warehouse", "building": "GT-06-WH", "resp": "Excel/Lock book/physical", "factory": "GTM", "joining": "15-Nov-2017", "mobile": "01723729003"}, {"sl": 72, "wh": "GT-06-WH", "name": "Md. Mojnu Alom", "id": "34317", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "GT-06-WH", "resp": "Bin card/loding point", "factory": "GTM", "joining": "07-Nov-2022", "mobile": "01329099136"}, {"sl": 73, "wh": "GT-06-WH", "name": "Anonto", "id": "34074", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "GT-06-WH", "resp": "Delivery/Separation", "factory": "GTM", "joining": "27-Feb-2022", "mobile": "01759191779"}, {"sl": 74, "wh": "GT-08-WH", "name": "Shefaly  zahan", "id": "30887", "desig": "Executive", "type": "Officer", "dept": "Warehouse", "building": "GT-08-WH", "resp": "Excel/Lock book/physical", "factory": "BGL", "joining": "25-Feb-2014", "mobile": "01310190858"}, {"sl": 75, "wh": "GT-08-WH", "name": "Umme Saleha akter", "id": "34530", "desig": "Jr. Executive", "type": "Officer", "dept": "Warehouse", "building": "GT-08-WH", "resp": "Bin card/loding point", "factory": "BGL", "joining": "02-Sep-2023", "mobile": "01850185588"}, {"sl": 76, "wh": "GT-08-WH", "name": "Horilal Ray", "id": "32897", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "GT-08-WH", "resp": "Delivery/Separation", "factory": "BGL", "joining": "11-Nov-2019", "mobile": "01772830735"}, {"sl": 77, "wh": "GT-08-WH", "name": "Sunil Ray", "id": "34425", "desig": "Labour", "type": "Labour", "dept": "Warehouse", "building": "GT-08-WH", "resp": "Delivery/Separation", "factory": "BGL", "joining": "22-May-2023", "mobile": "01764750154"}];
+const SHOW_FAC=true;
+function getAll(){const ex=JSON.parse(localStorage.getItem(all)||'[]');const ov=JSON.parse(localStorage.getItem(OV_KEY)||'{}');const base=BASE.map((r,i)=>Object.assign({status:'active'},r,ov[i]||{}));return[...base,...ex];}
+
+function getExtra(){return JSON.parse(localStorage.getItem(all)||'[]');}
+function saveExtra(a){localStorage.setItem(all,JSON.stringify(a));}
+function updStats(){const d=getAll();const s=(id,n)=>{const e=document.getElementById(id);if(e)e.textContent=n;};s('st-tot',d.length);s('st-off',d.filter(r=>r.type==='Officer').length);s('st-lab',d.filter(r=>r.type==='Labour').length);s('st-drv',d.filter(r=>r.type==='Driver').length);}
+function setTab(t){tabF=t;mpPg=1;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('ON',b.dataset.t===t));renderTable();}
+function getFilt(){
+  const d=getAll();
+  const q=(document.getElementById('fq')?.value||'').toLowerCase();
+  const wh=document.getElementById('fwh')?.value||'';
+  const dept=document.getElementById('fdept')?.value||'';
+  const fac=document.getElementById('ffac')?.value||'';
+  const ty=document.getElementById('fty')?.value||'';
+  return d.map((r,i)=>({...r,_gi:i})).filter(r=>{
+    if(q&&!JSON.stringify(r).toLowerCase().includes(q))return false;
+    if(wh&&r.wh!==wh)return false;
+    if(dept&&r.dept!==dept)return false;
+    if(fac&&r.factory!==fac)return false;
+    if(tabF==='active'||tabF==='inactive'){if((r.status||'active')!==tabF)return false;}
+    else if(tabF&&r.type!==tabF)return false;
+    if(ty&&r.type!==ty)return false;
+    return true;
+  });
+}
+function renderTable(){
+  const data=getFilt(),total=data.length,pages=Math.max(1,Math.ceil(total/PER));
+  if(mpPg>pages)mpPg=1;
+  const start=(mpPg-1)*PER,slice=data.slice(start,start+PER),bLen=BASE.length;
+  document.getElementById('TBODY').innerHTML=slice.map((r,i)=>{
+    const tc=r.type==='Officer'?'bo':r.type==='Driver'?'bd':'bl';
+    const st=r.status||'active',inactive=st==='inactive',isBase=r._gi<bLen;
+    const stCell=inactive?'<span style="color:var(--red);font-size:10px;font-weight:700">&#10005; Inactive</span>':'<span style="color:var(--grn);font-size:10px;font-weight:700">&#10003;</span>';
+    const nm=r.name.replace(/'/g,"\'");
+    const editB=`<button class="abtn a-e" onclick="(()=>openEdit(${r._gi}))" title="Edit">&#9998;</button>`;
+    const togB=`<button class="abtn a-tog" onclick="(()=>togStatus(${r._gi}))" title="${inactive?'Activate':'Deactivate'}">${inactive?'&#9654;':'&#9646;&#9646;'}</button>`;
+    const delB=isBase?'':`<button class="abtn a-d" onclick="(()=>askDel(${r._gi-bLen},'${nm}'))" title="Delete">&#128465;</button>`;
+    const facTd=SHOW_FAC?`<td><span class="chip">${r.factory}</span></td>`:'';
+    return `<tr style="opacity:${inactive?.4:1}">
+      <td style="color:var(--t3);font-family:monospace;font-size:11px">${start+i+1}</td>
+      <td><span class="chip">${r.wh}</span></td>
+      <td style="color:var(--t1);font-weight:600;white-space:nowrap">${r.name}</td>
+      <td style="font-family:monospace;color:var(--acc);font-size:12px">${r.id}</td>
+      <td style="font-size:12px">${r.desig}</td>
+      <td><span class="badge ${tc}">${r.type}</span></td>
+      <td style="font-size:12px">${r.dept}</td>
+      <td style="font-size:11px">${r.building}</td>
+      <td style="max-width:150px;white-space:normal;font-size:11px">${r.resp}</td>
+      ${facTd}
+      <td style="font-family:monospace;font-size:11px">${r.mobile||'&#8212;'}</td>
+      <td>${stCell}</td>
+      <td><div style="display:flex;gap:3px">${editB}${togB}${delB}</div></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('PI').textContent=total?`Showing ${start+1}\u2013${Math.min(start+PER,total)} of ${total}`:'No records';
+  let h=`<button class="pb" onclick="goP(${mpPg-1})" ${mpPg<=1?'disabled':''}>&#8249;</button>`;
+  const rng=[];for(let p=1;p<=pages;p++){if(p===1||p===pages||Math.abs(p-mpPg)<=1)rng.push(p);else if(rng[rng.length-1]!=='...')rng.push('...');}
+  rng.forEach(p=>{h+=p==='...'?`<button class="pb" disabled>...</button>`:`<button class="pb ${p===mpPg?'CUR':''}" onclick="goP(${p})">${p}</button>`;});
+  h+=`<button class="pb" onclick="goP(${mpPg+1})" ${mpPg>=pages?'disabled':''}>&#8250;</button>`;
+  document.getElementById('PBS').innerHTML=h;
+  updStats();
+}
+function goP(p){const pages=Math.ceil(getFilt().length/PER);if(p<1||p>pages)return;mpPg=p;renderTable();window.scrollTo(0,0);}
+function openAdd(){
+  document.getElementById('FT').textContent='Add New Person';
+  document.getElementById('EI').value='';
+  ['FW','FN','FI','FD','FDE','FB','FR','FM','FJ'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('FST').value='active';
+  showOv('OV-FORM');
+}
+function openEdit(gi){
+  const all=getAll(),r=all[gi];if(!r)return;
+  document.getElementById('FT').textContent='Edit: '+r.name;
+  document.getElementById('EI').value=gi;
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+  s('FW',r.wh);s('FN',r.name);s('FI',r.id);s('FF',r.factory);
+  s('FD',r.type);s('FDE',r.desig);s('FDE2',r.dept);s('FB',r.building);
+  s('FR',r.resp);s('FM',r.mobile);s('FJ',r.joining);s('FST',r.status||'active');
+  showOv('OV-FORM');
+}
+function saveRec(){savePerson();}
+function savePerson(){
+  const g=id=>(document.getElementById(id)?.value||'').trim();
+  const name=g('FN'),wh=g('FWH2')||g('FW'),id=g('FID')||g('FI');
+  if(!name||!wh||!id){toast('Name, WH Code & ID required','err');return;}
+  const rec={wh,name,id,desig:g('FDE')||'—',type:g('FD')||'Officer',dept:g('FDE2')||'—',building:g('FB')||'—',resp:g('FR')||'—',factory:g('FF')||'EPF',mobile:g('FM')||'—',joining:g('FJ')||'—',location:'—',status:g('FST')||'active',_upd:new Date().toISOString()};
+  const giStr=g('EI'),bLen=BASE.length,ex=getExtra();
+  if(giStr){
+    const gi=parseInt(giStr);
+    if(gi<bLen){const ov=JSON.parse(localStorage.getItem(OV_KEY)||'{}');ov[gi]=Object.assign({},BASE[gi],{status:'active'},rec);localStorage.setItem(OV_KEY,JSON.stringify(ov));}
+    else{ex[gi-bLen]=Object.assign(ex[gi-bLen],rec);saveExtra(ex);}
+    toast('Updated','tok');
+  }else{rec.sl=getAll().length+1;ex.push(rec);saveExtra(ex);toast('Added','tok');}
+  closeOv('OV-FORM');renderTable();
+}
+function togStatus(gi){
+  const all=getAll(),r=all[gi];if(!r)return;
+  const ns=(r.status||'active')==='active'?'inactive':'active';
+  const bLen=BASE.length;
+  if(gi<bLen){const ov=JSON.parse(localStorage.getItem(OV_KEY)||'{}');ov[gi]=Object.assign({},r,{status:ns});localStorage.setItem(OV_KEY,JSON.stringify(ov));}
+  else{const ex=getExtra();ex[gi-bLen].status=ns;saveExtra(ex);}
+  toast(ns==='active'?'Activated':'Deactivated','tok');renderTable();
+}
+function askDel(i,name){pendDel=i;document.getElementById('DNAME').textContent=name;showOv('OV-DEL');}
+function confirmDel(){if(pendDel===null)return;const ex=getExtra();ex.splice(pendDel,1);saveExtra(ex);closeOv('OV-DEL');toast('Deleted','err');pendDel=null;renderTable();}
+
+initApp();
+renderTable();
+</script>
+<div class="OV" id="bkpModal">
+  <div class="OV-box" style="max-width:500px">
+    <h3>💾 Backup &amp; Restore</h3>
+    <div class="OV-sub">ডেটা backup নিন অথবা restore করুন</div>
+    <div class="bkp-panel">
+      <div class="bkp-title">📤 Backup নিন</div>
+      <div class="bkp-sub">সম্পূর্ণ ডেটা download করুন</div>
+      <div class="bkp-btns">
+        <button class="btn btn-g" onclick="backupExcel()">📊 Excel (.csv)</button>
+        <button class="btn btn-b" onclick="backupJSON()">📄 JSON</button>
+        <button class="btn btn-p" onclick="backupEmail()">✉️ Email</button>
+      </div>
+    </div>
+    <div class="bkp-panel" style="background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.05));border-color:rgba(249,115,22,.2)">
+      <div class="bkp-title" style="color:var(--ora)">📥 Restore করুন</div>
+      <div class="bkp-sub">Backup file থেকে ডেটা ফিরিয়ে আনুন</div>
+      <div class="bkp-btns">
+        <label class="btn btn-y" style="cursor:pointer">📂 File নির্বাচন<input type="file" accept=".json,.csv" style="display:none" onchange="restoreBackup(this)"></label>
+      </div>
+    </div>
+    <div id="bkpStatus" style="font-size:13px;color:var(--t3);margin-bottom:8px;min-height:20px"></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeBkp()">বন্ধ করুন</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+/* ── Working Import / Export / Backup ── */
+function dlTemplate(){
+  var cols = typeof TEMPLATE_COLS!=='undefined' ? TEMPLATE_COLS : 
+    (typeof DATA!=='undefined'&&DATA.length ? Object.keys(DATA[0]).filter(function(k){return k!=='id'&&k!=='_gi'&&k!=='_fbKey'&&k!=='_upd';}) : ['col1','col2','col3']);
+  var csv = cols.join(',') + '\n' + cols.map(function(){return 'example';}).join(',') + '\n';
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = (typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS') + '_template.csv';
+  a.click();
+  showToast && showToast('📥 Template download হয়েছে','tok');
+  toast && toast('📥 Template download হয়েছে','ok');
+}
+function exportExcel(){
+  var src = typeof DATA!=='undefined' ? DATA : [];
+  if(!src||!src.length){(showToast||toast)&&(showToast?showToast('ডেটা নেই','terr'):toast('ডেটা নেই','err'));return;}
+  var cols = Object.keys(src[0]).filter(function(k){return k!=='_gi'&&k!=='_fbKey'&&k!=='_upd';});
+  var rows = [cols.join(',')];
+  src.forEach(function(r){
+    rows.push(cols.map(function(c){return '"'+(r[c]||'').toString().replace(/"/g,'""')+'"';}).join(','));
+  });
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(rows.join('\n'));
+  a.download = (typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS') + '_export_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  showToast && showToast('📤 Export সম্পন্ন! '+src.length+' রেকর্ড','tok');
+  toast && toast('📤 Export সম্পন্ন!','ok');
+}
+function importFile(inp){
+  var f=inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(e){
+    try{
+      var lines=e.target.result.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+      if(lines.length<2){(showToast||function(){})(  'ফাইলে ডেটা নেই','terr');return;}
+      var hdr=lines[0].split(',').map(function(h){return h.trim().replace(/^"|"$/g,'');});
+      var imported=[];
+      for(var i=1;i<lines.length;i++){
+        var vals=lines[i].split(',').map(function(v){return v.trim().replace(/^"|"$/g,'');});
+        var obj={id:Date.now()+i};
+        hdr.forEach(function(h,j){obj[h]=vals[j]||'';});
+        imported.push(obj);
+      }
+      if(typeof DATA!=='undefined') DATA=DATA.concat(imported);
+      if(typeof render==='function')render();
+      if(typeof renderTable==='function')renderTable();
+      if(typeof buildStats==='function')buildStats();
+      if(typeof updStats==='function')updStats();
+      showToast&&showToast('✅ '+imported.length+' রেকর্ড import হয়েছে','tok');
+      toast&&toast('✅ '+imported.length+' রেকর্ড import','ok');
+    }catch(err){
+      showToast&&showToast('❌ Import error: '+err.message,'terr');
+    }
+  };
+  rd.readAsText(f,'UTF-8');
+  inp.value='';
+}
+function openBackup(){var m=document.getElementById('bkpModal');if(m)m.classList.add('show');}
+function closeBkp(){var m=document.getElementById('bkpModal');if(m)m.classList.remove('show');}
+function backupJSON(){
+  var data=typeof DATA!=='undefined'?DATA:[];
+  var pn=typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS';
+  var json=JSON.stringify({system:'EPFBD_WMS_v8',page:pn,date:new Date().toISOString(),total:data.length,records:data},null,2);
+  var a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(json);
+  a.download='WMS_'+pn+'_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  var st=document.getElementById('bkpStatus');if(st)st.textContent='✅ JSON backup: '+data.length+' রেকর্ড download হয়েছে';
+  showToast&&showToast('💾 JSON Backup সম্পন্ন','tok');
+}
+function backupExcel(){
+  exportExcel();
+  var st=document.getElementById('bkpStatus');if(st)st.textContent='✅ Excel backup শুরু হয়েছে';
+}
+function backupEmail(){
+  var data=typeof DATA!=='undefined'?DATA:[];
+  var pn=typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS';
+  var body='EPFBD WMS Backup\nPage: '+pn+'\nDate: '+new Date().toLocaleDateString('en-GB')+'\nTotal Records: '+data.length+'\n\nData (JSON):\n'+JSON.stringify(data.slice(0,20),null,2)+(data.length>20?'\n...('+( data.length-20)+' more records)':'');
+  window.location.href='mailto:wms@epfbd.com?subject=WMS Backup — '+pn+' ('+new Date().toLocaleDateString('en-GB')+')&body='+encodeURIComponent(body);
+  var st=document.getElementById('bkpStatus');if(st)st.textContent='✉️ Email client খুলছে…';
+}
+function restoreBackup(inp){
+  var f=inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(e){
+    try{
+      var parsed;
+      if(f.name.endsWith('.json')){
+        parsed=JSON.parse(e.target.result);
+        var recs=parsed.records||parsed;
+        if(!Array.isArray(recs))throw new Error('Invalid JSON format');
+        if(typeof DATA!=='undefined')DATA=recs;
+        if(typeof render==='function')render();
+        if(typeof renderTable==='function')renderTable();
+        if(typeof buildStats==='function')buildStats();
+        if(typeof updStats==='function')updStats();
+        var st=document.getElementById('bkpStatus');
+        if(st)st.textContent='✅ '+recs.length+' রেকর্ড restore হয়েছে';
+        showToast&&showToast('✅ Restore সফল: '+recs.length+' রেকর্ড','tok');
+      }else{
+        // CSV restore
+        importFile(inp);return;
+      }
+    }catch(err){
+      var st=document.getElementById('bkpStatus');
+      if(st)st.textContent='❌ Error: '+err.message;
+      showToast&&showToast('❌ Restore ব্যর্থ','terr');
+    }
+  };
+  rd.readAsText(f,'UTF-8');
+  inp.value='';
+}
+
+</script>
+</body></html>

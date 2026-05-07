@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mail List — EPFBD WMS</title>
+
+
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../wms-theme.css">
+</head>
+<body>
+<header class="hdr">
+  <div><div class="hdr-title">Mail List</div><div class="hdr-bc">EPFBD WMS · Warehouse</div></div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" placeholder="Search…"></div>
+  <a class="hdr-btn" href="../firebase-setup.html">🔥</a>
+  <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
+  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <div class="hdr-clk" id="CLK">--:--:--</div>
+</header>
+<aside class="sb">
+  <a class="sb-logo" href="../index.html"><div class="sb-mark">🏭</div>
+    <div><div class="sb-name">EPFBD WMS</div><div class="sb-sub">Warehouse System</div></div></a>
+  <nav class="sb-nav">
+    <div class="sb-grp"><span class="sb-grp-lbl">Main</span>
+      <a class="sb-a" href="../index.html"><div class="sb-ico">🏠</div>Dashboard</a>
+      <a class="sb-a" href="../kpi/staff_kpi.html"><div class="sb-ico">⭐</div>KPI</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Manpower</span>
+      <a class="sb-a" href="../manpower/all_manpower.html"><div class="sb-ico">👥</div>All Manpower<span class="sb-badge">264</span></a>
+      <div class="sb-chips"><a class="sb-chip" href="../manpower/EPF_manpower.html">EPF</a><a class="sb-chip" href="../manpower/TGL_manpower.html">TGL</a><a class="sb-chip" href="../manpower/BGL_manpower.html">BGL</a><a class="sb-chip" href="../manpower/GTM_manpower.html">GTM</a><a class="sb-chip" href="../manpower/RFL_manpower.html">RFL</a><a class="sb-chip" href="../manpower/EC_manpower.html">EC</a></div>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Warehouse</span>
+      <a class="sb-a" href="../warehouse/wh_list.html"><div class="sb-ico">🏭</div>WH List</a>
+      <a class="sb-a" href="../warehouse/mis_login.html"><div class="sb-ico">🔑</div>MIS Login</a>
+      <a class="sb-a ON" href="../warehouse/mail_list.html"><div class="sb-ico">📧</div>Mail List</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Equipment</span>
+      <a class="sb-a" href="../equipment/pda_devices.html"><div class="sb-ico">📱</div>PDA &amp; Scanner</a>
+      <a class="sb-a" href="../equipment/barcode_printer.html"><div class="sb-ico">🖨</div>Barcode Printer</a>
+      <a class="sb-a" href="../equipment/forklift.html"><div class="sb-ico">🚜</div>Forklift</a>
+      <a class="sb-a" href="../equipment/maintenance_log.html"><div class="sb-ico">🔧</div>Maintenance</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">HR</span>
+      <a class="sb-a" href="../hr/attendance.html"><div class="sb-ico">📋</div>Attendance &amp; Leave</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Setup</span>
+      <a class="sb-a" href="../firebase-setup.html"><div class="sb-ico">🔥</div>Firebase</a>
+    </div>
+    <div class="sb-grp"><span class="sb-grp-lbl">Settings</span>
+      <a class="sb-a" href="../settings/index.html"><div class="sb-ico">⚙️</div>Settings</a>
+    </div>
+  </nav>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
+    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
+</aside>
+<main class="mn">
+<div class="ph">
+  <div class="ph-ico">&#128140;</div>
+  <div>
+    <div class="ph-title">Warehouse Mail List</div>
+    <div class="ph-sub">Email accounts — All warehouse units</div>
+  </div>
+  <div class="ph-r">
+    <span class="pill">2025 Active</span>
+    <span class="pill" id="cntPill">13 Accounts</span>
+  </div>
+</div>
+
+<!-- Tab bar -->
+<div class="tab-bar">
+  <button class="tab ON" onclick="switchTab('2025',this)">&#128197; 2025 List</button>
+  <button class="tab" onclick="switchTab('2023',this)">&#128194; 2023 Archive</button>
+</div>
+
+  <div class="imp-btns">
+    <button class="btn btn-b" onclick="dlTemplate()">⬇ Template (.csv)</button>
+    <label class="btn btn-g" style="cursor:pointer">📂 Import Excel<input type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importFile(this)"></label>
+    <button class="btn btn-y" onclick="exportExcel()">📤 Export</button>
+    <button class="btn btn-s" onclick="openBackup()">💾 Backup</button>
+  </div>
+</div>
+ters -->
+<div class="frow">
+  <input class="fi" id="srch" placeholder="&#128269; Search name, email, WH code…" oninput="render()">
+  <select class="fi" id="fWh" onchange="render()">
+    <option value="">All WH Code</option>
+    <option>BDC310</option>
+    <option>BDC210</option>
+    <option>BDC515</option>
+    <option>BDC110</option>
+    <option>BDC620</option>
+    <option>BDC610</option>
+    <option>BDC410</option>
+    <option>BDW515</option>
+    <option>BDW610</option>
+    <option>BDW310</option>
+    <option>GT08</option>
+    <option>GT06</option>
+  </select>
+</div>
+
+<!-- 2025 Table -->
+<div id="tab2025">
+<div class="card">
+  <div class="card-hd">
+    <div class="card-title">&#128140; Mail List — 2025 (Active)</div>
+    <span class="card-cnt" id="cnt25">0</span>
+  </div>
+  <!-- PIN gate for passwords -->
+  <div id="pinGate25" style="padding:20px">
+    <div class="pin-box" style="margin:0 auto">
+      <h3>&#128274; PIN Required</h3>
+      <p>Enter PIN to reveal email passwords</p>
+      <input class="pin-in" id="pinIn25" type="password" maxlength="4" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter')checkPin()">
+      <br>
+      <button class="btn" onclick="checkPin()">Unlock Passwords</button>
+      <div class="p-err" id="pinErr25"></div>
+    </div>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Email</th>
+        <th>Password</th>
+        <th>Full Name</th>
+        <th>Emp ID</th>
+        <th>Designation</th>
+        <th>WH Code</th>
+        <th>Department</th>
+        <th>Location</th>
+      </tr>
+    </thead>
+    <tbody id="tb25"></tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<!-- 2023 Archive Table -->
+<div id="tab2023" style="display:none">
+<div class="card">
+  <div class="card-hd">
+    <div class="card-title">&#128194; Mail List — 2023 (Archive)</div>
+    <span class="card-cnt" id="cnt23">0</span>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Email</th>
+        <th>Surname</th>
+        <th>Nick Name</th>
+        <th>Full Name</th>
+        <th>Emp ID</th>
+        <th>Designation</th>
+        <th>Department</th>
+        <th>Location</th>
+      </tr>
+    </thead>
+    <tbody id="tb23"></tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+</main>
+<script>
+const DATA_2025=[
+  {sl:1,email:'sm-bdc310@epfbd.com',pwd:'@52Yz9M@B3c',name:'Anarul Islam',empid:30569,desg:'Executive-2',wh:'BDC310',dept:'Sub Material',loc:'3B Warehouse(EPF)'},
+  {sl:2,email:'pm-bdc210@epfbd.com',pwd:'@43Cg79!frB',name:'Ratan / Shovo / Jagodis / Khaleda',empid:30346,desg:'Executive-2',wh:'BDC210',dept:'Packing Material',loc:'3B Warehouse(EPF)'},
+  {sl:3,email:'ele-bdc515@epfbd.com',pwd:'@4Lx3z57@Hc',name:'Mithun Sarker',empid:30866,desg:'Executive-2',wh:'BDC515',dept:'Electric Warehouse',loc:'3B Warehouse(EPF)'},
+  {sl:4,email:'mm-bdc110@epfbd.com',pwd:'@X63x5!7auZ',name:'Golam Rabbani',empid:30353,desg:'Executive-2',wh:'BDC110',dept:'Main Warehouse',loc:'3B Main WH'},
+  {sl:5,email:'hh3c-bdc620@epfbd.com',pwd:'@9Xa53!2ceP',name:'Najmul',empid:33737,desg:'Jr. Executive',wh:'BDC620',dept:'Human Hair',loc:'3C Human Hair WH'},
+  {sl:6,email:'hh3a-bdc610@epfbd.com',pwd:'@V4w7PZ@k35',name:'Al Faruque',empid:33423,desg:'Jr. Executive',wh:'BDC610',dept:'Human Hair',loc:'3A Human Hair'},
+  {sl:7,email:'fg-bdc410@epfbd.com',pwd:'@Jq32v!Ac57',name:'Mozammel',empid:30852,desg:'Executive-2',wh:'BDC610',dept:'Finished Goods',loc:'Finished Goods WH'},
+  {sl:8,email:'ele-bdw515@epfbd.com',pwd:'@tcK78a3@9P',name:'Mijar Rahman',empid:32149,desg:'Executive-2',wh:'BDW515',dept:'Electronic Warehouse',loc:'TGL Main WH'},
+  {sl:9,email:'hhtg-bdw610@epfbd.com',pwd:'@R4I63!L8cp',name:'Asha Moni',empid:31977,desg:'Executive-3',wh:'BDW610',dept:'Human Hair',loc:'TGL Warehouse'},
+  {sl:10,email:'sm-bdw310@epfbd.com',pwd:'@uI7369Yn!Q',name:'Dhananjoy',empid:32657,desg:'Executive-3',wh:'BDW310',dept:'Sub Material',loc:'TGL Warehouse'},
+  {sl:11,email:'wh-gt08@epfbd.com',pwd:'@wG738!Kc5h',name:'Shefaly Zahan',empid:30887,desg:'Executive-1',wh:'GT08',dept:'GT-08',loc:'GT-08 Warehouse'},
+  {sl:12,email:'wh-gt06@epfbd.com',pwd:'@5@7cGga84m',name:'Hasanat',empid:33927,desg:'Executive-3',wh:'GT06',dept:'GT-06',loc:'GT-06 Warehouse'},
+];
+
+const DATA_2023=[
+  // 2023 archive - reference data (no passwords)
+  {sl:1,email:'mm-bdc110@epfbd.com',surname:'Rabbani',nick:'Rabbani',name:'Golam Rabbani',empid:'BDC110',desg:'Executive-2',dept:'Main Material',loc:'3B Warehouse(EPF)'},
+  {sl:2,email:'pm-bdc210@epfbd.com',surname:'Raton',nick:'Raton',name:'Raton Ali',empid:'BDC210',desg:'Executive-2',dept:'Packing Materials',loc:'3C Human Hair WH'},
+  {sl:3,email:'sm-bdc310@epfbd.com',surname:'Anarul',nick:'Anarul',name:'Anarul Islam',empid:'BDC310',desg:'Executive-2',dept:'Sub Material',loc:'3A Human Hair'},
+  {sl:4,email:'fg-bdc410@epfbd.com',surname:'Mozammel',nick:'Mozammel',name:'Md. Mozzamel Haque',empid:'BDC410',desg:'Executive-2',dept:'Finished Goods',loc:'FG Warehouse'},
+  {sl:5,email:'ele-bdc515@epfbd.com',surname:'Mithun',nick:'Mithun',name:'Md. Mithun Sarker',empid:'BDC515',desg:'Executive-2',dept:'Electronic WH',loc:'TGL Main WH'},
+  {sl:6,email:'hh3a-bdc610@epfbd.com',surname:'Al Faruque',nick:'Faruque',name:'Al Faruque',empid:'BDC610',desg:'Executive-3',dept:'Human Hair',loc:'TGL Warehouse'},
+  {sl:7,email:'hh3c-bdc620@epfbd.com',surname:'Najmul',nick:'Najmul',name:'Md. Najmul Islam',empid:'BDC620',desg:'Executive-1',dept:'Human Hair',loc:'3C Human Hair WH'},
+];
+
+let pinOk=false;
+let visible2025={};
+let activeTab='2025';
+
+function switchTab(tab,el){
+  activeTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('ON'));
+  el.classList.add('ON');
+  document.getElementById('tab2025').style.display=tab==='2025'?'block':'none';
+  document.getElementById('tab2023').style.display=tab==='2023'?'block':'none';
+  render();
+}
+
+function checkPin(){
+  const v=document.getElementById('pinIn25').value;
+  if(v==='9625'){
+    pinOk=true;
+    document.getElementById('pinGate25').style.display='none';
+    render();
+  } else {
+    document.getElementById('pinErr25').textContent='Incorrect PIN.';
+    document.getElementById('pinIn25').value='';
+  }
+}
+
+function togglePwd(sl){visible2025[sl]=!visible2025[sl];render()}
+
+function deptColor(d){
+  if(d.includes('Sub'))return 'b-acc';
+  if(d.includes('Main'))return 'b-blue';
+  if(d.includes('Packing'))return 'b-wrn';
+  if(d.includes('Electric'))return 'b-ok';
+  if(d.includes('Human'))return 'b-err';
+  if(d.includes('Finished'))return 'b-grey';
+  return 'b-grey';
+}
+
+function render(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const fw=document.getElementById('fWh').value;
+
+  // 2025
+  let f25=DATA_2025.filter(d=>{
+    if(fw&&d.wh!==fw)return false;
+    if(q&&!(d.email.toLowerCase().includes(q)||d.name.toLowerCase().includes(q)||d.wh.toLowerCase().includes(q)||(d.empid+'').includes(q)))return false;
+    return true;
+  });
+  document.getElementById('cnt25').textContent=f25.length;
+  document.getElementById('cntPill').textContent=f25.length+' Accounts';
+  document.getElementById('tb25').innerHTML=f25.map(d=>{
+    const show=pinOk&&visible2025[d.sl];
+    const pwdCell=pinOk
+      ?`<span class="pwd-cell ${show?'':'hidden'}" onclick="togglePwd(${d.sl})">${show?d.pwd:'••••••••'}</span>`
+      :`<span style="color:var(--t3);font-size:10px">🔒 PIN required</span>`;
+    return `<tr>
+      <td>${d.sl}</td>
+      <td><a class="email-link" href="mailto:${d.email}">${d.email}</a></td>
+      <td>${pwdCell}</td>
+      <td><strong>${d.name}</strong></td>
+      <td style="font-family:monospace;font-size:11px">${d.empid}</td>
+      <td><span class="badge b-grey">${d.desg}</span></td>
+      <td><span class="badge b-acc">${d.wh}</span></td>
+      <td><span class="badge ${deptColor(d.dept)}">${d.dept}</span></td>
+      <td style="font-size:11px;color:var(--t3)">${d.loc}</td>
+    </tr>`;
+  }).join('');
+
+  // 2023
+  let f23=DATA_2023.filter(d=>{
+    if(q&&!(d.email.toLowerCase().includes(q)||d.name.toLowerCase().includes(q)||(d.empid+'').toLowerCase().includes(q)))return false;
+    return true;
+  });
+  document.getElementById('cnt23').textContent=f23.length;
+  document.getElementById('tb23').innerHTML=f23.map(d=>`<tr>
+    <td>${d.sl}</td>
+    <td><a class="email-link" href="mailto:${d.email}">${d.email}</a></td>
+    <td>${d.surname}</td>
+    <td>${d.nick}</td>
+    <td><strong>${d.name}</strong></td>
+    <td style="font-family:monospace;font-size:11px">${d.empid}</td>
+    <td><span class="badge b-grey">${d.desg}</span></td>
+    <td>${d.dept}</td>
+    <td style="font-size:11px;color:var(--t3)">${d.loc}</td>
+  </tr>`).join('');
+}
+
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('wms-theme',t);document.querySelectorAll('.tdot').forEach(d=>d.classList.toggle('active',d.dataset.t===t))}
+function setFont(f){document.documentElement.setAttribute('data-font',f);localStorage.setItem('wms-font',f);document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('active',b.dataset.f===f))}
+function startClock(){const c=document.getElementById('CLK');setInterval(()=>{c.textContent=new Date().toLocaleTimeString('en-GB')},1000)}
+function init(){const t=localStorage.getItem('wms-theme')||'slate';const f=localStorage.getItem('wms-font')||'ubuntu';setTheme(t);setFont(f);startClock();render()}
+init();
+</script>
+<div class="OV" id="bkpModal">
+  <div class="OV-box" style="max-width:500px">
+    <h3>💾 Backup &amp; Restore</h3>
+    <div class="OV-sub">ডেটা backup নিন অথবা restore করুন</div>
+    <div class="bkp-panel">
+      <div class="bkp-title">📤 Backup নিন</div>
+      <div class="bkp-sub">সম্পূর্ণ ডেটা download করুন</div>
+      <div class="bkp-btns">
+        <button class="btn btn-g" onclick="backupExcel()">📊 Excel (.csv)</button>
+        <button class="btn btn-b" onclick="backupJSON()">📄 JSON</button>
+        <button class="btn btn-p" onclick="backupEmail()">✉️ Email</button>
+      </div>
+    </div>
+    <div class="bkp-panel" style="background:linear-gradient(135deg,rgba(249,115,22,.07),rgba(251,191,36,.05));border-color:rgba(249,115,22,.2)">
+      <div class="bkp-title" style="color:var(--ora)">📥 Restore করুন</div>
+      <div class="bkp-sub">Backup file থেকে ডেটা ফিরিয়ে আনুন</div>
+      <div class="bkp-btns">
+        <label class="btn btn-y" style="cursor:pointer">📂 File নির্বাচন<input type="file" accept=".json,.csv" style="display:none" onchange="restoreBackup(this)"></label>
+      </div>
+    </div>
+    <div id="bkpStatus" style="font-size:13px;color:var(--t3);margin-bottom:8px;min-height:20px"></div>
+    <div class="modal-btns"><button class="btn btn-s" onclick="closeBkp()">বন্ধ করুন</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+/* ── Working Import / Export / Backup ── */
+function dlTemplate(){
+  var cols = typeof TEMPLATE_COLS!=='undefined' ? TEMPLATE_COLS : 
+    (typeof DATA!=='undefined'&&DATA.length ? Object.keys(DATA[0]).filter(function(k){return k!=='id'&&k!=='_gi'&&k!=='_fbKey'&&k!=='_upd';}) : ['col1','col2','col3']);
+  var csv = cols.join(',') + '\n' + cols.map(function(){return 'example';}).join(',') + '\n';
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = (typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS') + '_template.csv';
+  a.click();
+  showToast && showToast('📥 Template download হয়েছে','tok');
+  toast && toast('📥 Template download হয়েছে','ok');
+}
+function exportExcel(){
+  var src = typeof DATA!=='undefined' ? DATA : [];
+  if(!src||!src.length){(showToast||toast)&&(showToast?showToast('ডেটা নেই','terr'):toast('ডেটা নেই','err'));return;}
+  var cols = Object.keys(src[0]).filter(function(k){return k!=='_gi'&&k!=='_fbKey'&&k!=='_upd';});
+  var rows = [cols.join(',')];
+  src.forEach(function(r){
+    rows.push(cols.map(function(c){return '"'+(r[c]||'').toString().replace(/"/g,'""')+'"';}).join(','));
+  });
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(rows.join('\n'));
+  a.download = (typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS') + '_export_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  showToast && showToast('📤 Export সম্পন্ন! '+src.length+' রেকর্ড','tok');
+  toast && toast('📤 Export সম্পন্ন!','ok');
+}
+function importFile(inp){
+  var f=inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(e){
+    try{
+      var lines=e.target.result.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+      if(lines.length<2){(showToast||function(){})(  'ফাইলে ডেটা নেই','terr');return;}
+      var hdr=lines[0].split(',').map(function(h){return h.trim().replace(/^"|"$/g,'');});
+      var imported=[];
+      for(var i=1;i<lines.length;i++){
+        var vals=lines[i].split(',').map(function(v){return v.trim().replace(/^"|"$/g,'');});
+        var obj={id:Date.now()+i};
+        hdr.forEach(function(h,j){obj[h]=vals[j]||'';});
+        imported.push(obj);
+      }
+      if(typeof DATA!=='undefined') DATA=DATA.concat(imported);
+      if(typeof render==='function')render();
+      if(typeof renderTable==='function')renderTable();
+      if(typeof buildStats==='function')buildStats();
+      if(typeof updStats==='function')updStats();
+      showToast&&showToast('✅ '+imported.length+' রেকর্ড import হয়েছে','tok');
+      toast&&toast('✅ '+imported.length+' রেকর্ড import','ok');
+    }catch(err){
+      showToast&&showToast('❌ Import error: '+err.message,'terr');
+    }
+  };
+  rd.readAsText(f,'UTF-8');
+  inp.value='';
+}
+function openBackup(){var m=document.getElementById('bkpModal');if(m)m.classList.add('show');}
+function closeBkp(){var m=document.getElementById('bkpModal');if(m)m.classList.remove('show');}
+function backupJSON(){
+  var data=typeof DATA!=='undefined'?DATA:[];
+  var pn=typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS';
+  var json=JSON.stringify({system:'EPFBD_WMS_v8',page:pn,date:new Date().toISOString(),total:data.length,records:data},null,2);
+  var a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(json);
+  a.download='WMS_'+pn+'_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  var st=document.getElementById('bkpStatus');if(st)st.textContent='✅ JSON backup: '+data.length+' রেকর্ড download হয়েছে';
+  showToast&&showToast('💾 JSON Backup সম্পন্ন','tok');
+}
+function backupExcel(){
+  exportExcel();
+  var st=document.getElementById('bkpStatus');if(st)st.textContent='✅ Excel backup শুরু হয়েছে';
+}
+function backupEmail(){
+  var data=typeof DATA!=='undefined'?DATA:[];
+  var pn=typeof PAGE_NAME!=='undefined'?PAGE_NAME:'WMS';
+  var body='EPFBD WMS Backup\nPage: '+pn+'\nDate: '+new Date().toLocaleDateString('en-GB')+'\nTotal Records: '+data.length+'\n\nData (JSON):\n'+JSON.stringify(data.slice(0,20),null,2)+(data.length>20?'\n...('+( data.length-20)+' more records)':'');
+  window.location.href='mailto:wms@epfbd.com?subject=WMS Backup — '+pn+' ('+new Date().toLocaleDateString('en-GB')+')&body='+encodeURIComponent(body);
+  var st=document.getElementById('bkpStatus');if(st)st.textContent='✉️ Email client খুলছে…';
+}
+function restoreBackup(inp){
+  var f=inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(e){
+    try{
+      var parsed;
+      if(f.name.endsWith('.json')){
+        parsed=JSON.parse(e.target.result);
+        var recs=parsed.records||parsed;
+        if(!Array.isArray(recs))throw new Error('Invalid JSON format');
+        if(typeof DATA!=='undefined')DATA=recs;
+        if(typeof render==='function')render();
+        if(typeof renderTable==='function')renderTable();
+        if(typeof buildStats==='function')buildStats();
+        if(typeof updStats==='function')updStats();
+        var st=document.getElementById('bkpStatus');
+        if(st)st.textContent='✅ '+recs.length+' রেকর্ড restore হয়েছে';
+        showToast&&showToast('✅ Restore সফল: '+recs.length+' রেকর্ড','tok');
+      }else{
+        // CSV restore
+        importFile(inp);return;
+      }
+    }catch(err){
+      var st=document.getElementById('bkpStatus');
+      if(st)st.textContent='❌ Error: '+err.message;
+      showToast&&showToast('❌ Restore ব্যর্থ','terr');
+    }
+  };
+  rd.readAsText(f,'UTF-8');
+  inp.value='';
+}
+
+</script>
+</body>
+</html>
