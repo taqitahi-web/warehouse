@@ -4,7 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Settings — EPFBD WMS</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="../auth.js"></script>
+<script>
+(function(){
+  // Restore session or redirect to login
+  if(!WmsAuth.restore()){
+    window.location.href='../login.html';
+  }
+  }
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="../wms-theme.css">
 <style>
 .set-tabs{display:flex;gap:4px;margin-bottom:22px;border-bottom:2px solid var(--bdr);flex-wrap:wrap}
@@ -109,8 +121,8 @@
       <a class="sb-a ON" href="index.html"><div class="sb-ico">⚙️</div>Settings</a>
     </div>
   </nav>
-  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
-    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av" id="sb-av">MD</div>
+    <div><div class="sb-uname" id="sb-uname">Masud</div><div class="sb-urole" id="sb-urole">WH Manager · EPF</div></div></div></div>
 </aside>
 
 
@@ -119,7 +131,9 @@
   <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
   <div><div class="hdr-title">Settings</div><div class="hdr-bc">EPFBD WMS · System Configuration</div></div>
   <div class="hdr-sep"></div>
-  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <span id="role-badge" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(62,207,142,.15);color:var(--acc);letter-spacing:.5px;cursor:default" title="Current role"></span>
+  <button class="hdr-btn" onclick="WmsAuth.logout()" title="Logout" style="font-size:14px;color:var(--red)">⏻</button>
+  <div class="hdr-user"><div class="hdr-uav" id="hdr-av">MD</div><div class="hdr-uname" id="hdr-name">Masud</div></div>
   <div class="hdr-clk" id="CLK">--:--:--</div>
 </header>
 
@@ -142,6 +156,7 @@
   <button class="set-tab ON" onclick="showTab('sections',this)">🔒 Section Lock</button>
   <button class="set-tab" onclick="showTab('categories',this)">🗂 Categories</button>
   <button class="set-tab" onclick="showTab('import-export',this)">📦 Import/Export</button>
+  <button class="set-tab" onclick="showTab('users',this)">👥 Users</button>
   <button class="set-tab" onclick="showTab('system',this)">🔧 System</button>
 </div>
 
@@ -245,6 +260,57 @@
   </div>
 </div>
 
+
+<!-- ── USERS TAB ── -->
+<div class="set-pane" id="pane-users">
+  <div class="set-card">
+    <div class="set-card-title">👥 User Management</div>
+    <div class="set-card-sub">System users তৈরি, সম্পাদনা ও মুছুন। PIN দিয়ে login হয়।</div>
+
+    <!-- Role legend -->
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <span style="font-size:12px;background:rgba(62,207,142,.15);color:#3ecf8e;padding:4px 10px;border-radius:6px;font-weight:600">🔑 Admin — সব access</span>
+      <span style="font-size:12px;background:rgba(96,165,250,.15);color:#60a5fa;padding:4px 10px;border-radius:6px;font-weight:600">👔 Manager — নিজের factory, delete নেই</span>
+      <span style="font-size:12px;background:rgba(251,191,36,.15);color:#fbbf24;padding:4px 10px;border-radius:6px;font-weight:600">👁 Viewer — শুধু দেখা</span>
+    </div>
+
+    <!-- User list -->
+    <div id="userMgmtList" style="margin-bottom:16px"></div>
+
+    <!-- Add user form -->
+    <div style="padding-top:16px;border-top:1px solid var(--bdr)">
+      <div class="set-card-title" style="font-size:13.5px;margin-bottom:12px">➕ নতুন User যোগ করুন</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label style="font-size:11.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">নাম</label>
+          <input class="fi-sm" id="nuName" placeholder="যেমন: Masud"></div>
+        <div><label style="font-size:11.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Avatar (2 অক্ষর)</label>
+          <input class="fi-sm" id="nuAv" placeholder="MD" maxlength="2"></div>
+        <div><label style="font-size:11.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Role</label>
+          <select class="fi-sm" id="nuRole">
+            <option value="admin">Admin</option>
+            <option value="manager">Manager</option>
+            <option value="viewer">Viewer</option>
+          </select></div>
+        <div><label style="font-size:11.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">Factory</label>
+          <select class="fi-sm" id="nuFactory">
+            <option value="ALL">All Factories (Admin)</option>
+            <option value="EPF">EPF</option>
+            <option value="TGL">TGL</option>
+            <option value="BGL">BGL</option>
+            <option value="GTM">GTM</option>
+            <option value="RFL">RFL</option>
+            <option value="EC">EC</option>
+          </select></div>
+        <div><label style="font-size:11.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px">PIN (4 digit)</label>
+          <input class="fi-sm" id="nuPin" type="password" placeholder="****" maxlength="4" pattern="[0-9]{4}"></div>
+        <div style="display:flex;align-items:flex-end">
+          <button class="btn btn-p" style="width:100%" onclick="addUserMgmt()">+ Add User</button>
+        </div>
+      </div>
+      <div id="userMsgBox" style="font-size:12.5px;color:var(--t3);margin-top:8px;min-height:18px"></div>
+    </div>
+  </div>
+</div>
 </div></main>
 
 <div class="toast" id="toast"></div>
@@ -527,5 +593,36 @@ window.addEventListener('resize', function(){
 });
 </script>
 
+<script>
+/* ── RBAC UI Apply ── */
+(function applyRBAC(){
+  if(typeof WmsAuth==='undefined'||!WmsAuth.user)return;
+  WmsAuth.applyUI();
+})();
+
+function renderUserMgmt(){
+  if(typeof WmsAuth==='undefined'||!WmsAuth.user)return;
+  var users=WmsAuth.getUsers();
+  var el=document.getElementById('userMgmtList');
+  if(!el)return;
+  var RCLS={admin:'b-a',manager:'b-b',viewer:'b-y'};
+  el.innerHTML=users.map(function(u,i){
+    var avBg=u.role==='admin'?'linear-gradient(135deg,#3ecf8e,#2ba671)':u.role==='manager'?'linear-gradient(135deg,#60a5fa,#3b82f6)':'linear-gradient(135deg,#fbbf24,#f59e0b)';
+    return '<div class="sec-row">'+
+      '<div style="display:flex;align-items:center;gap:10px">'+
+        '<div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#0a0a0a;background:'+avBg+'">'+u.avatar+'</div>'+
+        '<div><div style="font-size:13.5px;font-weight:600;color:var(--t1)">'+u.name+'</div>'+
+        '<div style="display:flex;gap:5px;margin-top:3px">'+
+          '<span class="badge '+( RCLS[u.role]||'b-0')+'">'+u.role+'</span>'+
+          '<span class="badge b-0">'+u.factory+'</span>'+
+          '<span style="font-size:11px;color:var(--t3);font-family:monospace">PIN: '+'•'.repeat(u.pin.length)+'</span>'+
+        '</div></div></div>'+
+      '<div style="display:flex;gap:6px">'+
+        '<button class="abtn a-e" onclick="editUserPin('+i+')" title="PIN বদলান">🔑</button>'+
+        (u.role!=='admin'?'<button class="abtn a-d" onclick="delUserMgmt(''+u.id+'')" title="Delete">🗑</button>':'')+
+      '</div></div>';
+  }).join('');
+}
+</script>
 </body>
 </html>

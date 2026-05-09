@@ -7,7 +7,19 @@
 
 
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="auth.js"></script>
+<script>
+(function(){
+  // Restore session or redirect to login
+  if(!WmsAuth.restore()){
+    window.location.href='login.html';
+    throw new Error('redirect');
+  }
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="wms-theme.css">
 <style>
 .welcome{background:linear-gradient(135deg,#0c1a0e,#0a1614,#0d1118);border:1px solid var(--bdr);border-radius:var(--r5);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;position:relative;overflow:hidden}
@@ -80,6 +92,34 @@
 @media(max-width:900px){.bg-grid{grid-template-columns:1fr}.wstats{display:none}}
 @media(max-width:600px){.kpi-grid{grid-template-columns:1fr}.mg{grid-template-columns:1fr}}
 </style>
+
+<script>
+/* ── WMS Global Search Data ── */
+window.WMS_SEARCH_DATA = {
+  manpower: [],
+  warehouses: [],
+  equipment: [],
+  parts: [],
+  fuel: []
+};
+/* Load equipment + fuel from localStorage if available */
+(function(){
+  try{
+    var eq=localStorage.getItem('wms_pda_data');
+    if(eq)window.WMS_SEARCH_DATA.equipment=JSON.parse(eq);
+  }catch(e){}
+  try{
+    var p=localStorage.getItem('wms_fl_parts');
+    if(p)window.WMS_SEARCH_DATA.parts=JSON.parse(p).slice(0,200);
+  }catch(e){}
+  try{
+    var f=localStorage.getItem('wms_fl_fuel');
+    if(f)window.WMS_SEARCH_DATA.fuel=JSON.parse(f).slice(0,200);
+  }catch(e){}
+})();
+</script>
+
+<script src="search.js"></script>
 </head>
 <body>
 
@@ -114,8 +154,8 @@
       <a class="sb-a" href="firebase-setup.html"><div class="sb-ico">🔥</div>Firebase</a>
     </div>
   </nav>
-  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
-    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av" id="sb-av">MD</div>
+    <div><div class="sb-uname" id="sb-uname">Masud</div><div class="sb-urole" id="sb-urole">WH Manager · EPF</div></div></div></div>
 </aside>
 
 
@@ -125,10 +165,12 @@
   <button class="mob-menu-btn" id="mobMenuBtn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
   <div><div class="hdr-title">Dashboard</div><div class="hdr-bc">EPFBD WMS · Overview</div></div>
   <div class="hdr-sep"></div>
-  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" id="dashSearch" placeholder="Search modules…" oninput="dashSearch(this.value)"></div>
+  <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" id="dashSearch" placeholder="🔍 Staff, WH code, device, material…" oninput="globalSearch(this.value)" autocomplete="off" style="font-size:13px"></div>
   <a class="hdr-btn" href="firebase-setup.html">🔥</a>
   <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
-  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <span id="role-badge" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(62,207,142,.15);color:var(--acc);letter-spacing:.5px;cursor:default" title="Current role"></span>
+  <button class="hdr-btn" onclick="WmsAuth.logout()" title="Logout" style="font-size:14px;color:var(--red)">⏻</button>
+  <div class="hdr-user"><div class="hdr-uav" id="hdr-av">MD</div><div class="hdr-uname" id="hdr-name">Masud</div></div>
   <div class="hdr-clk" id="CLK">--:--:--</div>
 </header>
 
@@ -443,14 +485,118 @@ Please visit each module page for detailed data export.';
 }
 startClock();
 
-function dashSearch(q){
-  q = q.toLowerCase().trim();
+
+var _searchTimer = null;
+
+function globalSearch(q){
+  q = (q||'').trim();
+  var panel = document.getElementById('searchPanel');
+  var results_el = document.getElementById('searchResults');
+  var count_el = document.getElementById('searchCount');
+  
+  // Also filter module cards (quick local filter)
   var cards = document.querySelectorAll('.mc');
-  cards.forEach(function(c){
-    var txt = c.textContent.toLowerCase();
-    c.style.display = (!q || txt.indexOf(q)>=0) ? '' : 'none';
+  cards.forEach(function(card){
+    var txt = card.textContent.toLowerCase();
+    card.style.display = (!q||q.length<2||txt.indexOf(q.toLowerCase())>=0)?'':'none';
   });
+  
+  if(!q || q.length < 2){
+    if(panel) panel.style.display='none';
+    return;
+  }
+  
+  // Show panel
+  if(panel) panel.style.display='block';
+  if(count_el) count_el.textContent='Searching…';
+  
+  // Debounce
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(function(){
+    if(typeof WmsSearch === 'undefined'){
+      if(count_el) count_el.textContent='Search engine loading…';
+      return;
+    }
+    
+    var hits = WmsSearch.search(q, 40);
+    renderSearchResults(hits, q);
+  }, 180);
 }
+
+function renderSearchResults(hits, q){
+  var el = document.getElementById('searchResults');
+  var count_el = document.getElementById('searchCount');
+  if(!el) return;
+  
+  if(!hits || !hits.length){
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">🔍 "'+q+'" — কোনো ফলাফল পাওয়া যায়নি</div>';
+    if(count_el) count_el.textContent='0 results';
+    return;
+  }
+  
+  if(count_el) count_el.textContent = hits.length + ' results for "'+q+'"';
+  
+  // Group by type
+  var groups = {};
+  hits.forEach(function(h){
+    if(!groups[h.type]) groups[h.type]={label:h.label,icon:h.icon,items:[]};
+    groups[h.type].items.push(h);
+  });
+  
+  var html = '';
+  var TYPE_ORDER = ['manpower','warehouse','equipment','parts','fuel'];
+  TYPE_ORDER.forEach(function(type){
+    if(!groups[type]) return;
+    var g = groups[type];
+    html += '<div style="padding:6px 14px 2px;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.6px;margin-top:6px">'+g.icon+' '+g.label+' ('+g.items.length+')</div>';
+    g.items.slice(0,12).forEach(function(item){
+      var title = highlightMatch(item.title, q);
+      var sub = item.sub ? '<span style="font-size:11.5px;color:var(--t3)"> · '+item.sub+'</span>' : '';
+      html += '<a href="'+item.url+'" onclick="closeSearch()" style="display:flex;align-items:center;gap:12px;padding:10px 16px;text-decoration:none;transition:background .15s;border-radius:0" onmouseover="this.style.background='var(--acc3)'" onmouseout="this.style.background=''">'+
+        '<div style="width:32px;height:32px;border-radius:8px;background:var(--sur2);border:1px solid var(--bdr);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">'+item.icon+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="font-size:13.5px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+title+'</div>'+
+          sub+
+        '</div>'+
+        '<div style="font-size:11px;color:var(--t3);flex-shrink:0">→</div>'+
+      '</a>';
+    });
+  });
+  
+  el.innerHTML = html;
+}
+
+function highlightMatch(text, q){
+  if(!text||!q) return text||'';
+  var escaped = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return text.replace(new RegExp('('+escaped+')', 'gi'), '<mark style="background:rgba(62,207,142,.25);color:var(--acc);border-radius:3px;padding:0 2px">$1</mark>');
+}
+
+function closeSearch(){
+  var p=document.getElementById('searchPanel');
+  if(p)p.style.display='none';
+  var inp=document.getElementById('dashSearch');
+  if(inp){inp.value='';
+    // Restore all cards
+    document.querySelectorAll('.mc').forEach(function(c){c.style.display='';});
+  }
+}
+
+// Close on ESC or click outside
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSearch();});
+document.addEventListener('click',function(e){
+  var panel=document.getElementById('searchPanel');
+  var inp=document.getElementById('dashSearch');
+  if(panel&&inp&&!panel.contains(e.target)&&e.target!==inp)closeSearch();
+});
+
+// Build search index when page loads
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if(typeof WmsSearch!=='undefined') WmsSearch.build();
+  }, 1000); // delayed so it doesn't block initial render
+});
+
 
 </script>
 <div class="toast" id="toast"></div>
@@ -520,6 +666,28 @@ window.addEventListener('resize', function(){
   if(window.innerWidth>900){ closeSidebar(); }
 });
 </script>
+
+<script>
+/* ── RBAC UI Apply ── */
+(function applyRBAC(){
+  if(typeof WmsAuth==='undefined'||!WmsAuth.user)return;
+  WmsAuth.applyUI();
+})();
+</script>
+
+<!-- ── Global Search Results Panel ── -->
+<div id="searchPanel" style="
+  display:none;position:fixed;top:70px;left:50%;transform:translateX(-50%);
+  width:min(640px,92vw);max-height:72vh;overflow-y:auto;
+  background:var(--sur);border:1px solid var(--bdr);border-radius:16px;
+  box-shadow:0 8px 40px rgba(0,0,0,.7);z-index:999;padding:8px 0
+">
+  <div id="searchMeta" style="padding:8px 16px 6px;font-size:11.5px;color:var(--t3);border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between">
+    <span id="searchCount">Searching…</span>
+    <button onclick="closeSearch()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:16px;padding:0 4px">✕</button>
+  </div>
+  <div id="searchResults"></div>
+</div>
 
 </body>
 </html>

@@ -8,7 +8,19 @@
 
 
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="../auth.js"></script>
+<script>
+(function(){
+  // Restore session or redirect to login
+  if(!WmsAuth.restore()){
+    window.location.href='../login.html';
+  }
+  }
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="../wms-theme.css">
 <style>
 .a-add{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#0a0a0a;border:none;
@@ -43,7 +55,9 @@
   <div class="hdr-srch"><span style="color:var(--t3);font-size:16px">🔍</span><input type="text" placeholder="Search…"></div>
   <a class="hdr-btn" href="../firebase-setup.html">🔥</a>
   <div class="hdr-btn">🔔<div class="hdr-dot"></div></div>
-  <div class="hdr-user"><div class="hdr-uav">MD</div><div class="hdr-uname">Masud</div></div>
+  <span id="role-badge" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(62,207,142,.15);color:var(--acc);letter-spacing:.5px;cursor:default" title="Current role"></span>
+  <button class="hdr-btn" onclick="WmsAuth.logout()" title="Logout" style="font-size:14px;color:var(--red)">⏻</button>
+  <div class="hdr-user"><div class="hdr-uav" id="hdr-av">MD</div><div class="hdr-uname" id="hdr-name">Masud</div></div>
   <div class="hdr-clk" id="CLK">--:--:--</div>
 </header>
 
@@ -80,8 +94,8 @@
       <a class="sb-a" href="../settings/index.html"><div class="sb-ico">⚙️</div>Settings</a>
     </div>
   </nav>
-  <div class="sb-foot"><div class="sb-user"><div class="sb-av">MD</div>
-    <div><div class="sb-uname">Masud</div><div class="sb-urole">WH Manager · EPF</div></div></div></div>
+  <div class="sb-foot"><div class="sb-user"><div class="sb-av" id="sb-av">MD</div>
+    <div><div class="sb-uname" id="sb-uname">Masud</div><div class="sb-urole" id="sb-urole">WH Manager · EPF</div></div></div></div>
 </aside>
 
 
@@ -1222,5 +1236,12 @@ window.addEventListener('resize', function(){
 });
 </script>
 
+<script>
+/* ── RBAC UI Apply ── */
+(function applyRBAC(){
+  if(typeof WmsAuth==='undefined'||!WmsAuth.user)return;
+  WmsAuth.applyUI();
+})();
+</script>
 </body>
 </html>
