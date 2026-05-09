@@ -10,9 +10,9 @@
 /* ── Default users (stored in localStorage, editable from Settings) ── */
 var DEFAULT_USERS=[
   {id:'admin01',name:'Masud',role:'admin',factory:'ALL',pin:'1234',avatar:'MD'},
-  {id:'mgr_epf',name:'EPF Manager',role:'manager',factory:'EPF',pin:'2222',avatar:'EP'},
-  {id:'mgr_tgl',name:'TGL Manager',role:'manager',factory:'TGL',pin:'3333',avatar:'TG'},
-  {id:'mgr_bgl',name:'BGL Manager',role:'manager',factory:'BGL',pin:'4444',avatar:'BG'},
+  {id:'mgr_epf',name:'EPF Incharge',role:'manager',factory:'EPF',pin:'2222',avatar:'EP'},
+  {id:'mgr_tgl',name:'TGL Incharge',role:'manager',factory:'TGL',pin:'3333',avatar:'TG'},
+  {id:'mgr_bgl',name:'BGL Incharge',role:'manager',factory:'BGL',pin:'4444',avatar:'BG'},
   {id:'view01',name:'Viewer',role:'viewer',factory:'ALL',pin:'5555',avatar:'VW'},
 ];
 
@@ -87,6 +87,42 @@ var WmsAuth={
     if(window.location.pathname.indexOf('login.html')>=0)return;
     if(!WmsAuth.restore()){
       window.location.href=WmsAuth._loginPage();
+      return;
+    }
+    // Check section lock after auth
+    setTimeout(function(){ WmsAuth.checkSection(); }, 0);
+  },
+
+
+  /* Check if current page is locked by section settings */
+  checkSection: function(){
+    var sections = null;
+    try{ sections = JSON.parse(localStorage.getItem('wms_sections')||'null'); }
+    catch(e){}
+    if(!sections) return; // no custom sections = no lock
+
+    var currentPath = window.location.pathname;
+    var currentFile = currentPath.split('/').pop() || 'index.html';
+    
+    // Match current page against locked sections
+    for(var i=0; i<sections.length; i++){
+      var s = sections[i];
+      if(!s.locked) continue;
+      
+      // Check if this section URL matches current page
+      var sUrl = s.url || '';
+      var sFile = sUrl.split('/').pop() || '';
+      
+      if(sFile && currentFile === sFile){
+        // Page is locked — check if admin (admin bypasses section lock)
+        if(WmsAuth.user && WmsAuth.user.role === 'admin') return;
+        // Non-admin: redirect to dashboard
+        var depth = window.location.pathname.split('/').length - 2;
+        var prefix = '';
+        for(var d=0; d<depth; d++) prefix += '../';
+        window.location.replace((prefix||'./') + 'index.html?locked=1');
+        return;
+      }
     }
   },
 
