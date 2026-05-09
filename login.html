@@ -121,7 +121,7 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;pad
 var pinBuf='';
 var selUser=null;
 var ROLE_COLORS={admin:'av-admin',manager:'av-manager',viewer:'av-viewer'};
-var ROLE_LABELS={admin:'Admin · All Access',manager:'Manager',viewer:'Viewer · Read Only'};
+var ROLE_LABELS={admin:'Admin · All Access',manager:'Incharge',viewer:'Viewer · Read Only'};
 var FACTORY_CLR={admin:'role-admin',manager:'role-manager',viewer:'role-viewer'};
 
 function renderUsers(){
@@ -210,6 +210,22 @@ document.addEventListener('keydown',function(e){
   else if(e.key==='Backspace')pp('del');
   else if(e.key==='Enter')pp('ok');
 });
+
+
+/* Migrate old Manager → Incharge names */
+(function(){
+  var stored=localStorage.getItem('wms_users');
+  if(!stored)return;
+  try{
+    var u=JSON.parse(stored);var ch=false;
+    u.forEach(function(x){
+      if(x.name==='EPF Manager'){x.name='EPF Incharge';ch=true;}
+      if(x.name==='TGL Manager'){x.name='TGL Incharge';ch=true;}
+      if(x.name==='BGL Manager'){x.name='BGL Incharge';ch=true;}
+    });
+    if(ch)localStorage.setItem('wms_users',JSON.stringify(u));
+  }catch(e){}
+})();
 
 renderUsers();
 
